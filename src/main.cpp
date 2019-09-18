@@ -1,8 +1,10 @@
 #include "Sean/SeanTest.h"
 
-NXShield nx;
-
-int main()
+void setup()
 {
-    runSean();
+    runNX();
+
+    //return 1;
 }
+
+void loop() {}
