@@ -1,9 +1,6 @@
-#include "NXShield/NXShield.h"
+#include "SeanTest.h"
 
-#include <avr/io.h> // header file file for input output pins
-#include <util/delay.h> // header file for delay.
-
-int main (void)
+int runSean(void)
 {
     /* set pin 5 of PORTB for output*/
     DDRB = 0xFF;
@@ -18,4 +15,6 @@ int main (void)
         PORTB &= ~_BV(PORTB7);
         _delay_ms(500); //delay 1 second.
     }
+
+    return 1;
 }

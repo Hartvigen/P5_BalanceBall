@@ -1,0 +1,60 @@
+{
+    "configurations": [
+        {
+            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
+        },
+        {
+            "name": "Mac",
+            "macFrameworkPath": [],
+            "includePath": [
+                "/Users/MasterXD301/Projects/P5_BalanceBall/include",
+                "/Users/MasterXD301/Projects/P5_BalanceBall/src",
+                "/Users/MasterXD301/Projects/P5_BalanceBall/lib/NXShield",
+                "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/Wire/src",
+                "/Users/MasterXD301/Projects/P5_BalanceBall/lib/Wire",
+                "/Users/MasterXD301/Projects/P5_BalanceBall/lib/Wire/utility",
+                "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/cores/arduino",
+                "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/variants/mega",
+                "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src",
+                "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/HID/src",
+                "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SPI/src",
+                "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SoftwareSerial/src",
+                "/Users/MasterXD301/.platformio/packages/tool-unity",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/Users/MasterXD301/Projects/P5_BalanceBall/include",
+                    "/Users/MasterXD301/Projects/P5_BalanceBall/src",
+                    "/Users/MasterXD301/Projects/P5_BalanceBall/lib/NXShield",
+                    "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/Wire/src",
+                    "/Users/MasterXD301/Projects/P5_BalanceBall/lib/Wire",
+                    "/Users/MasterXD301/Projects/P5_BalanceBall/lib/Wire/utility",
+                    "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/cores/arduino",
+                    "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/variants/mega",
+                    "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src",
+                    "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/HID/src",
+                    "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SPI/src",
+                    "/Users/MasterXD301/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SoftwareSerial/src",
+                    "/Users/MasterXD301/.platformio/packages/tool-unity",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=40003",
+                "ARDUINO_AVR_MEGA2560",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10805",
+                "__AVR_ATmega2560__",
+                ""
+            ],
+            "intelliSenseMode": "clang-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "\"/Users/MasterXD301/.platformio/packages/toolchain-atmelavr/bin/avr-gcc\" -mmcu=atmega2560"
+        }
+    ],
+    "version": 4
+}
