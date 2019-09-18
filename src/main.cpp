@@ -1,10 +1,14 @@
 #include "Sean/SeanTest.h"
+#include <Arduino.h>
 
-void setup()
+int main()
 {
+    init();
+    #if defined(USBCON)
+        USBDevice.attach();
+    #endif
+
     runNX();
 
-    //return 1;
+    return 1;
 }
-
-void loop() {}
