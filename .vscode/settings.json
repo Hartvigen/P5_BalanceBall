@@ -1,6 +1,0 @@
-{
-    "terminal.integrated.env.osx": {
-        "PATH": "/Users/MasterXD301/.platformio/penv/bin:/Users/MasterXD301/.platformio/penv:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/usr/local/CrossPack-AVR/bin:/Applications/Wireshark.app/Contents/MacOS",
-        "PLATFORMIO_CALLER": "vscode"
-    }
-}

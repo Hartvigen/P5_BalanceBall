@@ -8,6 +8,7 @@ int main()
     #endif
 
     runNX();
+    runSean();
 
     return 1;
 }

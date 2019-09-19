@@ -25,10 +25,7 @@ void runNX()
     nxshield.init(SH_HardwareI2C);
     nxshield.bank_a.motorReset();
     
-    nxshield.bank_a.motorRunDegrees(SH_Motor_1, 
+    nxshield.bank_a.motorRunUnlimited(SH_Motor_1, 
                      SH_Direction_Forward, 
-                     50,
-                     1000, 
-                     SH_Completion_Dont_Wait,
-                     SH_Next_Action_BrakeHold);
+                     50);
 }
