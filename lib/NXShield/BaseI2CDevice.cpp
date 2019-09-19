@@ -23,9 +23,10 @@
 #include "BaseI2CDevice.h"
 #include <Wire.h>
 
-extern "C" {
-#include "../Wire/utility/twi.h"
-}
+//extern "C" {
+//#include "../Wire/utility/twi.h"
+//}
+#include <utility/twi.h>
 
 // Max I2C message length is 16 bytes.  
 const int BUFFER_LEN = 16;  
