@@ -169,6 +169,12 @@ typedef enum {
   \def SH_Bank_A
 	I2C address of bank A
 */
+
+typedef enum {
+  SH_Bank_A    = 0x06, 
+  SH_Bank_B     = 0x08  
+} SH_Bank;
+
 #define SH_Bank_A 0x06
 /*!
   \def SH_Bank_B
