@@ -1,13 +1,14 @@
 #ifndef Camera_h
 #define Camera_h
 
-#include <NXTCam.h>
-#include <Wire.h>
 #include <NXShield.h>
 
 #include <util/delay.h> // header file for delay.
+#include <Wire.h>
+#include <BreezyArduCAM.h>
+#include <SPI.h>
 
-extern NXTCam startAndReturnCamera(NXShield);
-extern void getAllBlobs(NXTCam, int*, int*, int*);
+extern Arducam initCam();
+extern void runCameraTest();
 
 #endif

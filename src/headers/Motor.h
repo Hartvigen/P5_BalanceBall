@@ -11,7 +11,8 @@ extern void runMotor(SH_Bank, SH_Motor, SH_Direction, int, long);
 extern void runOuterMotors(SH_Direction,int,long);
 extern void runInnerMotors(SH_Direction,int,long);
 
-extern void runNX(NXShield);
+extern void runMoterTest();
+
 
 
 #endif

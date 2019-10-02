@@ -1,19 +1,25 @@
-
-#include <Wire.h>
-#include <BreezyArduCAM.h>
-#include <SPI.h>
-//#include "headers/Motor.h"
+#include "headers/Camera.h"
+#include "headers/Motor.h"
 
 int main()
 {
     init();
+    
+    runMoterTest();
 
-    Serial_ArduCAM_FrameGrabber fg;
-    ArduCAM_Mini_2MP myCam(53, &fg); //53 referes to the slave pin number.
+    runCameraTest();
+    
+    return 0;
+}
 
-    // ArduCAM Mini uses both I^2C and SPI buses
-    Wire.begin();
-    SPI.begin();
+void runMoterTest(){
+    
+    runMotor(SH_Bank_B,SH_Motor_1,SH_Direction_Forward,10,100);
+    
+}
+
+void runCameraTest(){
+    Arducam myCam = initCam();
 
     // Fastest baud rat
     Serial.begin(921600);
@@ -26,6 +32,4 @@ int main()
     {
       myCam.capture();
     }
-    
-    return 0;
 }

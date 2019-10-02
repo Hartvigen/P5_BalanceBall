@@ -175,16 +175,16 @@ class ArduCAM_Mini_5MP : public ArduCAM_Mini
 /**
  * An abstract class for the ArduCAM Mini 2MP.  
  */
-class ArduCAM_Mini_2MP : public ArduCAM_Mini {
+class Arducam : public ArduCAM_Mini {
 
     public:
 
         /**
-         * Constructs an ArduCAM_Mini_2MP object.
+         * Constructs an Arducam object.
          * @param cs pin for Chip Select signal
          * @param fg pointer to FrameGrabber object
          */
-        ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg);
+        Arducam(int cs, class ArduCAM_FrameGrabber * fg);
 
         /**
          * Begins capture in QVGA (raw) mode.

@@ -23,7 +23,6 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "BreezyArduCAM.h"
 
 #include "ov2640_regs.h"
-//#include "ov5642_regs.h"
 
 #include <Wire.h>
 #include <SPI.h>
@@ -163,7 +162,7 @@ void ArduCAM_Mini::capture(void)
 }
 
 
-void ArduCAM_Mini_2MP::beginQvga(uint8_t _scaledown, bool _grayscale)
+void Arducam::beginQvga(uint8_t _scaledown, bool _grayscale)
 {
     scaledown = 1 << _scaledown;
     grayscale = _grayscale;
@@ -173,57 +172,57 @@ void ArduCAM_Mini_2MP::beginQvga(uint8_t _scaledown, bool _grayscale)
 }
 
 
-void ArduCAM_Mini_2MP::transferQvgaByte(void)
+void Arducam::transferQvgaByte(void)
 {
     SPI.transfer(0x00);
 }
 
-ArduCAM_Mini_2MP::ArduCAM_Mini_2MP(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, 0x5FFFF, cs, fg)
+Arducam::Arducam(int cs, class ArduCAM_FrameGrabber * fg) : ArduCAM_Mini(0x60, 0x5FFFF, cs, fg)
 {
     usingJpeg = false;
 }
 
-void ArduCAM_Mini_2MP::beginJpeg160x120(void)
+void Arducam::beginJpeg160x120(void)
 {
     beginJpeg(OV2640_160x120_JPEG);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg176x144(void)
+void Arducam::beginJpeg176x144(void)
 {
     beginJpeg(OV2640_176x144_JPEG);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg320x240(void)
+void Arducam::beginJpeg320x240(void)
 {
     beginJpeg(OV2640_320x240_JPEG);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg352x288(void)
+void Arducam::beginJpeg352x288(void)
 {
     beginJpeg(OV2640_352x288_JPEG);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg640x480(void)
+void Arducam::beginJpeg640x480(void)
 {
     beginJpeg(OV2640_640x480_JPEG);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg800x600(void)
+void Arducam::beginJpeg800x600(void)
 {
     beginJpeg(OV2640_800x600_JPEG);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg1024x768(void)
+void Arducam::beginJpeg1024x768(void)
 {
     beginJpeg(OV2640_1024x768_JPEG);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg1280x1024(void)
+void Arducam::beginJpeg1280x1024(void)
 {
     beginJpeg(OV2640_1280x1024_JPEG);
 }
 
-void ArduCAM_Mini_2MP::beginJpeg1600x1200(void)
+void Arducam::beginJpeg1600x1200(void)
 {
     beginJpeg(OV2640_1600x1200_JPEG);
 }
@@ -288,7 +287,7 @@ void ArduCAM_Mini::grabQvgaFrame(uint32_t length)
     }
 }
 
-void ArduCAM_Mini_2MP::beginJpeg(const struct sensor_reg reglist[])
+void Arducam::beginJpeg(const struct sensor_reg reglist[])
 {
     usingJpeg = true;
 
@@ -303,7 +302,7 @@ void ArduCAM_Mini_2MP::beginJpeg(const struct sensor_reg reglist[])
     wrSensorRegs8_8(reglist);
 }
 
-void ArduCAM_Mini_2MP::begin(void)
+void Arducam::begin(void)
 {
     spiCheck();
 
