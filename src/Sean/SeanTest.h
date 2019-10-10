@@ -12,5 +12,6 @@
 
 extern int runSean();
 extern void runNX();
+extern void runPixy();
 
 #endif

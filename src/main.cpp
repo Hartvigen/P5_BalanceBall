@@ -7,7 +7,8 @@ int main()
         USBDevice.attach();
     #endif
 
-    runNX();
+    Serial.begin(9600);
+
     runSean();
 
     return 1;
