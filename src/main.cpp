@@ -13,18 +13,20 @@ typedef struct {
     uint32_t size;
 } Packet;
 
-void writeSerial(byte code, uint32_t value);
+ArduCAM myCAM(OV2640, SLAVE_PIN);
+
+void initCam();
+void takeAndWritePicture();
+void readAndSendImage(ArduCAM myCAM);
+byte* readImageRow(ArduCAM myCAM);
+void skipImageRow(ArduCAM myCAM);
+
 void writeSerial(byte code, byte* bytes, uint32_t length);
 Packet readSerial();
 byte* intToBytes(uint32_t value);
 
-void read_fifo_burst(ArduCAM myCAM);
-void readAndSendImage(ArduCAM myCAM);
-void takeAndWritePicture();
-void initCam();
-
-int shift = 0;
-ArduCAM myCAM(OV2640, SLAVE_PIN);
+const uint32_t imageWidth = 320;
+const uint32_t imageHeight = 240;
 
 
 int main()
@@ -32,33 +34,35 @@ int main()
     init();
     Wire.begin();
     SPI.begin();
-    Serial.begin(921600);
+    Serial.begin(115200*6);
     while (!Serial) {}
+    delay(500);
+    while(Serial.available() > 0)
+        Serial.read();
 
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
-    
-    pinMode(SLAVE_PIN, OUTPUT);
-    digitalWrite(SLAVE_PIN, HIGH);
-    
-    /*
+    delay(1000);
+
     initCam();
     while (true)
     {
-        // Read serial input here
+        digitalWrite(LED_BUILTIN, HIGH);
+        while (!Serial.available()) {}
+        digitalWrite(LED_BUILTIN, LOW);
+        Serial.read();
+
         takeAndWritePicture();
     }
-    */
-
-    delay(1000);
-    Packet pac = readSerial();
-    writeSerial(1, pac.data, pac.size);
 
     return 1;
 }
 
 void initCam()
 {
+    pinMode(SLAVE_PIN, OUTPUT);
+    digitalWrite(SLAVE_PIN, HIGH);
+
     // Resets the CPLD (processor)
     myCAM.write_reg(0x07, 0x80);
     delay(100);
@@ -67,73 +71,74 @@ void initCam()
     
     myCAM.set_format(BMP); // Resolution of 320x240
     myCAM.InitCAM();
-    //delay(500);
+    delay(100);
 }
 
 void takeAndWritePicture()
 {
     myCAM.flush_fifo();
-    myCAM.clear_fifo_flag();
     myCAM.start_capture();
-
     while (!myCAM.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) { }
-    read_fifo_burst(myCAM);
+
+    readAndSendImage(myCAM);
 }
 
 void readAndSendImage(ArduCAM myCAM)
 {
-    
-}
-
-void read_fifo_burst(ArduCAM myCAM)
-{
-    uint32_t length = myCAM.read_fifo_length();
-    writeSerial(1, length);
-    while (Serial.available() == 0) {}
-    Serial.read();
-
-    int size = 320 * 2; // resolution width * 2 (rgb)
-    byte data[size];
-    int i = 0;
-
+    SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
     myCAM.CS_LOW();
-    myCAM.set_fifo_burst(); //Set fifo burst mode
+    myCAM.set_fifo_burst();
 
-    //shift += 10;
-    //for (int x = 0; x < shift; x++)
-    //    SPI.transfer(0x00);
-
-    while (length)
+    SPI.transfer(0x00); // The first bit is a header? DON'T remove this. without this, colors goes green goo negative, n' shit.
+    for(uint32_t i = 0; i < imageHeight; i++)
     {
-        i = 0;
-        while (length && i < size)
-        {
-            length--;
-            data[i++] = SPI.transfer(0x00);
-            delayMicroseconds(15);
-        }
-
-        if (i > 0)
-            Serial.write(data, i);
+        byte* row = readImageRow(myCAM);
+        writeSerial(0x01, row, imageWidth*3);
+        while(!Serial.available()) {}
+        Serial.read();
+        delete row;
     }
     
+    SPI.endTransaction();
     myCAM.CS_HIGH();
 }
 
-void writeSerial(byte code, uint32_t value)
+byte* readImageRow(ArduCAM myCAM)
 {
-    byte* buf = intToBytes(value);
-    writeSerial(code, buf, 4);
-    delete buf;
+    byte* row = (byte*)malloc(imageWidth*3);
+
+    for (uint32_t i = 0; i < imageWidth; i++)
+    {
+        byte b1 = SPI.transfer(0x00);
+        delayMicroseconds(1);
+        byte b2 = SPI.transfer(0x00);
+
+        uint32_t c565 = b1 | b2 << 8;
+
+        row[3*i+2] = (c565 & 0x1f);
+        row[3*i+1] = ((c565 >> 5) & 0x3f);
+        row[3*i]   = ((c565 >> 11) & 0x1f);
+    }
+
+    return row;
+}
+
+void skipImageRow(ArduCAM myCAM)
+{
+    for (uint32_t i = 0; i < imageWidth; i++)
+    {
+        SPI.transfer(0x00);
+        SPI.transfer(0x00);
+    }
 }
 
 void writeSerial(byte code, byte* bytes, uint32_t length)
 {
-    digitalWrite(LED_BUILTIN, HIGH); 
     byte* size = intToBytes(length);
     Serial.write(code);
     Serial.write(size, 4);
     Serial.write(bytes, length);
+    Serial.flush();
     delete size;
 }
 
@@ -150,10 +155,12 @@ Packet readSerial()
     
     uint32_t size = pac.size;
     pac.data = (byte*)malloc(size);
-    
-    while(Serial.available() < (int)size) { delay(2); }
 
+    while((uint32_t)Serial.available() < (uint32_t)size) { delay(2); }
     Serial.readBytes(pac.data, size);
+
+    while (Serial.available() > 0)
+        Serial.read();
 
     return pac;
 }
