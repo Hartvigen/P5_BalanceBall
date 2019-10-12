@@ -36,7 +36,6 @@ int main()
     SPI.begin();
     Serial.begin(115200*6);
     while (!Serial) {}
-    delay(500);
     while(Serial.available() > 0)
         Serial.read();
 
@@ -49,10 +48,12 @@ int main()
     {
         digitalWrite(LED_BUILTIN, HIGH);
         while (!Serial.available()) {}
-        digitalWrite(LED_BUILTIN, LOW);
         Serial.read();
+        digitalWrite(LED_BUILTIN, LOW);
 
         takeAndWritePicture();
+
+        while (Serial.available()) Serial.read();
     }
 
     return 1;
@@ -72,6 +73,8 @@ void initCam()
     myCAM.set_format(BMP); // Resolution of 320x240
     myCAM.InitCAM();
     delay(100);
+
+    myCAM.OV2640_set_Special_effects(BW);
 }
 
 void takeAndWritePicture()

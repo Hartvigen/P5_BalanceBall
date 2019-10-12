@@ -24,7 +24,6 @@ void setup() {
   println("Creating connection to: '" + Serial.list()[1] + "'...");
   udSerial = new Serial(this, Serial.list()[1], 115200*6);
   println("Connected!");
-  delay(500);
   udSerial.clear();
   delay(2000);
 }
