@@ -74,6 +74,7 @@ void initCam()
     myCAM.InitCAM();
     delay(100);
 
+    myCAM.OV2640_set_Brightness(Brightness2);
     myCAM.OV2640_set_Special_effects(BW);
 }
 
