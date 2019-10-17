@@ -9,6 +9,9 @@ int row = 0, col = 0;
 int imageWidth = 320;
 int imageHeight = 240;
 
+boolean testrun = true;
+float Rmin = 31, Gmin = 63, Bmin = 31;
+
 class Packet {
   int code;
   byte[] data;
@@ -21,8 +24,8 @@ void setup() {
   noStroke();  // Don't draw a stroke around shapes
   
   printArray(Serial.list());
-  println("Creating connection to: '" + Serial.list()[1] + "'...");
-  udSerial = new Serial(this, Serial.list()[1], 115200*6);
+  println("Creating connection to: '" + Serial.list()[0] + "'...");
+  udSerial = new Serial(this, Serial.list()[0], 115200*6);
   println("Connected!");
   udSerial.clear();
   delay(2000);
@@ -36,17 +39,58 @@ void keyPressed(){
   row = col = 0;
   fill(0);
   rect(0,0,width,height);
+  float R, G, B;
+  float[][][] image = new float[imageHeight][imageWidth][3];
+  float X_co = 0, Y_co = 0, P_c = 0;
   
   udSerial.write(1);
-  print("Getting image... ");
+  println("Getting image... ");
   for (int i = 0; i < imageHeight; i++)
   {
     Packet pac = readSerial();
-    for (int x = imageWidth-1; x >= 0; x--)
-      drawPixel(pac.data[x*3], pac.data[x*3+1], pac.data[x*3+2]);
+    for (int x = imageWidth-2; x >= 0; x-- ){
+      
+      R = (float) pac.data[x*3];
+      G = (float) pac.data[x*3+1];
+      B = (float) pac.data[x*3+2];
+      image[i][x][0] = R;
+      image[i][x][1] = G;
+      image[i][x][2] = B;
+      if(testrun){
+        if(Rmin > R)
+          Rmin = R;
+        if(Gmin > G)
+          Gmin = G;
+        if(Bmin > B)
+          Bmin = B;
+      }
+      else if(i % 5 == 0 && R < Rmin && B < Bmin && G < Gmin){
+        image[i][x][0] = 31;
+        P_c = P_c + 1;
+        X_co = (x - X_co)/P_c + X_co;
+        Y_co = (i - Y_co)/P_c + Y_co;        
+      }
+        
+      /*else{
+        R = 0;
+        G = 0;
+        B = 0;
+      }*/
+    }
+  
     udSerial.write(1);
   }
+  for (int h = 0; h < imageHeight; h++)
+      for (int x = imageWidth-2; x >= 0; x-- ){
+        if(x == (int) X_co && h == (int) Y_co)
+          drawPixel(0, 63, 0);
+        drawPixel((int) image[h][x][0], (int) image[h][x][1], (int) image[h][x][2]);
+      }
+  println("X = " + X_co);
+  println("Y = " + Y_co);
   println("Done!");
+  if(testrun)
+    testrun = false;
 }
 
 
@@ -89,7 +133,7 @@ void drawPixel(int r, int g, int b)
   fill(r,g,b);
   rect(col, row, 1, 1);
   
-  if ((col = ((col + 1) % imageWidth)) == 0)
+  if ((col = ((col + 1) % (imageWidth -1))) == 0)
     row++;
 }
 
