@@ -1,5 +1,10 @@
 #include "headers/Motor.h"
 
+
+//"SH_Bank" describes which side of the shield we use
+//"SH_Motor" describes which port we use on the chosen bank, counting from the side with cable input to the shield
+//"SH_Direction" is either forward or backward
+//speed is given in RPM, with a max value of 170 as per the motor specifications
 void runMotor(SH_Bank bank, SH_Motor motor, SH_Direction direction, int speed, long degrees)
 {
     NXShield nxshield;
@@ -31,7 +36,7 @@ void runOuterMotors(SH_Direction direction, int speed, long degrees)
 {
     NXShield nxshield;
     nxshield.init(SH_HardwareI2C);
-
+    
     nxshield.bank_a.motorRunDegrees(SH_Motor_Both, 
                     direction, 
                     speed,
