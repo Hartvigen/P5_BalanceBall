@@ -1,4 +1,5 @@
-#include "Sean/SeanTest.h"
+#include "headers/Camera.h"
+#include "headers/Motor.h"
 
 #include <Wire.h>
 #include <ArduCAM.h>
