@@ -12,6 +12,7 @@ int imageHeight = 240;
 boolean testrun = true;
 float Rmin = 31, Gmin = 63, Bmin = 31;
 
+
 class Packet {
   int code;
   byte[] data;
@@ -49,7 +50,8 @@ void keyPressed(){
   {
     Packet pac = readSerial();
     for (int x = imageWidth-2; x >= 0; x-- ){
-      
+      //if(x < 0 || x > 320)
+        //continue;
       R = (float) pac.data[x*3];
       G = (float) pac.data[x*3+1];
       B = (float) pac.data[x*3+2];
@@ -63,12 +65,13 @@ void keyPressed(){
           Gmin = G;
         if(Bmin > B)
           Bmin = B;
-      }
+      }    
       else if(i % 5 == 0 && R < Rmin && B < Bmin && G < Gmin){
         image[i][x][0] = 31;
         P_c = P_c + 1;
         X_co = (x - X_co)/P_c + X_co;
-        Y_co = (i - Y_co)/P_c + Y_co;        
+        Y_co = (i - Y_co)/P_c + Y_co;
+        println("P_C = " + P_c);
       }
         
       /*else{
@@ -84,10 +87,14 @@ void keyPressed(){
       for (int x = imageWidth-2; x >= 0; x-- ){
         if(x == (int) X_co && h == (int) Y_co)
           drawPixel(0, 63, 0);
-        drawPixel((int) image[h][x][0], (int) image[h][x][1], (int) image[h][x][2]);
+        else
+          drawPixel((int) image[h][x][0], (int) image[h][x][1], (int) image[h][x][2]);
       }
   println("X = " + X_co);
   println("Y = " + Y_co);
+  println("Rmin = " + Rmin);
+  println("Gmin = " + Gmin);
+  println("Bmin = " + Bmin);
   println("Done!");
   if(testrun)
     testrun = false;
