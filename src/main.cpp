@@ -33,7 +33,9 @@ const uint32_t imageHeight = 240;
 int main()
 {
     init();
-
+    initNxShield();
+    generalMotorTest();
+/*
     Wire.begin();
     SPI.begin();
     Serial.begin(115200*6);
@@ -58,7 +60,7 @@ int main()
         while (Serial.available()) Serial.read();
     }
 
-    return 1;
+    return 1;*/
 }
 
 
