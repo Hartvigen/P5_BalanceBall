@@ -5,7 +5,7 @@
 #include "Camera.h"
 
 #define SLAVE_PIN 53
-#define SKIpointCountOUNT 4
+#define SKIP_COUNT 4
 #define LEFT_BAR 30
 #define RIGHT_BAR 30
 #define CAPTURE_RATE 250
@@ -23,9 +23,9 @@ float Rmin = 31, Gmin = 63, Bmin = 31;
 void initCam();
 void calibrateCam();
 byte* calibrateFromImageRow();
-void getBallLocation(int16_t& xCo, int16_t& yCo);
-void readImage(int16_t& xCo, int16_t& yCo);
-void readImageRow(uint16_t& pointCount, int16_t& xCo, int16_t& yCo, uint16_t  rowNumber);
+void getBallLocation(float& xCo, float& yCo);
+void readImage(float& xCo, float& yCo);
+void readImageRow(uint16_t& pointCount, float& xCo, float& yCo, uint16_t  rowNumber);
 void skipImageRows();
 void skipImageRow();
 
@@ -65,7 +65,7 @@ int main()
     while(Serial.available() == 0){}
     Serial.read();
     calibrateCam();
-    int16_t xCo, yCo;
+    float xCo, yCo;
     uint64_t nextCapture =  0;
     while (true)
     {
@@ -81,8 +81,8 @@ int main()
         //nextCapture = millis() + CAPTURE_RATE;
         xCo = 0, yCo = 0;
         getBallLocation(xCo, yCo);
-        byte* xbyte = int16ToBytes(xCo + 1);
-        byte* ybyte = int16ToBytes(yCo + 1);
+        byte* xbyte = int16ToBytes((int16_t) xCo);
+        byte* ybyte = int16ToBytes((int16_t) yCo);
 
 
         writeSerial(1, xbyte, 2);
@@ -143,7 +143,7 @@ void calibrateCam(){
 
 }
 
-void getBallLocation(int16_t& xCo, int16_t& yCo)
+void getBallLocation(float& xCo, float& yCo)
 {
     myCAM.flush_fifo();
     myCAM.start_capture();
@@ -152,7 +152,7 @@ void getBallLocation(int16_t& xCo, int16_t& yCo)
     readImage(xCo, yCo);
 }
 
-void readImage(int16_t& xCo, int16_t& yCo)
+void readImage(float& xCo, float& yCo)
 {
     SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
     myCAM.CS_LOW();
@@ -160,7 +160,7 @@ void readImage(int16_t& xCo, int16_t& yCo)
     uint16_t pointCount = 0;
     SPI.transfer(0x00); // The first bit is a header? DON'T remove this. without this, colors goes green goo negative, n' shit.
     skipImageRow();
-    for(uint16_t i = 0; i < imageHeight-1; i++)
+    for(uint16_t i = 0; i < imageHeight-1; i += 5)
     {
         skipImageRows();
         readImageRow(pointCount, xCo, yCo, i);
@@ -170,7 +170,7 @@ void readImage(int16_t& xCo, int16_t& yCo)
     myCAM.CS_HIGH();
 }
 
-void readImageRow(uint16_t& pointCount, int16_t& xCo, int16_t& yCo,  uint16_t  rowNumber)
+void readImageRow(uint16_t& pointCount, float& xCo, float& yCo,  uint16_t  rowNumber)
 {
     for (uint16_t i = 0; i < imageWidth; i++)
     {
@@ -178,13 +178,16 @@ void readImageRow(uint16_t& pointCount, int16_t& xCo, int16_t& yCo,  uint16_t  r
         delayMicroseconds(1);
         byte b2 = SPI.transfer(0x00);
 
+        if(i < LEFT_BAR || i > imageWidth-RIGHT_BAR)
+            continue;
         uint32_t c565 = b1 | b2 << 8;
 
         if((c565 & 0x1f) < Rmin && ((c565 >> 5) & 0x3f) < Gmin && ((c565 >> 11) & 0x1f) < Bmin){
             pointCount += 1;
-            xCo += (int16_t)((i - ceil((float) actualImageWidth/2)) - xCo) / pointCount;
-            yCo += (int16_t)(rowNumber - ceil((float) actualImageHeight/2) - yCo)/pointCount;
+            xCo += ((i - ceil((float) imageWidth/2)) - xCo) / pointCount;
+            yCo += (rowNumber - ceil((float) imageHeight/2) - yCo)/pointCount;
         }
+
     }
 }
 
@@ -215,7 +218,7 @@ byte* calibrateFromImageRow()
 
 void skipImageRows()
 {
-    uint32_t skipcount = SKIpointCountOUNT * imageWidth;
+    uint32_t skipcount = SKIP_COUNT * imageWidth;
     for (uint32_t i = 0; i < skipcount; i++)
     {
         SPI.transfer(0x00);
@@ -252,7 +255,7 @@ void readAndSendImage(ArduCAM myCAM)
     {
         byte* row = readImageRow(myCAM);
         writeSerial(0x01, row, imageWidth*3);
-        while(!Serial.available()) {}
+        while(!Serial.available()) {delay(2);}
         Serial.read();
         delete row;
     }
