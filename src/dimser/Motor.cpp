@@ -63,7 +63,11 @@ void runInnerMotors(SH_Direction direction, int speed, long degrees)
 }
 
 void generalMotorTest(){
-        int i = (SH_POSITION_M1);
-        printf("%d", i);
 
+        int i = SH_POSITION_M1;
+        int l = SH_POSITION_M2;
+        while(true){
+        Serial.println("Motor 1: " + i);
+        Serial.println("Motor 2: " + l);
+        }
 }
