@@ -1,3 +1,4 @@
+/*#ifdef UNIT_TEST
 #include <Arduino.h>
 #include <unity.h>
 
@@ -15,8 +16,8 @@ void setup() {
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
     delay(2000);
-
-    UNITY_BEGIN();    // IMPORTANT LINE!
+    
+    UNITY_BEGIN();    
 
     pinMode(LED_BUILTIN, OUTPUT);
 }
@@ -25,13 +26,6 @@ uint8_t i = 0;
 uint8_t max_blinks = 5;
 
 void loop() {
-    int test1 = 20;
-    int test2 = 10;
-
-    test1 += test2;
-
-    TEST_ASSERT_EQUAL(test1, 30);
-
     if (i < max_blinks)
     {
         RUN_TEST(test_led_state_high);
@@ -44,3 +38,6 @@ void loop() {
       UNITY_END(); // stop unit testing
     }
 }
+
+#endif
+*/

@@ -1,4 +1,4 @@
-#include <Arduino.h>
+#ifdef UNIT_TEST
 #include <unity.h>
 
 int main(){
@@ -8,3 +8,5 @@ int main(){
 
     UNITY_END();
 }
+
+#endif

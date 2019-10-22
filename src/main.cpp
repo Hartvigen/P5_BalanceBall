@@ -1,3 +1,4 @@
+#ifndef UNIT_TEST
 #include "headers/Motor.h"
 #include <Wire.h>
 #include <ArduCAM.h>
@@ -33,8 +34,6 @@ int main()
 {
     init();
 
-    runMotorTest(); //MotorTest
-
     Wire.begin();
     SPI.begin();
     Serial.begin(115200*6);
@@ -62,11 +61,6 @@ int main()
     return 1;
 }
 
-void runMotorTest(){
-    
-    runMotor(SH_Bank_B,SH_Motor_1,SH_Direction_Forward,10,100);
-    
-}
 
 void initCam()
 {
@@ -189,3 +183,5 @@ byte* intToBytes(uint32_t value)
 
     return buf;
 }
+
+#endif
