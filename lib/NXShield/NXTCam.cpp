@@ -125,7 +125,7 @@ int NXTCam::getNumberObjects()
 
 void NXTCam::getBlobs(int *nblobs, uint8_t *color, uint8_t *left, uint8_t *top, uint8_t *right, uint8_t *bottom)
 {
-    *nblobs = readByte(Cam_Number_Objects);
+  *nblobs = readByte(Cam_Number_Objects);
   for (int i = 0; i < *nblobs; i++) {
     uint8_t* buf ;
     buf = (uint8_t *) readString (Start_Reg +(i*5), 5);
