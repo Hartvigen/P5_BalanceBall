@@ -12,7 +12,7 @@ void initNxShield(){
 //"SH_Bank" describes which side of the shield we use
 //"SH_Motor" describes which port we use on the chosen bank, counting from the side with cable input to the shield
 //"SH_Direction" is either forward or backward
-//speed is given in RPM, with a max value of 170 as per the motor specifications
+//speed is given as a number between 1-100 with 100 being the fastest
 void runMotor(SH_Bank bank, SH_Motor motor, SH_Direction direction, int speed, long degrees)
 {
 
@@ -57,14 +57,13 @@ void runInnerMotors(SH_Direction direction, int speed, long degrees)
                     direction, 
                     speed,
                     degrees, 
-                    SH_Completion_Wait,
-                    SH_Next_Action_Brake);
+                    SH_Completion_Wait_For,
+                    SH_Next_Action_BrakeHold);
 
 }
 
 void generalMotorTest(){
-    while(true){
-        runInnerMotors(SH_Direction_Forward, 50, 20);
-        runInnerMotors(SH_Direction_Reverse, 50, 20);
-    }
+        int i = (SH_POSITION_M1);
+        printf("%d", i);
+
 }
