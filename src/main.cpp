@@ -42,7 +42,7 @@ int main()
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
     delay(1000);
-
+    
     initCam();
     while (true)
     {
@@ -74,7 +74,6 @@ void initCam()
     myCAM.InitCAM();
     delay(100);
 
-    myCAM.OV2640_set_Brightness(Brightness2);
     myCAM.OV2640_set_Special_effects(BW);
 }
 
