@@ -63,14 +63,46 @@ void runInnerMotors(SH_Direction direction, int speed, long degrees)
 }
 
 void generalMotorTest(){
+    Serial.println(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1));
+    float Em = 0;
+    int32_t encode;
+    int i = 0;
     delay(2000);
-        for(int x = 0; x < 5; x++){
-        runInnerMotors(SH_Direction_Reverse, 50, 30);
+
+    for(int x = 0; x < 5; x++){
+        runInnerMotors(SH_Direction_Reverse, 50, 34);
         delay(1000);
+        encode = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1);
+        Serial.print("Motor 1: ");
+        Serial.println(encode);
+        i += 1;
+        Em += (encode-Em)/i;
+        Serial.print("Em: ");
+        Serial.println(Em);
+        
         runInnerMotors(SH_Direction_Forward, 50, 60);
         delay(1000);                   
+                encode = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1);
+        Serial.print("Motor 1: ");
+        Serial.println(encode);
+        i += 1;
+        Em += (encode-Em)/i;
+        Serial.print("Em: ");
+        Serial.println(Em);
+
         runInnerMotors(SH_Direction_Reverse, 50, 30);
         delay(1000);                
+                encode = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1);
+        Serial.print("Motor 1: ");
+        Serial.println(encode);
+        i += 1;
+        Em += (encode-Em)/i;
+        Serial.print("Em: ");
+        Serial.println(Em);
+        Serial.print("Voltage: ");
+        Serial.println(nxshield.bank_a.nxshieldGetBatteryVoltage());
+        
+        
 
         }
         

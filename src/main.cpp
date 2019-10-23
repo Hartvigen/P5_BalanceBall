@@ -29,6 +29,7 @@ void readImage(float& xCo, float& yCo);
 void readImageRow(uint16_t& pointCount, float& xCo, float& yCo, uint16_t  rowNumber);
 void skipImageRows();
 void skipImageRow();
+void MotorTest1();
 
 
 const uint32_t imageWidth = 320;
@@ -38,7 +39,6 @@ int main()
 {
     init();
     initNxShield();
-    generalMotorTest();
 
     Wire.begin();
     SPI.begin();
@@ -46,30 +46,31 @@ int main()
     while (!Serial) {}
     while(Serial.available() > 0)
       Serial.read();
-
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
     delay(1000);
+    generalMotorTest();
 
-    initCam();
+    /*initCam();
     calibrateCam();
     while(Serial.available() == 0){}
     Serial.read();
     Serial.println("Starting...");
     float xCo, yCo;
     uint64_t nextCapture =  0;
-    while (true)
+    
     {
-        while(millis() < nextCapture){}
-        nextCapture = millis() + CAPTURE_RATE;
-        xCo = 0, yCo = 0;
-        getBallLocation(xCo, yCo);
-
+        //while(millis() < nextCapture){}
+        //nextCapture = millis() + CAPTURE_RATE;
+        //xCo = 0, yCo = 0;
+        //getBallLocation(xCo, yCo);
+        //generalMotorTest();
+        
 
         //getBallLocation
         //Choose action (center of ball, current tilt, velocity of ball)
         //perform action (Set tilt)
-    }
+    }*/
     return 0;
 }
 
@@ -103,6 +104,7 @@ void calibrateCam(){
     SPI.transfer(0x00); // The first bit is a header? DON'T remove this. without this, colors goes green goo negative, n' shit.
     for(uint32_t i = 0; i < imageHeight; i++)
     {
+        skipImageRow();
         calibrateFromImageRow();;
     }
     
