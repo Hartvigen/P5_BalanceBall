@@ -56,18 +56,23 @@ void runInnerMotors(SH_Direction direction, int speed, long degrees)
     nxshield.bank_a.motorRunDegrees(SH_Motor_Both, 
                     direction, 
                     speed,
-                    degrees, 
+                    degrees,   
                     SH_Completion_Wait_For,
                     SH_Next_Action_BrakeHold);
 
 }
 
 void generalMotorTest(){
+    delay(2000);
+        for(int x = 0; x < 5; x++){
+        runInnerMotors(SH_Direction_Reverse, 50, 30);
+        delay(1000);
+        runInnerMotors(SH_Direction_Forward, 50, 60);
+        delay(1000);                   
+        runInnerMotors(SH_Direction_Reverse, 50, 30);
+        delay(1000);                
 
-        int i = SH_POSITION_M1;
-        int l = SH_POSITION_M2;
-        while(true){
-        Serial.println("Motor 1: " + i);
-        Serial.println("Motor 2: " + l);
         }
+        
+
 }
