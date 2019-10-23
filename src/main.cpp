@@ -1,4 +1,3 @@
-#ifndef UNIT_TEST
 #include "headers/Motor.h"
 #include <Wire.h>
 #include <ArduCAM.h>
@@ -40,7 +39,7 @@ int main()
     init();
     initNxShield();
     generalMotorTest();
-/*
+
     Wire.begin();
     SPI.begin();
     Serial.begin(115200*6); //baudrate
@@ -73,7 +72,6 @@ int main()
     }
     return 0;
 }
-
 
 void initCam()
 {
@@ -198,3 +196,4 @@ void skipImageRow()
         SPI.transfer(0x00);
     }
 }
+
