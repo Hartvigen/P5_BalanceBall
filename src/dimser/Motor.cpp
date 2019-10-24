@@ -77,7 +77,6 @@ void stabilize(){
     bool outerFlag = false;
     int directionFlagInner = 0;
     int directionFlagOuter = 0;
-    int motorCount = 5;
 
 
     runInnerMotors(SH_Direction_Forward, 1, 20);
@@ -99,51 +98,57 @@ void stabilize(){
 
 bool stabilizeInner(int directionFlag)
 {
-    if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) > 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) > 0 && directionFlag != 1){
+    int curMotor1 = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1);
+    int curMotor2 = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2);
+
+    if(curMotor1 > 0 && curMotor2 > 0 && directionFlag != 1){
         nxshield.bank_a.motorRunUnlimited(SH_Motor_Both, SH_Direction_Reverse, 1);
         directionFlag = 1;
         }
     
-    else if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) < 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) < 0 && directionFlag != 2){
+    else if(curMotor1 < 0 && curMotor1 < 0 && directionFlag != 2){
         nxshield.bank_a.motorRunUnlimited(SH_Motor_Both, SH_Direction_Forward, 1);
         directionFlag = 2;
         }
 
-    if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) == 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) == 0) 
+    if(curMotor1 == 0 && curMotor2 == 0) 
     {
         nxshield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
         Serial.println("Inner stable");
         return true;
     }
     Serial.print("Motor 1: ");
-    Serial.print(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1));
+    Serial.print(curMotor1);
     Serial.print("     Motor 2: ");
-    Serial.println(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2));
+    Serial.println(curMotor2);
     return false;
 }
 
 bool stabilizeOuter(int directionFlag)
 {
-    if(nxshield.bank_b.motorGetEncoderPosition(SH_Motor_1) > 0 && nxshield.bank_b.motorGetEncoderPosition(SH_Motor_2) > 0 && directionFlag != 1){
+    int curMotor1 = nxshield.bank_b.motorGetEncoderPosition(SH_Motor_1);
+    int curMotor2 = nxshield.bank_b.motorGetEncoderPosition(SH_Motor_2);
+
+    if(curMotor1 > 0 && curMotor2 > 0 && directionFlag != 1){
         nxshield.bank_b.motorRunUnlimited(SH_Motor_Both, SH_Direction_Reverse, 1);
         directionFlag = 1;
         }
     
-    else if(nxshield.bank_b.motorGetEncoderPosition(SH_Motor_1) < 0 && nxshield.bank_b.motorGetEncoderPosition(SH_Motor_2) < 0 && directionFlag != 2){
+    else if(curMotor1 < 0 && curMotor2 < 0 && directionFlag != 2){
         nxshield.bank_b.motorRunUnlimited(SH_Motor_Both, SH_Direction_Forward, 1);
         directionFlag = 2;
         }
 
-    if(nxshield.bank_b.motorGetEncoderPosition(SH_Motor_1) == 0 && nxshield.bank_b.motorGetEncoderPosition(SH_Motor_2) == 0) 
+    if(curMotor1 == 0 && curMotor2 == 0) 
     {
         nxshield.bank_b.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
         Serial.println("Outer stable");
         return true;
     }
     Serial.print("Motor 3: ");
-    Serial.print(nxshield.bank_b.motorGetEncoderPosition(SH_Motor_1));
+    Serial.print(curMotor1);
     Serial.print("     Motor 4: ");
-    Serial.println(nxshield.bank_b.motorGetEncoderPosition(SH_Motor_2));
+    Serial.println(curMotor2);
     return false;
 }
 
