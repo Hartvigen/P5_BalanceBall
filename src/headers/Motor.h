@@ -14,6 +14,7 @@ extern void runInnerMotors(SH_Direction,int,long);
 extern void runMotorTest();//MotorTests
 void generalMotorTest();
 void initNxShield();
+void stabilize();
 
 
 

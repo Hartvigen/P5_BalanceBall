@@ -49,8 +49,10 @@ int main()
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
     delay(1000);
-    generalMotorTest();
-
+    //generalMotorTest();
+    for(int x = 0; x < 10; x++){
+            stabilize();
+    }
     /*initCam();
     calibrateCam();
     while(Serial.available() == 0){}

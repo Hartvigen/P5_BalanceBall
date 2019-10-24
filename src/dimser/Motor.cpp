@@ -62,6 +62,73 @@ void runInnerMotors(SH_Direction direction, int speed, long degrees)
 
 }
 
+
+void printSerialMotorData(float Em){
+    Serial.print("Motor 1: ");
+    Serial.println(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_Both));
+    Serial.print("Em: ");
+    Serial.println(Em);
+    Serial.println();
+}
+
+bool stabilize(){
+    nxshield.bank_a.motorSetEncoderTarget(SH_Motor_Both, 0);
+    bool innerflag = false;
+    int directionflag = 0;
+    runInnerMotors(SH_Direction_Forward, 20, 20);
+    delay(1000);
+    nxshield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_Float);
+    while(!flag){
+        delay(20);
+        if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) > 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) > 0 && directionflag != 1){
+            nxshield.bank_a.motorRunUnlimited(SH_Motor_Both, SH_Direction_Reverse, 1);
+            directionflag = 1;
+            }
+        
+        else if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) < 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) < 0 && directionflag != 2){
+            nxshield.bank_a.motorRunUnlimited(SH_Motor_Both, SH_Direction_Forward, 1);
+            directionflag = 2;
+            }
+
+        if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) == 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) == 0) 
+        {
+            nxshield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
+            Serial.println("Inner stable");
+            return true;
+        }
+        Serial.print("Motor 1: ");
+        Serial.print(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1));
+        Serial.print("     Motor 2: ");
+        Serial.println(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2));
+    }
+    Serial.println("Congratulations!");
+}
+
+void stabilizeInner()
+{
+    delay(20);
+        if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) > 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) > 0 && directionflag != 1){
+            nxshield.bank_a.motorRunUnlimited(SH_Motor_Both, SH_Direction_Reverse, 1);
+            directionflag = 1;
+            }
+        
+        else if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) < 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) < 0 && directionflag != 2){
+            nxshield.bank_a.motorRunUnlimited(SH_Motor_Both, SH_Direction_Forward, 1);
+            directionflag = 2;
+            }
+
+        if(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1) == 0 && nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2) == 0) 
+        {
+            nxshield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
+            flag = true;
+            Serial.println("Inner stable");
+        }
+        Serial.print("Motor 1: ");
+        Serial.print(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1));
+        Serial.print("     Motor 2: ");
+        Serial.println(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_2));
+}
+
 void generalMotorTest(){
     Serial.println(nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1));
     float Em = 0;
@@ -69,40 +136,31 @@ void generalMotorTest(){
     int i = 0;
     delay(2000);
 
-    for(int x = 0; x < 5; x++){
-        runInnerMotors(SH_Direction_Reverse, 50, 34);
+    for(int x = 0; x < 2; x++){
+        runInnerMotors(SH_Direction_Reverse, 50, 30);
         delay(1000);
+
         encode = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1);
-        Serial.print("Motor 1: ");
-        Serial.println(encode);
         i += 1;
         Em += (encode-Em)/i;
-        Serial.print("Em: ");
-        Serial.println(Em);
+        printSerialMotorData(Em);
+
         
         runInnerMotors(SH_Direction_Forward, 50, 60);
-        delay(1000);                   
-                encode = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1);
-        Serial.print("Motor 1: ");
-        Serial.println(encode);
+        delay(1000);   
+
+        encode = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1);
         i += 1;
         Em += (encode-Em)/i;
-        Serial.print("Em: ");
-        Serial.println(Em);
-
-        runInnerMotors(SH_Direction_Reverse, 50, 30);
+        printSerialMotorData(Em);
+        
+        
+        /*runInnerMotors(SH_Direction_Reverse, 50, 30);
         delay(1000);                
                 encode = nxshield.bank_a.motorGetEncoderPosition(SH_Motor_1);
-        Serial.print("Motor 1: ");
-        Serial.println(encode);
         i += 1;
         Em += (encode-Em)/i;
-        Serial.print("Em: ");
-        Serial.println(Em);
-        Serial.print("Voltage: ");
-        Serial.println(nxshield.bank_a.nxshieldGetBatteryVoltage());
-        
-        
+        printSerialMotorData(Em);  */     
 
         }
         
