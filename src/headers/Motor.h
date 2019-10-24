@@ -15,6 +15,9 @@ extern void runMotorTest();//MotorTests
 void generalMotorTest();
 void initNxShield();
 void stabilize();
+bool stabilizeInner(int directionFlag);
+bool stabilizeOuter(int directionFlag);
+
 
 
 
