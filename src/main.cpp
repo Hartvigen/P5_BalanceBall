@@ -50,8 +50,10 @@ int main()
     digitalWrite(LED_BUILTIN, LOW);
     delay(1000);
     //generalMotorTest();
-    //for(int x = 0; x < 10; x++)
+    for(int x = 0; x < 3; x++){
         stabilize();
+        delay(1000);
+    }
     /*initCam();
     calibrateCam();
     while(Serial.available() == 0){}
