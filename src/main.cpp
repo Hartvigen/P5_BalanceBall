@@ -6,6 +6,7 @@
 #include "Camera.h"
 
 #define SLAVE_PIN 53
+
 #define SKIP_COUNT 4
 #define LEFT_BAR 30
 #define RIGHT_BAR 30
@@ -38,7 +39,7 @@ const uint32_t imageHeight = 240;
 int main()
 {
     init();
-    initNxShield();
+    //initNxShield();
 
     Wire.begin();
     SPI.begin();
@@ -46,14 +47,75 @@ int main()
     while (!Serial) {}
     while(Serial.available() > 0)
       Serial.read();
+
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
     delay(1000);
-    //generalMotorTest();
-    for(int x = 0; x < 3; x++){
-        stabilize();
-        delay(1000);
+
+    float angle = 0;
+    float mod = 0.05;
+    uint64_t calibrateTime = 0;
+
+    NXShield shield;
+    shield.init(SH_HardwareI2C);
+    shield.bank_a.motorReset();
+    shield.bank_b.motorReset();
+
+
+    //shield.bank_a.motorSetSpeedPID(3,1,1);
+    shield.bank_a.motorSetSpeed(SH_Motor_1, 60);
+    shield.bank_a.motorSetSpeed(SH_Motor_2, 60);
+    shield.bank_a.motorSetEncoderPID(20000,12000,30000);
+    shield.bank_a.motorStartBothInSync();
+    shield.bank_a.motorSetCommandRegA(SH_Motor_1, 0xB8);
+
+    while (true)
+    {
+        delay(10);
+        angle += mod;
+        if (abs(angle) >= 10)
+        {
+            mod *= -1;
+            angle += mod;
+        }
+
+        if (millis() > calibrateTime)
+        {
+            shield.bank_a.motorSetEncoderTarget(SH_Motor_1, angle);
+            shield.bank_a.motorSetEncoderTarget(SH_Motor_2, angle);
+
+            Serial.print("Angle: ");
+            Serial.println(angle);
+            Serial.print("Position: ");
+            Serial.println(shield.bank_a.motorGetEncoderPosition(SH_Motor_Both));
+            Serial.print("Target: ");
+            Serial.println(shield.bank_a.motorGetEncoderTarget(SH_Motor_Both));
+
+            /*
+            int encoder = shield.bank_a.motorGetEncoderPosition(SH_Motor_Both);
+            float adjust = angle - encoder;
+            shield.bank_a.motorRunDegrees(
+                SH_Motor_Both, 
+                (adjust > 0 ? SH_Direction_Forward : SH_Direction_Reverse), 
+                90, 
+                (long)abs(adjust),
+                SH_Completion_Dont_Wait,
+                SH_Next_Action_Float
+            );
+
+            Serial.print("Angle: ");
+            Serial.println(angle);
+            Serial.print("Adjust: ");
+            Serial.println(adjust);
+            Serial.print("Encoder: ");
+            Serial.println(encoder);
+            Serial.println();
+            //*/
+
+            calibrateTime = millis() + 250;
+        }
     }
+
     /*initCam();
     calibrateCam();
     while(Serial.available() == 0){}
@@ -166,7 +228,6 @@ void readImageRow(uint16_t& pointCount, float& xCo, float& yCo,  uint16_t  rowNu
 
 void calibrateFromImageRow()
 {
-
     for (uint32_t i = 0; i < imageWidth; i++)
     {
         byte b1 = SPI.transfer(0x00);
