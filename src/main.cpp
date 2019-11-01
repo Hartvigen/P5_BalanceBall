@@ -1,9 +1,12 @@
-#include "headers/Motor.h"
+#include "rollingTable/Motors.h"
+
 #include <Wire.h>
 #include <ArduCAM.h>
 #include <SPI.h>
 #include "memorysaver.h"
-#include "Camera.h"
+
+using namespace RollingTable;
+
 
 #define SLAVE_PIN 53
 
@@ -53,97 +56,28 @@ int main()
     delay(1000);
 
     float angle = 0;
-    float mod = 0.4;
+    float mod = 3;
     uint64_t calibrateTime = 0;
 
-    int8_t dir = 0;
-    int8_t dirb = 0;
-
-    NXShield shield;
-    shield.init(SH_HardwareI2C);
-    shield.bank_a.motorReset();
-    shield.bank_b.motorReset();
-
-
-    //shield.bank_a.motorSetSpeedPID(3,1,1);
-    //shield.bank_a.motorSetSpeed(SH_Motor_1, 80);
-    //shield.bank_a.motorSetSpeed(SH_Motor_2, 80);
-    //shield.bank_a.motorSetEncoderPID(12000,1000,30000);
-    shield.bank_a.motorStartBothInSync();
-    //shield.bank_a.motorSetCommandRegA(SH_Motor_1, 0xB8);
-
+    Motors motors;
+    motors.SetMaxAngle(15);
+    motors.SetInnerSpeed(10);
+    motors.SetOuterSpeed(10);
+    
     while (true)
     {
         delay(10);
         angle += mod;
-        if (abs(angle) >= 15)
-        {
-            mod *= -1;
-            angle += mod;
-        }
 
         if (millis() > calibrateTime)
         {
-            int encoder = shield.bank_a.motorGetEncoderPosition(SH_Motor_Both);
-            int8_t adjust = round(angle - encoder);
-            float nextDir = adjust > 0 ? 1 : -1;
-
-            if (abs(adjust) <= 1)
-            {
-                dir = 0;
-                shield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
-            }
-            else if (abs(adjust) <= 3)
-            {
-                dir = 0;
-                shield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_Float);
-            }
-            else if (dir != nextDir)
-            {
-                dir = nextDir;
-                shield.bank_a.motorRunUnlimited(
-                    SH_Motor_Both, 
-                    (adjust > 0 ? SH_Direction_Forward : SH_Direction_Reverse), 
-                    5
-                );
-            }
-
-            int encoderb = shield.bank_b.motorGetEncoderPosition(SH_Motor_Both);
-            int8_t adjustb = round(angle - encoderb);
-            float nextDirb = adjustb > 0 ? 1 : -1;
-
-            if (abs(adjustb) <= 1)
-            {
-                dirb = 0;
-                shield.bank_b.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
-            }
-            else if (abs(adjustb) <= 3)
-            {
-                dirb = 0;
-                shield.bank_b.motorStop(SH_Motor_Both, SH_Next_Action_Float);
-            }
-            else if (dirb != nextDirb)
-            {
-                dirb = nextDirb;
-                shield.bank_b.motorRunUnlimited(
-                    SH_Motor_Both, 
-                    (adjustb > 0 ? SH_Direction_Forward : SH_Direction_Reverse), 
-                    7
-                );
-            }
-
-            Serial.print("Adjust: ");
-            Serial.println(adjust);
-            Serial.print("Dir: ");
-            Serial.println(dir);
-            Serial.print("Angle: ");
-            Serial.println(angle);
-            Serial.print("Encoder: ");
-            Serial.println(encoder);
-            Serial.println();
+            motors.SetInnerAngle(cos(angle*0.0174532925)*10);
+            motors.SetOuterAngle(sin(angle*0.0174532925)*10);
 
             calibrateTime = millis() + 50;
         }
+
+        motors.Move();
     }
 
     /*initCam();
