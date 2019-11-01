@@ -79,8 +79,8 @@ void stabilize(){
     int directionFlagOuter = 0;
 
 
-    runInnerMotors(SH_Direction_Forward, 1, 20);
-    runOuterMotors(SH_Direction_Forward, 1, 20);
+    runInnerMotors(SH_Direction_Forward, 10, 20);
+    runOuterMotors(SH_Direction_Forward, 10, 20);
     delay(1000);
     nxshield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_Float);
     nxshield.bank_b.motorStop(SH_Motor_Both, SH_Next_Action_Float);
