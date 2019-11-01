@@ -1,11 +1,16 @@
-#include "headers/Motor.h"
+#include "rollingTable/MotorsController.h"
+
 #include <Wire.h>
 #include <ArduCAM.h>
 #include <SPI.h>
 #include "memorysaver.h"
 #include "headers/Camera.h"
 
+using namespace RollingTable;
+
+
 #define SLAVE_PIN 53
+
 #define SKIP_COUNT 4
 #define LEFT_BAR 30
 #define RIGHT_BAR 30
@@ -29,7 +34,7 @@ const uint32_t imageHeight = 240;
 int main()
 {
     init();
-    initNxShield();
+    //initNxShield();
 
     Wire.begin();
     SPI.begin();
@@ -37,10 +42,37 @@ int main()
     while (!Serial) {}
     while(Serial.available() > 0)
       Serial.read();
+
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
     delay(1000);
-    initCam();
+
+    float angle = 0;
+    float mod = 3;
+    uint64_t calibrateTime = 0;
+
+    MotorsController motors;
+    motors.SetMaxAngle(15);
+    motors.SetInnerSpeed(10);
+    motors.SetOuterSpeed(10);
+    
+    while (true)
+    {
+        delay(10);
+        angle += mod;
+
+        if (millis() > calibrateTime)
+        {
+            motors.SetInnerAngle(cos(angle*0.0174532925)*10);
+            motors.SetOuterAngle(sin(angle*0.0174532925)*10);
+
+            calibrateTime = millis() + 50;
+        }
+
+        motors.Move();
+    }
+
+    /*initCam();
     calibrateCam();
     while(Serial.available() == 0){}
     Serial.read();
