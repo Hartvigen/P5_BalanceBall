@@ -168,7 +168,7 @@ void generalMotorTest(){
         Em += (encode-Em)/i;
         printSerialMotorData(Em);
 
-        
+
         runOuterMotors(SH_Direction_Forward, 50, 60);
         delay(1000);   
 
@@ -176,16 +176,13 @@ void generalMotorTest(){
         i += 1;
         Em += (encode-Em)/i;
         printSerialMotorData(Em);
-        
-        
+
+
         runOuterMotors(SH_Direction_Reverse, 50, 30);
         delay(1000);                
-                encode = nxshield.bank_b.motorGetEncoderPosition(SH_Motor_1);
+        encode = nxshield.bank_b.motorGetEncoderPosition(SH_Motor_1);
         i += 1;
         Em += (encode-Em)/i;
         printSerialMotorData(Em);    
-
-        }
-        
-
+    }
 }

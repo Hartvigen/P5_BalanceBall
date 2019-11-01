@@ -1,9 +1,10 @@
-#ifndef MOTORS_H_INCLUDE
-#define MOTORS_H_INCLUDE
+#ifndef MOTORS_CONTROLLER_H_INCLUDE
+#define MOTORS_CONTROLLER_H_INCLUDE
 
 #include <stdint.h>
-#include <Wire.h>
 #include <NXShield.h>
+
+#define MAX_ANGLE (int8_t)15
 
 namespace RollingTable
 {
@@ -11,8 +12,6 @@ namespace RollingTable
     {
         private:
             NXShield shield;
-
-            int8_t maxAngle = 0;
 
             int8_t innerAngle = 0;
             int8_t innerDir = 0;
@@ -28,7 +27,6 @@ namespace RollingTable
             MotorsController();
 
             void Reset();
-            void SetMaxAngle(int8_t angle);
 
             void SetInnerAngle(int8_t targetAngle);
             void SetInnerSpeed(int8_t speed);
@@ -37,6 +35,7 @@ namespace RollingTable
             void SetOuterSpeed(int8_t speed);
 
             void Move();
+            void MoveCircleTest();
     };
 }
 

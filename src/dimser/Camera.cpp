@@ -21,6 +21,7 @@ float Rmin = 31, Gmin = 63, Bmin = 31;
 const uint32_t imageWidth = 320;
 const uint32_t imageHeight = 240;
 
+
 void initCam()
 {
     pinMode(SLAVE_PIN, OUTPUT);
@@ -38,6 +39,7 @@ void initCam()
 
     myCAM.OV2640_set_Special_effects(BW);
 }
+
 
 void calibrateCam(){
     myCAM.flush_fifo();
@@ -59,6 +61,25 @@ void calibrateCam(){
     myCAM.CS_HIGH();
     Serial.println("Finished Calibrating");
 }
+
+void calibrateFromImageRow()
+{
+    for (uint32_t i = 0; i < imageWidth; i++)
+    {
+        byte b1 = SPI.transfer(0x00);
+        delayMicroseconds(1);
+        byte b2 = SPI.transfer(0x00);
+        if(i < LEFT_BAR || i > imageWidth-RIGHT_BAR)
+            continue;
+
+        uint32_t c565 = b1 | b2 << 8;
+
+        Rmin = min(Rmin, (c565 & 0x1f));   
+        Gmin = min(Gmin, ((c565 >> 5) & 0x3f));
+        Bmin = min(Bmin,  ((c565 >> 11) & 0x1f));
+    }
+}
+
 
 void getBallLocation(float& xCo, float& yCo)
 {
@@ -108,24 +129,6 @@ void readImageRow(uint16_t& pointCount, float& xCo, float& yCo,  uint16_t  rowNu
     }
 }
 
-void calibrateFromImageRow()
-{
-
-    for (uint32_t i = 0; i < imageWidth; i++)
-    {
-        byte b1 = SPI.transfer(0x00);
-        delayMicroseconds(1);
-        byte b2 = SPI.transfer(0x00);
-        if(i < LEFT_BAR || i > imageWidth-RIGHT_BAR)
-            continue;
-
-        uint32_t c565 = b1 | b2 << 8;
-
-        Rmin = min(Rmin, (c565 & 0x1f));   
-        Gmin = min(Gmin, ((c565 >> 5) & 0x3f));
-        Bmin = min(Bmin,  ((c565 >> 11) & 0x1f));
-    }
-}
 
 void skipImageRows()
 {
