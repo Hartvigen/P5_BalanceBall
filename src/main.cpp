@@ -59,7 +59,7 @@ int main()
     float mod = 3;
     uint64_t calibrateTime = 0;
 
-    Motors motors;
+    MotorsController motors;
     motors.SetMaxAngle(15);
     motors.SetInnerSpeed(10);
     motors.SetOuterSpeed(10);

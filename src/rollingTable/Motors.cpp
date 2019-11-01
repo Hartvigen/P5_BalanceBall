@@ -2,7 +2,7 @@
 
 namespace RollingTable
 {
-    Motors::Motors()
+    MotorsController::MotorsController()
     {
         shield.init(SH_HardwareI2C);
         shield.bank_a.motorStartBothInSync();
@@ -11,44 +11,44 @@ namespace RollingTable
         Reset();
     }
 
-    void Motors::Reset() {
+    void MotorsController::Reset() {
         shield.bank_a.motorReset();
         shield.bank_b.motorReset();
     }
 
-    void Motors::SetMaxAngle(int8_t angle){
+    void MotorsController::SetMaxAngle(int8_t angle){
         maxAngle = angle;
     }
 
 
-    void Motors::SetInnerAngle(int8_t targetAngle) {
+    void MotorsController::SetInnerAngle(int8_t targetAngle) {
         innerAngle = min(targetAngle, 15);
         innerAngle = max(innerAngle, -15);
     }
 
-    void Motors::SetInnerSpeed(int8_t speed) {
+    void MotorsController::SetInnerSpeed(int8_t speed) {
         innerSpeed = speed;
     }
 
 
-    void Motors::SetOuterAngle(int8_t targetAngle) {
+    void MotorsController::SetOuterAngle(int8_t targetAngle) {
         outerAngle = min(targetAngle, 15);
         outerAngle = max(outerAngle, -15);
     }
 
-    void Motors::SetOuterSpeed(int8_t speed) {
+    void MotorsController::SetOuterSpeed(int8_t speed) {
         outerSpeed = speed;
     }
 
 
-    void Motors::Move()
+    void MotorsController::Move()
     {
         Move(shield.bank_a, innerAngle, innerDir, innerSpeed);
         Move(shield.bank_b, outerAngle, outerDir, outerSpeed);
     }
 
 
-    void Motors::Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed)
+    void MotorsController::Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed)
     {
         int8_t encoder = bank.motorGetEncoderPosition(SH_Motor_Both);
         int8_t adjust = angle - encoder;

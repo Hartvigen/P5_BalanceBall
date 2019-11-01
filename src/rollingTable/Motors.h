@@ -7,7 +7,7 @@
 
 namespace RollingTable
 {
-    class Motors
+    class MotorsController
     {
         private:
             NXShield shield;
@@ -25,7 +25,7 @@ namespace RollingTable
             void Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed);
 
         public:
-            Motors();
+            MotorsController();
 
             void Reset();
             void SetMaxAngle(int8_t angle);
