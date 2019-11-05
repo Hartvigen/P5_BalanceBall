@@ -2,10 +2,10 @@
 
 namespace RollingTable
 {
-    CameraController::CameraController()
-    { }
+    ArduCAM CameraController::camera;
+    uint8_t CameraController::minR, CameraController::minG, CameraController::minB;
 
-    CameraController::CameraController(int slavePin)
+    void CameraController::Init(int slavePin)
     {
         camera = ArduCAM(OV2640, slavePin);
 

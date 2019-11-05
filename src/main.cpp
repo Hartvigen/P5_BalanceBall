@@ -7,11 +7,6 @@ using namespace RollingTable;
 #define CAM_SLAVE_PIN 53
 
 #define INTERVAL_TRACK (uint64_t)200;
-
-
-MotorsController motors;
-CameraController camera;
-
 uint64_t trackTime = 0;
 
 
@@ -19,11 +14,13 @@ void initialize();
 void setup();
 void loop();
 
+
 int main()
 {
     initialize();
     setup();
 
+    digitalWrite(LED_BUILTIN, HIGH);
     while (true)
         loop();
 
@@ -35,7 +32,7 @@ void initialize()
 {
     init();
     pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(LED_BUILTIN, LOW);
 
     Wire.begin();
     SPI.begin();
@@ -49,12 +46,13 @@ void initialize()
 
 void setup()
 {
-    motors.Reset();
-    motors.SetInnerSpeed(10);
-    motors.SetOuterSpeed(10);
+    MotorsController::Init();
+    MotorsController::Reset();
+    MotorsController::SetInnerSpeed(10);
+    MotorsController::SetOuterSpeed(10);
 
-    camera = CameraController(CAM_SLAVE_PIN);
-    camera.Recalibrate();
+    CameraController::Init(CAM_SLAVE_PIN);
+    CameraController::Recalibrate();
 }
 
 void loop()
@@ -66,15 +64,15 @@ void loop()
         int16_t xCo, yCo;
         int16_t xAng, yAng;
 
-        camera.GetBallLocation(xCo, yCo);
+        CameraController::GetBallLocation(xCo, yCo);
 
-        /* Get xAng, yAng. This is where PID and AI will differ */
+        // Get xAng, yAng. This is where PID and AI will differ
 
-        motors.SetInnerAngle(xAng);
-        motors.SetOuterAngle(yAng);
+        MotorsController::SetInnerAngle(xAng);
+        MotorsController::SetOuterAngle(yAng);
     }
 
-    motors.Move();
+    MotorsController::Move();
 }
 
 

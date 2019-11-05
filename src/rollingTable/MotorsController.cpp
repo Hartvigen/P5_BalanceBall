@@ -2,7 +2,17 @@
 
 namespace RollingTable
 {
-    MotorsController::MotorsController()
+    NXShield MotorsController::shield;
+
+    int8_t MotorsController::innerAngle;
+    int8_t MotorsController::innerDir;
+    int8_t MotorsController::innerSpeed;
+
+    int8_t MotorsController::outerAngle;
+    int8_t MotorsController::outerDir;
+    int8_t MotorsController::outerSpeed;
+
+    void MotorsController::Init()
     {
         shield.init(SH_HardwareI2C);
         shield.bank_a.motorStartBothInSync();

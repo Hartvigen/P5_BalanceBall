@@ -11,31 +11,31 @@ namespace RollingTable
     class MotorsController
     {
         private:
-            NXShield shield;
+            static NXShield shield;
 
-            int8_t innerAngle = 0;
-            int8_t innerDir = 0;
-            int8_t innerSpeed = 0;
+            static int8_t innerAngle;
+            static int8_t innerDir;
+            static int8_t innerSpeed;
 
-            int8_t outerAngle = 0;
-            int8_t outerDir = 0;
-            int8_t outerSpeed = 0;
+            static int8_t outerAngle;
+            static int8_t outerDir;
+            static int8_t outerSpeed;
 
-            void Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed);
+            static void Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed);
 
         public:
-            MotorsController();
+            static void Init();
 
-            void Reset();
+            static void Reset();
 
-            void SetInnerAngle(int8_t targetAngle);
-            void SetInnerSpeed(int8_t speed);
+            static void SetInnerAngle(int8_t targetAngle);
+            static void SetInnerSpeed(int8_t speed);
 
-            void SetOuterAngle(int8_t targetAngle);
-            void SetOuterSpeed(int8_t speed);
+            static void SetOuterAngle(int8_t targetAngle);
+            static void SetOuterSpeed(int8_t speed);
 
-            void Move();
-            void MoveCircleTest();
+            static void Move();
+            static void MoveCircleTest();
     };
 }
 
