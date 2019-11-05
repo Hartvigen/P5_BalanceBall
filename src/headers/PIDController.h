@@ -5,6 +5,6 @@
 #include <Arduino.h>
 
 void initPID();
-void runPID();
+void runPID(float xCo, float yCo);
 
 #endif
