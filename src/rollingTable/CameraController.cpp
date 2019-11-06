@@ -6,6 +6,11 @@ namespace RollingTable
     ArduCAM CameraController::camera;
     uint8_t CameraController::minR, CameraController::minG, CameraController::minB;
 
+    float xAvgPart, yAvgPart;
+    uint32_t pointsAveragedPart;
+    uint16_t rowPart;
+
+
     void CameraController::Init(int slavePin)
     {
         minR = minG = minB = 0;
@@ -122,7 +127,7 @@ namespace RollingTable
     }
 
 
-    void CameraController::GetBallLocation(int16_t& xCo, int16_t& yCo)
+    bool CameraController::GetBallLocation(int16_t& xCo, int16_t& yCo)
     {
         uint32_t pointsAveraged = 0; // Is uint32 since 240*320 > UINT16_MAX
         float avgX = 0, avgY = 0;
@@ -131,7 +136,7 @@ namespace RollingTable
         BeginRead();
 
         SkipRows(TOP_MARGIN);
-        for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (SKIP_COUNT+1))
+        for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (FULL_SKIP_COUNT+1))
         {
             SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
 
@@ -140,7 +145,7 @@ namespace RollingTable
                 uint8_t b1 = SPI.transfer(0x00);
                 uint8_t b2 = SPI.transfer(0x00);
                 
-                if (col % (SKIP_COUNT+1) == 0)
+                if (col % (FULL_SKIP_COUNT+1) == 0)
                 {
                     uint32_t c565 = b1 | b2 << 8;
 
@@ -154,7 +159,7 @@ namespace RollingTable
             }
 
             SkipColumns(LEFT_MARGIN);
-            SkipRows(SKIP_COUNT);
+            SkipRows(FULL_SKIP_COUNT);
         }
         
         EndRead();
@@ -164,10 +169,12 @@ namespace RollingTable
         {
             xCo = -((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2));
             yCo = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2);
+            return true;
         }
         else
         {
             xCo = yCo = 0;
+            return false;
         }
     }
 
@@ -202,7 +209,7 @@ namespace RollingTable
                 bytes[col*3+2] = ((c565 >> 11) & 0x1f); // B
 
                 ///*
-                if (row % (SKIP_COUNT+1) == 0 && 
+                if (row % (FULL_SKIP_COUNT+1) == 0 && 
                     bytes[col*3+0] < minR && (bytes[col*3+1] & 0x3f) < minG && (bytes[col*3+2] & 0x1f) < minB)
                 {
                     bytes[col*3+0] = 31;
@@ -230,5 +237,68 @@ namespace RollingTable
         SerialHelper::SendInt(pointsAveraged == 0 ? 0 : (-((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2))));
         SerialHelper::AwaitSignal();
         SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2)));
+    }
+
+
+    void CameraController::StartTracking()
+    {
+        xAvgPart = 0;
+        yAvgPart = 0;
+        rowPart = 0;
+        pointsAveragedPart = 0;
+        
+        Capture();
+
+        BeginRead();
+        SkipRows(TOP_MARGIN);
+        EndRead();
+    }
+
+    void CameraController::ProceedTracking(uint16_t trackTimes)
+    {
+        BeginRead();
+        
+        for (uint16_t row = 0; row < trackTimes; row++)
+        {
+            SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
+            for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
+            {
+                uint8_t b1 = SPI.transfer(0x00);
+                uint8_t b2 = SPI.transfer(0x00);
+                
+                if (col % (PART_SKIP_COUNT+1) == 0)
+                {
+                    uint32_t c565 = b1 | b2 << 8;
+
+                    if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
+                    {
+                        pointsAveragedPart += 1;
+                        xAvgPart += (col - xAvgPart) / pointsAveragedPart;
+                        yAvgPart += (rowPart - yAvgPart) / pointsAveragedPart;
+                    }
+                }
+            }
+            SkipColumns(LEFT_MARGIN);
+            SkipRows(PART_SKIP_COUNT);
+
+            rowPart += (PART_SKIP_COUNT+1);
+        }
+
+        EndRead();
+    }
+
+    bool CameraController::EndTracking(int16_t& xCo, int16_t& yCo)
+    {
+        if (pointsAveragedPart != 0)
+        {
+            xCo = -((int16_t)round(xAvgPart) - (int16_t)(IMAGE_WIDTH/2));
+            yCo = (int16_t)round(yAvgPart) - (int16_t)(IMAGE_HEIGHT/2);
+            return true;
+        }
+        else
+        {
+            xCo = yCo = 0;
+            return false;
+        }
     }
 }

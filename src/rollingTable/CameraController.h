@@ -16,7 +16,8 @@
 #define IMAGE_WIDTH (CAPTURE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN)
 #define IMAGE_HEIGHT (CAPTURE_HEIGHT - TOP_MARGIN)
 
-#define SKIP_COUNT (uint16_t)3
+#define FULL_SKIP_COUNT (uint16_t)3
+#define PART_SKIP_COUNT (uint16_t)5
 
 
 namespace RollingTable
@@ -38,8 +39,12 @@ namespace RollingTable
             static void Init(int slavePin);
 
             static void Recalibrate();
-            static void GetBallLocation(int16_t& xCo, int16_t& yCo);
+            static bool GetBallLocation(int16_t& xCo, int16_t& yCo);
             static void SendImage();
+
+            static void StartTracking();
+            static void ProceedTracking(uint16_t trackTimes);
+            static bool EndTracking(int16_t& xCo, int16_t& yCo);
     };
 }
 

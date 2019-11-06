@@ -1,6 +1,7 @@
 #include "main.h"
 #include "Serial/SerialHelper.h"
 
+bool ballFound = false;
 int16_t xCo, yCo;
 int16_t xAng, yAng;
 
@@ -14,7 +15,10 @@ int main()
 
     digitalWrite(LED_BUILTIN, HIGH);
     while (true)
-        loop();
+        if (ballFound)
+            loop();
+        else 
+            track();
 
     while(false)
         CameraController::SendImage();
@@ -53,15 +57,29 @@ void setup()
 void loop()
 {
     time = millis();
-    CameraController::GetBallLocation(xCo, yCo);
-    Serial.print(millis() - time); Serial.print(" "); Serial.print(xCo); Serial.print(" "); Serial.println(yCo);
+    
+    ballFound = CameraController::GetBallLocation(xCo, yCo);
+    
+    Serial.print(millis() - time); Serial.print(" "); 
+    if (ballFound)
+    { Serial.print(xCo); Serial.print(" "); Serial.println(yCo); }
+    else
+    { Serial.println("Lost..."); }
+    
 
     // Get xAng, yAng. This is where PID and AI will differ
 
-    MotorsController::SetInnerAngle(xAng);
-    MotorsController::SetOuterAngle(yAng);
+    //MotorsController::SetInnerAngle(xAng);
+    //MotorsController::SetOuterAngle(yAng);
 
     //MotorsController::Move();
+}
+
+void track()
+{
+    time = millis();
+    ballFound = CameraController::GetBallLocation(xCo, yCo);
+    Serial.print(millis() - time); Serial.print(" "); Serial.println("Tracking...");
 }
 
 

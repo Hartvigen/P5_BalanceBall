@@ -13,3 +13,4 @@ uint64_t trackTime = 0;
 void initialize();
 void setup();
 void loop();
+void track();
