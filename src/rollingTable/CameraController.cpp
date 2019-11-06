@@ -1,4 +1,5 @@
 #include "CameraController.h"
+#include "Serial/SerialHelper.h"
 
 namespace RollingTable
 {
@@ -7,6 +8,8 @@ namespace RollingTable
 
     void CameraController::Init(int slavePin)
     {
+        minR = minG = minB = 0;
+
         camera = ArduCAM(OV2640, slavePin);
 
         pinMode(slavePin, OUTPUT);
@@ -36,7 +39,7 @@ namespace RollingTable
 
     void CameraController::SkipRows(uint16_t count)
     {
-        for (uint16_t row; row < count; row++)
+        for (uint16_t row = 0; row < count; row++)
             for (uint16_t col = 0; col < CAPTURE_WIDTH; col++)
             {
                 SPI.transfer(0x00);
@@ -101,6 +104,20 @@ namespace RollingTable
         }
 
         EndRead();
+
+        ///*
+        Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
+        Serial.print("minG: "); Serial.print(minG); Serial.print("  ");
+        Serial.print("minB: "); Serial.print(minB); Serial.println();
+        //*/
+
+        /*
+        Serial.write(minR);
+        SerialHelper::AwaitSignal();
+        Serial.write(minG);
+        SerialHelper::AwaitSignal();
+        Serial.write(minB);
+        //*/
     }
 
 
@@ -113,7 +130,7 @@ namespace RollingTable
         BeginRead();
 
         SkipRows(TOP_MARGIN);
-        for (uint16_t row = 0; row < IMAGE_HEIGHT; row += SKIP_COUNT+1)
+        for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (SKIP_COUNT+1))
         {
             SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
 
@@ -138,7 +155,74 @@ namespace RollingTable
         EndRead();
 
         // Return coordinates offset to have center in (0,0)
-        yCo = (int16_t)round(avgY) - IMAGE_HEIGHT/2;
-        xCo = (int16_t)round(avgX) - IMAGE_WIDTH/2;
+        if (pointsAveraged != 0)
+        {
+            xCo = -((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2));
+            yCo = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2);
+        }
+        else
+        {
+            xCo = yCo = 0;
+        }
+    }
+
+
+    void CameraController::SendImage()
+    {
+        uint32_t pointsAveraged = 0; // Is uint32 since 240*320 > UINT16_MAX
+        float avgX = 0, avgY = 0;
+
+        uint8_t* bytes = (uint8_t*)malloc(IMAGE_WIDTH * 3);
+
+        SerialHelper::AwaitSignal();
+        SerialHelper::SendInt(IMAGE_HEIGHT);
+        SerialHelper::SendInt(IMAGE_WIDTH);
+        
+        Capture();
+        BeginRead();
+
+        SkipRows(TOP_MARGIN);
+        for (uint16_t row = 0; row < IMAGE_HEIGHT; row++)
+        {
+            SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
+
+            for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
+            {
+                uint8_t b1 = SPI.transfer(0x00);
+                uint8_t b2 = SPI.transfer(0x00);
+                uint16_t c565 = b1 | b2 << 8;
+
+                bytes[col*3+0] = (c565 & 0x1f);         // R
+                bytes[col*3+1] = ((c565 >> 5) & 0x3f);  // G
+                bytes[col*3+2] = ((c565 >> 11) & 0x1f); // B
+
+                ///*
+                if (row % 5 == 0 && bytes[col*3+0] < minR && (bytes[col*3+1] & 0x3f) < minG && (bytes[col*3+2] & 0x1f) < minB)
+                {
+                    bytes[col*3+0] = 31;
+                    bytes[col*3+1] = 0;
+                    bytes[col*3+2] = 0;
+
+                    pointsAveraged += 1;
+                    avgX += (col - avgX) / pointsAveraged;
+                    avgY += (row - avgY) / pointsAveraged;
+                }
+                //*/
+            }
+
+            SkipColumns(LEFT_MARGIN);
+
+            SerialHelper::AwaitSignal();
+            SerialHelper::SendBytes(bytes, IMAGE_WIDTH * 3);
+        }
+
+        EndRead();
+
+        delete bytes;
+
+        SerialHelper::AwaitSignal();
+        SerialHelper::SendInt(pointsAveraged == 0 ? 0 : (-((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2))));
+        SerialHelper::AwaitSignal();
+        SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2)));
     }
 }
