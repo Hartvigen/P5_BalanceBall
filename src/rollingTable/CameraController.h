@@ -16,7 +16,7 @@
 #define IMAGE_WIDTH (CAPTURE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN)
 #define IMAGE_HEIGHT (CAPTURE_HEIGHT - TOP_MARGIN)
 
-#define SKIP_COUNT (uint16_t)4
+#define SKIP_COUNT (uint16_t)3
 
 
 namespace RollingTable

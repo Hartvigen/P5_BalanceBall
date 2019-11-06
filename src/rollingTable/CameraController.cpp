@@ -41,10 +41,7 @@ namespace RollingTable
     {
         for (uint16_t row = 0; row < count; row++)
             for (uint16_t col = 0; col < CAPTURE_WIDTH; col++)
-            {
-                SPI.transfer(0x00);
-                SPI.transfer(0x00);
-            }
+                SPI.transfer16(0x00);
     }
 
     void CameraController::SkipColumns(uint16_t count)
@@ -105,6 +102,10 @@ namespace RollingTable
 
         EndRead();
 
+        if (minR > 0) minR--;
+        if (minG > 0) minG--;
+        if (minB > 0) minB--;
+
         ///*
         Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
         Serial.print("minG: "); Serial.print(minG); Serial.print("  ");
@@ -138,20 +139,24 @@ namespace RollingTable
             {
                 uint8_t b1 = SPI.transfer(0x00);
                 uint8_t b2 = SPI.transfer(0x00);
-                uint32_t c565 = b1 | b2 << 8;
-
-                if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
+                
+                if (col % (SKIP_COUNT+1) == 0)
                 {
-                    pointsAveraged += 1;
-                    avgX += (col - avgX) / pointsAveraged;
-                    avgY += (row - avgY) / pointsAveraged;
+                    uint32_t c565 = b1 | b2 << 8;
+
+                    if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
+                    {
+                        pointsAveraged += 1;
+                        avgX += (col - avgX) / pointsAveraged;
+                        avgY += (row - avgY) / pointsAveraged;
+                    }
                 }
             }
 
             SkipColumns(LEFT_MARGIN);
             SkipRows(SKIP_COUNT);
         }
-
+        
         EndRead();
 
         // Return coordinates offset to have center in (0,0)
@@ -197,7 +202,8 @@ namespace RollingTable
                 bytes[col*3+2] = ((c565 >> 11) & 0x1f); // B
 
                 ///*
-                if (row % 5 == 0 && bytes[col*3+0] < minR && (bytes[col*3+1] & 0x3f) < minG && (bytes[col*3+2] & 0x1f) < minB)
+                if (row % (SKIP_COUNT+1) == 0 && 
+                    bytes[col*3+0] < minR && (bytes[col*3+1] & 0x3f) < minG && (bytes[col*3+2] & 0x1f) < minB)
                 {
                     bytes[col*3+0] = 31;
                     bytes[col*3+1] = 0;
