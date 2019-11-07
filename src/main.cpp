@@ -58,10 +58,9 @@ void setup()
 void loop()
 {
     time = millis();
-    
     ballFound = CameraController::GetBallLocation(xCo, yCo);
-    
     Serial.print(millis() - time); Serial.print(" "); 
+
     if (ballFound)
     { Serial.print(xCo); Serial.print(" "); Serial.println(yCo); }
     else

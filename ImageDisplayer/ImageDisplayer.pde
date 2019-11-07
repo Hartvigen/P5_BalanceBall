@@ -64,10 +64,10 @@ void keyPressed()
   for (int y = 0; y < h; y++)
   {
     byte[] bytes = image.get(y);
-    for (int x = w-3; x >= 0; x--)
+    for (int x = 0; x < w; x++)
     {
       fill(bytes[x*3], bytes[x*3+1], bytes[x*3+2]);
-      rect(w-x-1, y, 1, 1);
+      rect(x, y, 1, 1);
     }
   }
   

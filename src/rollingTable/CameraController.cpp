@@ -14,7 +14,6 @@ namespace RollingTable
     void CameraController::Init(int slavePin)
     {
         minR = minG = minB = 0;
-
         camera = ArduCAM(OV2640, slavePin);
 
         pinMode(slavePin, OUTPUT);
@@ -87,25 +86,20 @@ namespace RollingTable
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
                 uint16_t c565 = SPI.transfer16(0x00);
-                c565 = c565 >> 8 | c565 << 8;
 
                 uint8_t R = (c565 & 0x1f);
                 uint8_t G = ((c565 >> 5) & 0x3f);
                 uint8_t B = ((c565 >> 11) & 0x1f);
 
-                if (R > 3 && R < minR) minR = R;
-                if (G > 6 && G < minG) minG = G;
-                if (B > 3 && B < minB) minB = B;
+                if (R > 5 && R < minR) minR = R;
+                if (G > 10 && G < minG) minG = G;
+                if (B > 5 && B < minB) minB = B;
             }
 
             SkipColumns(LEFT_MARGIN);
         }
 
         EndRead();
-
-        //if (minR > 0) minR--;
-        //if (minG > 0) minG--;
-        //if (minB > 0) minB--;
 
         ///*
         Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
@@ -142,8 +136,6 @@ namespace RollingTable
                 
                 if (col % (FULL_SKIP_COUNT+1) == 0)
                 {
-                    c565 = c565 >> 8 | c565 << 8;
-
                     if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
                     {
                         pointsAveraged += 1;
@@ -162,7 +154,7 @@ namespace RollingTable
         // Return coordinates offset to have center in (0,0)
         if (pointsAveraged != 0)
         {
-            xCo = -((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2));
+            xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2);
             yCo = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2);
             return true;
         }
@@ -196,7 +188,6 @@ namespace RollingTable
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
                 uint16_t c565 = SPI.transfer16(0x00);
-                c565 = c565 >> 8 | c565 << 8;
 
                 bytes[col*3+0] = (c565 & 0x1f);         // R
                 bytes[col*3+1] = ((c565 >> 5) & 0x3f);  // G
@@ -226,7 +217,7 @@ namespace RollingTable
         delete bytes;
 
         SerialHelper::AwaitSignal();
-        SerialHelper::SendInt(pointsAveraged == 0 ? 0 : (-((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2))));
+        SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2)));
         SerialHelper::AwaitSignal();
         SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2)));
     }
@@ -255,16 +246,10 @@ namespace RollingTable
             SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
-                //uint8_t b1 = SPI.transfer(0x00);
-                //uint8_t b2 = SPI.transfer(0x00);
-
                 uint16_t c565 = SPI.transfer16(0x00);
                 
                 if (col % (PART_SKIP_COUNT+1) == 0)
                 {
-                    //uint16_t c565 = b1 | b2 << 8;
-                    c565 = c565 >> 8 | c565 << 8;
-
                     if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
                     {
                         pointsAveragedPart += 1;
@@ -286,7 +271,7 @@ namespace RollingTable
     {
         if (pointsAveragedPart != 0)
         {
-            xCo = -((int16_t)round(xAvgPart) - (int16_t)(IMAGE_WIDTH/2));
+            xCo = (int16_t)round(xAvgPart) - (int16_t)(IMAGE_WIDTH/2);
             yCo = (int16_t)round(yAvgPart) - (int16_t)(IMAGE_HEIGHT/2);
             return true;
         }
