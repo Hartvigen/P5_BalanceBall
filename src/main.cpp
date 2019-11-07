@@ -20,7 +20,7 @@ int main()
         else 
             track();
 
-    while(false)
+    while(true)
         CameraController::SendImage();
 
     return 0;
@@ -34,6 +34,7 @@ void initialize()
     digitalWrite(LED_BUILTIN, LOW);
 
     Wire.begin();
+    Wire.setClock((uint32_t)1000000);
     SPI.begin();
     Serial.begin(691200L);
 

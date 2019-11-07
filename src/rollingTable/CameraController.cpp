@@ -36,7 +36,7 @@ namespace RollingTable
     {
         camera.flush_fifo();
         camera.start_capture();
-        while(!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) {}
+        while (!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) { }
 
         // Skip dummy byte here
         camera.read_fifo();
@@ -52,10 +52,7 @@ namespace RollingTable
     void CameraController::SkipColumns(uint16_t count)
     {
         for (uint16_t col = 0; col < count; col++)
-        {
-            SPI.transfer(0x00);
-            SPI.transfer(0x00);
-        }
+            SPI.transfer16(0x00);
     }
 
 
@@ -69,8 +66,8 @@ namespace RollingTable
 
     void CameraController::EndRead()
     {
-        SPI.endTransaction();
         camera.CS_HIGH();
+        SPI.endTransaction();
     }
 
 
@@ -89,17 +86,16 @@ namespace RollingTable
 
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
-                uint8_t b1 = SPI.transfer(0x00);
-                uint8_t b2 = SPI.transfer(0x00);
-                uint16_t c565 = b1 | b2 << 8;
+                uint16_t c565 = SPI.transfer16(0x00);
+                c565 = c565 >> 8 | c565 << 8;
 
                 uint8_t R = (c565 & 0x1f);
                 uint8_t G = ((c565 >> 5) & 0x3f);
                 uint8_t B = ((c565 >> 11) & 0x1f);
 
-                if (R < minR) minR = R;
-                if (G < minG) minG = G;
-                if (B < minB) minB = B;
+                if (R > 3 && R < minR) minR = R;
+                if (G > 6 && G < minG) minG = G;
+                if (B > 3 && B < minB) minB = B;
             }
 
             SkipColumns(LEFT_MARGIN);
@@ -107,9 +103,9 @@ namespace RollingTable
 
         EndRead();
 
-        if (minR > 0) minR--;
-        if (minG > 0) minG--;
-        if (minB > 0) minB--;
+        //if (minR > 0) minR--;
+        //if (minG > 0) minG--;
+        //if (minB > 0) minB--;
 
         ///*
         Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
@@ -142,12 +138,11 @@ namespace RollingTable
 
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
-                uint8_t b1 = SPI.transfer(0x00);
-                uint8_t b2 = SPI.transfer(0x00);
+                uint16_t c565 = SPI.transfer16(0x00);
                 
                 if (col % (FULL_SKIP_COUNT+1) == 0)
                 {
-                    uint32_t c565 = b1 | b2 << 8;
+                    c565 = c565 >> 8 | c565 << 8;
 
                     if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
                     {
@@ -200,15 +195,13 @@ namespace RollingTable
 
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
-                uint8_t b1 = SPI.transfer(0x00);
-                uint8_t b2 = SPI.transfer(0x00);
-                uint16_t c565 = b1 | b2 << 8;
+                uint16_t c565 = SPI.transfer16(0x00);
+                c565 = c565 >> 8 | c565 << 8;
 
                 bytes[col*3+0] = (c565 & 0x1f);         // R
                 bytes[col*3+1] = ((c565 >> 5) & 0x3f);  // G
                 bytes[col*3+2] = ((c565 >> 11) & 0x1f); // B
 
-                ///*
                 if (row % (FULL_SKIP_COUNT+1) == 0 && 
                     bytes[col*3+0] < minR && (bytes[col*3+1] & 0x3f) < minG && (bytes[col*3+2] & 0x1f) < minB)
                 {
@@ -220,7 +213,6 @@ namespace RollingTable
                     avgX += (col - avgX) / pointsAveraged;
                     avgY += (row - avgY) / pointsAveraged;
                 }
-                //*/
             }
 
             SkipColumns(LEFT_MARGIN);
@@ -263,12 +255,15 @@ namespace RollingTable
             SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
-                uint8_t b1 = SPI.transfer(0x00);
-                uint8_t b2 = SPI.transfer(0x00);
+                //uint8_t b1 = SPI.transfer(0x00);
+                //uint8_t b2 = SPI.transfer(0x00);
+
+                uint16_t c565 = SPI.transfer16(0x00);
                 
                 if (col % (PART_SKIP_COUNT+1) == 0)
                 {
-                    uint32_t c565 = b1 | b2 << 8;
+                    //uint16_t c565 = b1 | b2 << 8;
+                    c565 = c565 >> 8 | c565 << 8;
 
                     if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
                     {
