@@ -20,8 +20,8 @@ int main()
         else 
             track();
 
-    while(true)
-        CameraController::SendImage();
+    //while(true)
+    //    CameraController::SendImage();
 
     return 0;
 }

@@ -81,7 +81,7 @@ namespace RollingTable
         SkipRows(TOP_MARGIN);
         for (uint16_t row = 0; row < IMAGE_HEIGHT; row++)
         {
-            SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
+            SkipColumns(LEFT_MARGIN);
 
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
@@ -96,7 +96,7 @@ namespace RollingTable
                 if (B > 5 && B < minB) minB = B;
             }
 
-            SkipColumns(LEFT_MARGIN);
+            SkipColumns(RIGHT_MARGIN);
         }
 
         EndRead();
@@ -128,7 +128,7 @@ namespace RollingTable
         SkipRows(TOP_MARGIN);
         for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (FULL_SKIP_COUNT+1))
         {
-            SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
+            SkipColumns(LEFT_MARGIN);
 
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
@@ -145,7 +145,7 @@ namespace RollingTable
                 }
             }
 
-            SkipColumns(LEFT_MARGIN);
+            SkipColumns(RIGHT_MARGIN);
             SkipRows(FULL_SKIP_COUNT);
         }
         
@@ -183,7 +183,7 @@ namespace RollingTable
         SkipRows(TOP_MARGIN);
         for (uint16_t row = 0; row < IMAGE_HEIGHT; row++)
         {
-            SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
+            SkipColumns(LEFT_MARGIN);
 
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
@@ -206,7 +206,7 @@ namespace RollingTable
                 }
             }
 
-            SkipColumns(LEFT_MARGIN);
+            SkipColumns(RIGHT_MARGIN);
 
             SerialHelper::AwaitSignal();
             SerialHelper::SendBytes(bytes, IMAGE_WIDTH * 3);
@@ -243,7 +243,7 @@ namespace RollingTable
         
         for (uint16_t row = 0; row < trackTimes; row++)
         {
-            SkipColumns(RIGHT_MARGIN); // Since image is mirrored, right first
+            SkipColumns(LEFT_MARGIN);
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
                 uint16_t c565 = SPI.transfer16(0x00);
@@ -258,7 +258,7 @@ namespace RollingTable
                     }
                 }
             }
-            SkipColumns(LEFT_MARGIN);
+            SkipColumns(RIGHT_MARGIN);
             SkipRows(PART_SKIP_COUNT);
 
             rowPart += (PART_SKIP_COUNT+1);
