@@ -10,6 +10,9 @@ namespace RollingTable
     uint32_t pointsAveragedPart;
     uint16_t rowPart;
 
+    uint32_t pointsAveraged = 0; // Is uint32 since 240*320 > UINT16_MAX
+    float avgX = 0, avgY = 0;
+
 
     void CameraController::Init(int slavePin)
     {
@@ -35,10 +38,18 @@ namespace RollingTable
     {
         camera.flush_fifo();
         camera.start_capture();
-        while (!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) { }
+        //while (!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) { }
 
+        SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+        
+        camera.CS_LOW();
+        do SPI.transfer(ARDUCHIP_TRIG); while (!(SPI.transfer(0x00) & CAP_DONE_MASK));
+        camera.CS_HIGH();
+        
         // Skip dummy byte here
         camera.read_fifo();
+        
+        SPI.endTransaction();
     }
 
     void CameraController::SkipRows(uint16_t count)
@@ -82,7 +93,6 @@ namespace RollingTable
         for (uint16_t row = 0; row < IMAGE_HEIGHT; row++)
         {
             SkipColumns(LEFT_MARGIN);
-
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
                 uint16_t c565 = SPI.transfer16(0x00);
@@ -91,9 +101,12 @@ namespace RollingTable
                 uint8_t G = ((c565 >> 5) & 0x3f);
                 uint8_t B = ((c565 >> 11) & 0x1f);
 
-                if (R > 5 && R < minR) minR = R;
-                if (G > 10 && G < minG) minG = G;
-                if (B > 5 && B < minB) minB = B;
+                if ((R > 4 && G > 8 && B > 4) && (R < minR && G < minG && B < minB))
+                {
+                    minR = R;
+                    minG = G;
+                    minB = B;
+                }
             }
 
             SkipColumns(RIGHT_MARGIN);
@@ -119,8 +132,8 @@ namespace RollingTable
 
     bool CameraController::GetBallLocation(int16_t& xCo, int16_t& yCo)
     {
-        uint32_t pointsAveraged = 0; // Is uint32 since 240*320 > UINT16_MAX
-        float avgX = 0, avgY = 0;
+        pointsAveraged = 0;
+        avgX = avgY = 0;
 
         Capture();
         BeginRead();
@@ -129,19 +142,16 @@ namespace RollingTable
         for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (FULL_SKIP_COUNT+1))
         {
             SkipColumns(LEFT_MARGIN);
-
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
                 uint16_t c565 = SPI.transfer16(0x00);
-                
-                if (col % (FULL_SKIP_COUNT+1) == 0)
+
+                if (col % (FULL_SKIP_COUNT+1) == 0 && 
+                    (c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
                 {
-                    if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
-                    {
-                        pointsAveraged += 1;
-                        avgX += (col - avgX) / pointsAveraged;
-                        avgY += (row - avgY) / pointsAveraged;
-                    }
+                    ++pointsAveraged;
+                    avgX += (col - avgX) / pointsAveraged;
+                    avgY += (row - avgY) / pointsAveraged;
                 }
             }
 
@@ -150,6 +160,8 @@ namespace RollingTable
         }
         
         EndRead();
+
+        Serial.print(pointsAveraged); Serial.print(" ");
 
         // Return coordinates offset to have center in (0,0)
         if (pointsAveraged != 0)
@@ -168,8 +180,8 @@ namespace RollingTable
 
     void CameraController::SendImage()
     {
-        uint32_t pointsAveraged = 0; // Is uint32 since 240*320 > UINT16_MAX
-        float avgX = 0, avgY = 0;
+        pointsAveraged = 0;
+        avgX = avgY = 0;
 
         uint8_t* bytes = (uint8_t*)malloc(IMAGE_WIDTH * 3);
 
@@ -200,7 +212,7 @@ namespace RollingTable
                     bytes[col*3+1] = 0;
                     bytes[col*3+2] = 0;
 
-                    pointsAveraged += 1;
+                    ++pointsAveraged;
                     avgX += (col - avgX) / pointsAveraged;
                     avgY += (row - avgY) / pointsAveraged;
                 }

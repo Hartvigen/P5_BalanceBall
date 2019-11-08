@@ -81,31 +81,3 @@ void track()
     ballFound = CameraController::GetBallLocation(xCo, yCo);
     Serial.print(millis() - time); Serial.print(" "); Serial.println("Tracking...");
 }
-
-
-
-/*
-initCam();
-calibrateCam();
-while(Serial.available() == 0){}
-Serial.read();
-Serial.println("Starting...");
-float xCo, yCo;
-uint64_t nextCapture =  0;
-
-{
-    while(millis() < nextCapture){}
-    nextCapture = millis() + CAPTURE_RATE;
-    xCo = 0, yCo = 0;
-    getBallLocation(xCo, yCo);
-    Serial.print("X: ");
-    Serial.print(xCo);
-    Serial.print("    Y: ");
-    Serial.println(yCo);
-    
-
-    //getBallLocation
-    //Choose action (center of ball, current tilt, velocity of ball)
-    //perform action (Set tilt)
-}
-*/
