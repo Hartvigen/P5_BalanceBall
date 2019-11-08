@@ -57,3 +57,11 @@ class Inverse implements ActivationFunction
     return numerator/x;
   }
 }
+
+class ReLU implements ActivationFunction{
+  float compute(float x)
+  {
+    return x < 0 ? 0 : x;
+  }
+  
+}
