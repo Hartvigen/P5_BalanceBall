@@ -1,4 +1,4 @@
-int framerate = 60; //<>// //<>// //<>// //<>// //<>//
+int framerate = 60; //<>// //<>// //<>//
 long currentTime = 0;
 int timestep = 1000/framerate;
 int infoBoxHeight = 65;
@@ -54,15 +54,15 @@ void initialize()
     readEpoch(input);
 
     tables[0] = new Table(250, new PVector(width/2, height/2), new FirstBrain(loadBrain(input)), maxFitness);
-    try {
-      input.read();
-    }
-    catch(IOException e) {
-      e.printStackTrace();
-    }
-
+      try {
+        input.read();
+      }
+      catch(IOException e) {
+        e.printStackTrace();
+      }
+    
     for (int i = 1; i < genSize; i++) {
-      tables[i] = new Table(250, new PVector(width/2, height/2), new FirstBrain(loadBrain(input)));
+      tables[i] = new Table(250, new PVector(width/2, height/2), new FirstBrain(loadBrain(input))); //<>//
       try {
         input.read();
       }
@@ -92,7 +92,7 @@ void mutate()
   }
 
   for (int i = 1; i < genSize - 1; i++)
-    newTables[i].brain.mutate(0.3, 0.12);
+    newTables[i].brain.mutate(0.3, 0.06);
 
   newTables[genSize-1] = new Table(250, new PVector(width/2, height/2));
 
@@ -105,20 +105,16 @@ Table getParent()
 {
   float fitnessSum = 0f;
   for (int i = 0; i < genSize; i++)
-    if (tables[i].fitness > 20)
-      fitnessSum += tables[i].fitness;
+    fitnessSum += tables[i].fitness;
 
-  if(fitnessSum == 0)
-    return tables[int(random(0, 19))];
   float probability = random(0f, fitnessSum);
   float runningSum = 0f;
   for (int i = 0; i < genSize; i++)
-    if (tables[i].fitness > 20)
-    {
-      runningSum += tables[i].fitness;
-      if (runningSum >= probability)
-        return tables[i];
-    }
+  {
+    runningSum += tables[i].fitness;
+    if (runningSum >= probability)
+      return tables[i];
+  }
 
   return null; // Should never get here
 }
@@ -161,7 +157,7 @@ void draw()
     stillRunning = genSize;
   } else
   {
-    mutate();
+    mutate(); //<>//
   }
 
   drawInfo();
