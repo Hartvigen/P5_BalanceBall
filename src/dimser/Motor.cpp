@@ -54,9 +54,9 @@ void runOuterMotors(SH_Direction direction, int speed, long degrees)
 void runInnerMotors(SH_Direction direction, int speed, long degrees)
 {
     nxshield.bank_a.motorRunDegrees(SH_Motor_Both, 
-                    direction, 
+                    direction,
                     speed,
-                    degrees,   
+                    degrees,
                     SH_Completion_Wait_For,
                     SH_Next_Action_BrakeHold);
 

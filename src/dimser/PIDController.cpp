@@ -5,7 +5,7 @@ double setPoint; //we only have one setpoint as the desired value for both inner
 double innerInput, outerInput; //ball posistion for both inner and outer
 double innerOutput, outerOutput; //motor turn
 
-double IKp, OKp = 0, IKi, OKi = 0, IKd, OKd = 0;
+double IKp = 1, OKp = 1, IKi = 0, OKi = 0, IKd = 0, OKd = 0;
 
 //We use two seperate PID Controllers as the input for 
 PID innerPid(&innerInput, &innerOutput, &setPoint, IKp, IKi, IKd, DIRECT);
@@ -21,11 +21,30 @@ void initPID(){
 }
 
 void runPID(float xCo, float yCo){
-    innerInput = xCo;
-    outerInput = yCo;
+    innerInput = abs(xCo) * -1;
+    outerInput = abs(yCo) * -1;
 
     innerPid.Compute();
     outerPid.Compute();
+
+    if(xCo > setPoint)
+        Serial.println("forward");
+
+    else if(xCo <= setPoint)
+        Serial.println("backwards");
+
+
+    if(yCo > setPoint)
+        Serial.println("forward");
+
+    else if(yCo <= setPoint)
+        Serial.println("backwards");
+
+    Serial.print("inner: ");
+    Serial.print(innerOutput);
+    Serial.print("  ");
+    Serial.print("outer: ");
+    Serial.println(outerOutput);
 
 
 }

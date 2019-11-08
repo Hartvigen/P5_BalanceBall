@@ -1,5 +1,6 @@
 #include "main.h"
 #include "Serial/SerialHelper.h"
+#include "headers/PIDController.h"
 
 bool ballFound = false;
 int16_t xCo, yCo;
@@ -34,7 +35,6 @@ void initialize()
     digitalWrite(LED_BUILTIN, LOW);
 
     Wire.begin();
-    Wire.setClock((uint32_t)1000000);
     SPI.begin();
     Serial.begin(691200L);
 
@@ -50,6 +50,7 @@ void setup()
     MotorsController::Reset();
     MotorsController::SetInnerSpeed(10);
     MotorsController::SetOuterSpeed(10);
+    initPID();
 
     CameraController::Init(CAM_SLAVE_PIN);
     CameraController::Recalibrate();
@@ -60,9 +61,12 @@ void loop()
     time = millis();
     ballFound = CameraController::GetBallLocation(xCo, yCo);
     Serial.print(millis() - time); Serial.print(" "); 
+    
 
     if (ballFound)
-    { Serial.print(xCo); Serial.print(" "); Serial.println(yCo); }
+    { Serial.print(xCo); Serial.print(" "); Serial.println(yCo); 
+      runPID(xCo, yCo);
+    }
     else
     { Serial.println("Lost..."); }
     

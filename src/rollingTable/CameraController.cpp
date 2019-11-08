@@ -161,7 +161,7 @@ namespace RollingTable
         
         EndRead();
 
-        Serial.print(pointsAveraged); Serial.print(" ");
+        //Serial.print(pointsAveraged); Serial.print(" ");
 
         // Return coordinates offset to have center in (0,0)
         if (pointsAveraged != 0)
