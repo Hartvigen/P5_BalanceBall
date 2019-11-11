@@ -36,11 +36,10 @@ namespace RollingTable
 
     void CameraController::Capture()
     {
+        SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+
         camera.flush_fifo();
         camera.start_capture();
-        //while (!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) { }
-
-        SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
         
         camera.CS_LOW();
         do SPI.transfer(ARDUCHIP_TRIG); while (!(SPI.transfer(0x00) & CAP_DONE_MASK));
@@ -114,13 +113,13 @@ namespace RollingTable
 
         EndRead();
 
-        ///*
+        /*
         Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
         Serial.print("minG: "); Serial.print(minG); Serial.print("  ");
         Serial.print("minB: "); Serial.print(minB); Serial.println();
         //*/
 
-        /*
+        ///*
         Serial.write(minR);
         SerialHelper::AwaitSignal();
         Serial.write(minG);
