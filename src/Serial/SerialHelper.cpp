@@ -1,3 +1,4 @@
+#if USE_IMG_DIS
 #include "SerialHelper.h"
 
 void SerialHelper::AwaitSignal()
@@ -23,3 +24,4 @@ void SerialHelper::SendInt(int32_t value)
 
     Serial.write(bytes, 4);
 }
+#endif
