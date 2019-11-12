@@ -1,13 +1,19 @@
 #ifndef CAMERA_CONTROLLER_H_INCLUDE
 #define CAMERA_CONTROLLER_H_INCLUDE
 
+#include "Setup.h"
+
 #include <stdint.h>
 #include <Arduino.h>
 #include <ArduCAM.h>
 #include <SPI.h>
 
-#define CAPTURE_WIDTH (uint16_t)320
-#define CAPTURE_HEIGHT (uint16_t)240
+#if USE_IMG_DIS
+#include "Serial/SerialHelper.h"
+#endif
+
+#define CAPTURE_WIDTH (uint16_t)160 // 320
+#define CAPTURE_HEIGHT (uint16_t)120 // 240
 
 #define LEFT_MARGIN (uint16_t)16
 #define RIGHT_MARGIN (uint16_t)15
@@ -40,7 +46,10 @@ namespace RollingTable
 
             static void Recalibrate();
             static bool GetBallLocation(int16_t& xCo, int16_t& yCo);
+
+#if USE_IMG_DIS
             static void SendImage();
+#endif
 
             static void StartTracking();
             static void ProceedTracking(uint16_t trackTimes);

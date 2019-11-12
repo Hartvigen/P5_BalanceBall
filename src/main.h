@@ -1,6 +1,10 @@
+#include "Setup.h"
+
 #include "rollingTable/MotorsController.h"
 #include "rollingTable/CameraController.h"
 #include <Wire.h>
+
+#include "headers/PIDController.h"
 
 using namespace RollingTable;
 

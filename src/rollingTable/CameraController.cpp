@@ -1,5 +1,4 @@
 #include "CameraController.h"
-#include "Serial/SerialHelper.h"
 
 namespace RollingTable
 {
@@ -10,8 +9,8 @@ namespace RollingTable
     uint32_t pointsAveragedPart;
     uint16_t rowPart;
 
-    uint32_t pointsAveraged = 0; // Is uint32 since 240*320 > UINT16_MAX
-    float avgX = 0, avgY = 0;
+    uint32_t pointsAveraged; // Is uint32 since 240*320 > UINT16_MAX
+    float avgX, avgY;
 
 
     void CameraController::Init(int slavePin)
@@ -113,19 +112,17 @@ namespace RollingTable
 
         EndRead();
 
-        /*
-        Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
-        Serial.print("minG: "); Serial.print(minG); Serial.print("  ");
-        Serial.print("minB: "); Serial.print(minB); Serial.println();
-        //*/
-
-        ///*
+#if USE_IMG_DIS
         Serial.write(minR);
         SerialHelper::AwaitSignal();
         Serial.write(minG);
         SerialHelper::AwaitSignal();
         Serial.write(minB);
-        //*/
+#else
+        Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
+        Serial.print("minG: "); Serial.print(minG); Serial.print("  ");
+        Serial.print("minB: "); Serial.print(minB); Serial.println();
+#endif  
     }
 
 
@@ -160,8 +157,6 @@ namespace RollingTable
         
         EndRead();
 
-        //Serial.print(pointsAveraged); Serial.print(" ");
-
         // Return coordinates offset to have center in (0,0)
         if (pointsAveraged != 0)
         {
@@ -177,6 +172,7 @@ namespace RollingTable
     }
 
 
+#if USE_IMG_DIS
     void CameraController::SendImage()
     {
         pointsAveraged = 0;
@@ -232,6 +228,7 @@ namespace RollingTable
         SerialHelper::AwaitSignal();
         SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2)));
     }
+#endif
 
 
     void CameraController::StartTracking()

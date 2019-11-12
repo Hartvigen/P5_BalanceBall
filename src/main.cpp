@@ -1,6 +1,4 @@
 #include "main.h"
-#include "Serial/SerialHelper.h"
-#include "headers/PIDController.h"
 
 bool ballFound = false;
 int16_t xCo, yCo;
@@ -14,15 +12,14 @@ int main()
     initialize();
     setup();
 
-    digitalWrite(LED_BUILTIN, HIGH);
-    while (true)
-        if (ballFound)
-            loop();
-        else 
-            track();
-
+#if USE_IMG_DIS
     while(true)
         CameraController::SendImage();
+#else
+    while (true)
+        if (ballFound) loop();
+        else track();
+#endif
 
     return 0;
 }
@@ -31,8 +28,6 @@ int main()
 void initialize()
 {
     init();
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, LOW);
 
     Wire.begin();
     SPI.begin();
@@ -50,7 +45,12 @@ void setup()
     MotorsController::Reset();
     MotorsController::SetInnerSpeed(10);
     MotorsController::SetOuterSpeed(10);
+    
+#if USE_PID
     initPID();
+#else
+    // Use AI
+#endif
 
     CameraController::Init(CAM_SLAVE_PIN);
     CameraController::Recalibrate();
@@ -62,16 +62,20 @@ void loop()
     ballFound = CameraController::GetBallLocation(xCo, yCo);
     Serial.print(millis() - time); Serial.print(" "); 
     
-
     if (ballFound)
-    { Serial.print(xCo); Serial.print(" "); Serial.println(yCo); 
-      runPID(xCo, yCo);
+    { 
+        Serial.print(xCo); Serial.print(" "); Serial.println(yCo);
+
+#if USE_PID
+        runPID(xCo, yCo);
+#else
+        // Use AI
+#endif
     }
     else
-    { Serial.println("Lost..."); }
-    
-
-    // Get xAng, yAng. This is where PID and AI will differ
+    { 
+        Serial.println("Lost..."); 
+    }
 
     //MotorsController::SetInnerAngle(xAng);
     //MotorsController::SetOuterAngle(yAng);

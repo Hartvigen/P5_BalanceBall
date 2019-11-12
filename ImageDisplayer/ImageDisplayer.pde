@@ -44,6 +44,8 @@ void keyPressed()
   int h = readInt();
   int w = readInt();
   
+  println("Size (" + w + "," + h + ")");
+  
   ArrayList<byte[]> image = new ArrayList<byte[]>();
   
   for (int i = 0; i < h; i++)
