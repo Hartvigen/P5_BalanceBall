@@ -19,28 +19,33 @@ namespace RollingTable
         shield.bank_b.motorStartBothInSync();
     }
 
-    void MotorsController::Reset() {
+    void MotorsController::Reset() 
+    {
         shield.bank_a.motorReset();
         shield.bank_b.motorReset();
     }
 
 
-    void MotorsController::SetInnerAngle(int8_t targetAngle) {
+    void MotorsController::SetInnerAngle(int8_t targetAngle) 
+    {
         innerAngle = min(targetAngle, MAX_ANGLE);
         innerAngle = max(innerAngle, -MAX_ANGLE);
     }
 
-    void MotorsController::SetInnerSpeed(int8_t speed) {
+    void MotorsController::SetInnerSpeed(int8_t speed) 
+    {
         innerSpeed = speed;
     }
 
 
-    void MotorsController::SetOuterAngle(int8_t targetAngle) {
+    void MotorsController::SetOuterAngle(int8_t targetAngle) 
+    {
         outerAngle = min(targetAngle, MAX_ANGLE);
         outerAngle = max(outerAngle, -MAX_ANGLE);
     }
 
-    void MotorsController::SetOuterSpeed(int8_t speed) {
+    void MotorsController::SetOuterSpeed(int8_t speed) 
+    {
         outerSpeed = speed;
     }
 

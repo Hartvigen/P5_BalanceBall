@@ -12,8 +12,8 @@
 #include "Serial/SerialHelper.h"
 #endif
 
-#define CAPTURE_WIDTH (uint16_t)160 // 320
-#define CAPTURE_HEIGHT (uint16_t)120 // 240
+#define CAPTURE_WIDTH (uint16_t)160
+#define CAPTURE_HEIGHT (uint16_t)120
 
 #define LEFT_MARGIN (uint16_t)16
 #define RIGHT_MARGIN (uint16_t)15

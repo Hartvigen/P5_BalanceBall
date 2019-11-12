@@ -94,9 +94,9 @@ namespace RollingTable
             {
                 uint16_t c565 = SPI.transfer16(0x00);
 
-                uint8_t R = (c565 & 0x1f);
-                uint8_t G = ((c565 >> 5) & 0x3f);
-                uint8_t B = ((c565 >> 11) & 0x1f);
+                uint8_t R = (c565 & 0x1F);
+                uint8_t G = ((c565 >> 5) & 0x3F);
+                uint8_t B = ((c565 >> 11) & 0x1F);
 
                 if ((R > 4 && G > 8 && B > 4) && (R < minR && G < minG && B < minB))
                 {
@@ -142,7 +142,7 @@ namespace RollingTable
                 uint16_t c565 = SPI.transfer16(0x00);
 
                 if (col % (FULL_SKIP_COUNT+1) == 0 && 
-                    (c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
+                    (c565 & 0x1F) < minR && ((c565 >> 5) & 0x3F) < minG && ((c565 >> 11) & 0x1F) < minB)
                 {
                     ++pointsAveraged;
                     avgX += (col - avgX) / pointsAveraged;
@@ -195,11 +195,11 @@ namespace RollingTable
             {
                 uint16_t c565 = SPI.transfer16(0x00);
 
-                bytes[col*3+0] = (c565 & 0x1f);         // R
-                bytes[col*3+1] = ((c565 >> 5) & 0x3f);  // G
-                bytes[col*3+2] = ((c565 >> 11) & 0x1f); // B
+                bytes[col*3+0] = (c565 & 0x1F);         // R
+                bytes[col*3+1] = ((c565 >> 5) & 0x3F);  // G
+                bytes[col*3+2] = ((c565 >> 11) & 0x1F); // B
 
-                if (row % (FULL_SKIP_COUNT+1) == 0 && 
+                if (row % (FULL_SKIP_COUNT+1) == 0 && col % (FULL_SKIP_COUNT+1) == 0 && 
                     bytes[col*3+0] < minR && bytes[col*3+1] < minG && bytes[col*3+2] < minB)
                 {
                     bytes[col*3+0] = 31;
