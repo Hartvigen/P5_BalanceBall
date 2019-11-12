@@ -17,8 +17,7 @@ int main()
         CameraController::SendImage();
 #else
     while (true)
-        if (ballFound) loop();
-        else track();
+        loop();
 #endif
 
     return 0;
@@ -46,15 +45,16 @@ void setup()
     MotorsController::SetInnerSpeed(10);
     MotorsController::SetOuterSpeed(10);
     
-#if USE_PID
+    #if USE_PID
     initPID();
-#else
-    // Use AI
-#endif
+    #else
+    // Init AI
+    #endif
 
     CameraController::Init(CAM_SLAVE_PIN);
     CameraController::Recalibrate();
 }
+
 
 void loop()
 {
@@ -66,26 +66,19 @@ void loop()
     { 
         Serial.print(xCo); Serial.print(" "); Serial.println(yCo);
 
-#if USE_PID
+        #if USE_PID
         runPID(xCo, yCo);
-#else
+        #else
         // Use AI
-#endif
+        #endif
     }
     else
     { 
-        Serial.println("Lost..."); 
+        Serial.println("Tracking..."); 
     }
 
-    //MotorsController::SetInnerAngle(xAng);
-    //MotorsController::SetOuterAngle(yAng);
+    MotorsController::SetInnerAngle(xAng);
+    MotorsController::SetOuterAngle(yAng);
 
     //MotorsController::Move();
-}
-
-void track()
-{
-    time = millis();
-    ballFound = CameraController::GetBallLocation(xCo, yCo);
-    Serial.print(millis() - time); Serial.print(" "); Serial.println("Tracking...");
 }

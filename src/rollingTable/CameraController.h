@@ -48,12 +48,8 @@ namespace RollingTable
             static bool GetBallLocation(int16_t& xCo, int16_t& yCo);
 
 #if USE_IMG_DIS
-            static void SendImage();
+            static void SendImageToProcessing();
 #endif
-
-            static void StartTracking();
-            static void ProceedTracking(uint16_t trackTimes);
-            static bool EndTracking(int16_t& xCo, int16_t& yCo);
     };
 }
 
