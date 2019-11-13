@@ -2,7 +2,7 @@
 
 bool ballFound = false;
 int16_t xCo, yCo;
-int16_t xAng, yAng;
+int8_t xAng = 0, yAng = 0;
 
 uint32_t time;
 
@@ -67,7 +67,7 @@ void loop()
         Serial.print(xCo); Serial.print(" "); Serial.println(yCo);
 
         #if USE_PID
-        runPID(xCo, yCo);
+        runPID(xCo, yCo, xAng, yAng);
         #else
         // Use AI
         #endif
@@ -78,7 +78,10 @@ void loop()
     }
 
     MotorsController::SetInnerAngle(xAng);
-    MotorsController::SetOuterAngle(yAng);
+    MotorsController::SetOuterAngle(0);
 
-    //MotorsController::Move();
+    Serial.print(" Output: ");
+    Serial.println(xAng);
+    
+    MotorsController::Move();
 }

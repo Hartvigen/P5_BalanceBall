@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <PID_v1.h>
+#include <rollingTable/MotorsController.h>
 
 #define MAX_OUTPUT 50
 
@@ -11,7 +12,7 @@ double integralSum = 0;
 float lastInput = 0;
 double output = 0;
 
-double IKp = 0.175, OKp = 0.175, IKi = 0, OKi = 0, IKd = 1, OKd = 1;
+double IKp = 0.175, OKp = 0.175, IKi = 0, OKi = 0, IKd = 0, OKd = 2;
 
 //We use two seperate PID Controllers as the input for 
 PID innerPid(&innerInput, &innerOutput, &setPoint, IKp, IKi, IKd, DIRECT);
@@ -26,7 +27,7 @@ void initPID(){
 
 }
 
-void runPID(float xCo, float yCo){
+void runPID(float xCo, float yCo, int8_t &xAng, int8_t &yAng){
 
 
     double proportional = IKp * xCo;
@@ -40,10 +41,10 @@ void runPID(float xCo, float yCo){
 
     output = result;
 
+    xAng = output;
+
     Serial.print("Posistion: ");
     Serial.print(xCo);
-    Serial.print(" Output: ");
-    Serial.println(output);
 
 
 }

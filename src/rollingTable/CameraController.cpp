@@ -111,6 +111,10 @@ namespace RollingTable
 
         EndRead();
 
+        minR-=2;
+        minG-=2;
+        minB-=2;
+
 #if USE_IMG_DIS
         Serial.write(minR);
         SerialHelper::AwaitSignal();
