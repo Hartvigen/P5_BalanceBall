@@ -55,10 +55,10 @@ class FirstBrain implements Brain
 
 
     hl1 = new Neuron[] {
-      new Neuron(resig, input, weights[0][0]), 
-      new Neuron(resig, input, weights[0][1]), 
-      new Neuron(resig, input, weights[0][2]), 
-      new Neuron(resig, input, weights[0][3]), 
+      new Neuron(linear, input, weights[0][0]), 
+      new Neuron(linear, input, weights[0][1]), 
+      new Neuron(linear, input, weights[0][2]), 
+      new Neuron(linear, input, weights[0][3]), 
       new Neuron(tipInv, input, weights[0][4]), 
       new Neuron(tipInv, input, weights[0][5]), 
     };
@@ -141,7 +141,7 @@ class Neuron
 
     inputCount = inputs.length;
     for (int i = 0; i < inputCount; i++)
-      weights[i] = random(5) - 2.5;
+      weights[i] = random(2) - 1;
   }
 
   Neuron(ActivationFunction _func, Neuron[] _inputs, float[] _weights, float _bias)

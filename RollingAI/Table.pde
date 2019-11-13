@@ -18,7 +18,7 @@ class Table
   Brain brain;
   float[] decision;
   long decisionTime = 0;
-  int delayTime = 300;
+  int delayTime = 150;
 
   float fitness = 0f;
   float allTimeBest = 0f;
@@ -100,6 +100,7 @@ class Table
       {
         desiredX = decision[0] * maxAngle;
         desiredY = decision[1] * maxAngle;
+        println("X = " + desiredX + ", Y = " + desiredY);
         powerX = decision[2];
         powerY = decision[3];
         decisionTime = 0;
@@ -144,16 +145,11 @@ class Table
   void updateTilt()
   {
     float xDiff = desiredX - angleX;
-    println(desiredX + " - " + angleX + " = " + xDiff); 
-    print(xDiff);
-    xDiff *= powerX;
-    println(" * " + powerX + " = " + xDiff);
-    print(angleX);
-    angleX += min(5, max(-5, xDiff));
-    println(" + " + min(5, max(-5, xDiff)) + " = " + angleX);
     
+    xDiff *= powerX;
+    
+    angleX += min(5, max(-5, xDiff));
     angleX = min(maxAngle, max(-maxAngle, angleX));
-
     float yDiff = desiredY - angleY;
     yDiff *= powerY;
     angleY += min(5, max(-5, yDiff));

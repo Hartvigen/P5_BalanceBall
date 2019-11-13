@@ -17,7 +17,6 @@ int shownIndex = -1;
 
 float maxFitness = 0f;
 
-
 void setup()
 {
   size(500, 500);
