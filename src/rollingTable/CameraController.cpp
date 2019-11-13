@@ -134,15 +134,14 @@ namespace RollingTable
         BeginRead();
 
         SkipRows(TOP_MARGIN);
-        for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (FULL_SKIP_COUNT+1))
+        for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (ROW_SKIP_COUNT+1))
         {
             SkipColumns(LEFT_MARGIN);
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
                 uint16_t c565 = SPI.transfer16(0x00);
 
-                if (col % (FULL_SKIP_COUNT+1) == 0 && 
-                    (c565 & 0x1F) < minR && ((c565 >> 5) & 0x3F) < minG && ((c565 >> 11) & 0x1F) < minB)
+                if ((c565 & 0x1F) < minR && ((c565 >> 5) & 0x3F) < minG && ((c565 >> 11) & 0x1F) < minB)
                 {
                     ++pointsAveraged;
                     avgX += (col - avgX) / pointsAveraged;
@@ -151,7 +150,7 @@ namespace RollingTable
             }
 
             SkipColumns(RIGHT_MARGIN);
-            SkipRows(FULL_SKIP_COUNT);
+            SkipRows(ROW_SKIP_COUNT);
         }
         
         EndRead();
@@ -199,7 +198,7 @@ namespace RollingTable
                 bytes[col*3+1] = ((c565 >> 5) & 0x3F);  // G
                 bytes[col*3+2] = ((c565 >> 11) & 0x1F); // B
 
-                if (row % (FULL_SKIP_COUNT+1) == 0 && col % (FULL_SKIP_COUNT+1) == 0 && 
+                if (row % (ROW_SKIP_COUNT+1) == 0 &&
                     bytes[col*3+0] < minR && bytes[col*3+1] < minG && bytes[col*3+2] < minB)
                 {
                     bytes[col*3+0] = 31;
