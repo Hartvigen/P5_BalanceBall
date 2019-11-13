@@ -53,7 +53,7 @@ namespace RollingTable
     void MotorsController::Move()
     {
         Move(shield.bank_a, innerAngle, innerDir, innerSpeed);
-        Move(shield.bank_b, outerAngle, outerDir, outerSpeed);
+        //Move(shield.bank_b, outerAngle, outerDir, outerSpeed);
     }
 
 

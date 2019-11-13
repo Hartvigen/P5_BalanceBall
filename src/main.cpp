@@ -53,22 +53,31 @@ void setup()
     #endif
 
     CameraController::Init(CAM_SLAVE_PIN);
-    CameraController::ManualCalibrate(5,10,5);
+    CameraController::ManualCalibrate(3,6,3);
 }
 
 
 void loop()
 {
+
     time = millis();
     ballFound = CameraController::GetBallLocation(xCo, yCo);
     Serial.print(millis() - time); Serial.print(" "); 
-    
+    delay(10);
     if (ballFound)
     { 
         Serial.print(xCo); Serial.print(" "); Serial.println(yCo);
 
         #if USE_PID
         runPID(xCo, yCo, xAng, yAng);
+
+        MotorsController::SetInnerAngle(xAng);
+        MotorsController::SetOuterAngle(0);
+
+        Serial.print(" Output: ");
+        Serial.println(xAng);
+        
+        MotorsController::Move();
         #else
         // Use AI
         #endif
@@ -78,11 +87,4 @@ void loop()
         Serial.println("Tracking..."); 
     }
 
-    MotorsController::SetInnerAngle(xAng);
-    MotorsController::SetOuterAngle(0);
-
-    Serial.print(" Output: ");
-    Serial.println(xAng);
-    
-    MotorsController::Move();
 }
