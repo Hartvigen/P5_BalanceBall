@@ -78,7 +78,7 @@ namespace RollingTable
     }
 
 
-    void CameraController::Recalibrate()
+    void CameraController::AutoCalibrate()
     {
         Capture();
         BeginRead();
@@ -111,9 +111,7 @@ namespace RollingTable
 
         EndRead();
 
-        minR-=2;
-        minG-=2;
-        minB-=2;
+        minR--; minG--; minB--;
 
 #if USE_IMG_DIS
         Serial.write(minR);
@@ -126,6 +124,13 @@ namespace RollingTable
         Serial.print("minG: "); Serial.print(minG); Serial.print("  ");
         Serial.print("minB: "); Serial.print(minB); Serial.println();
 #endif  
+    }
+
+    void CameraController::ManualCalibrate(uint8_t r, uint8_t g, uint8_t b)
+    {
+        minR = r;
+        minG = g;
+        minB = b;
     }
 
 

@@ -42,8 +42,9 @@ namespace RollingTable
 
         public:
             static void Init(int slavePin);
+            static void AutoCalibrate();
+            static void ManualCalibrate(uint8_t r, uint8_t g, uint8_t b);
 
-            static void Recalibrate();
             static bool GetBallLocation(int16_t& xCo, int16_t& yCo);
 
 #if USE_IMG_DIS

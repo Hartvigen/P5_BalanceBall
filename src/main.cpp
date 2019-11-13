@@ -13,6 +13,7 @@ int main()
     setup();
 
 #if USE_IMG_DIS
+    SerialHelper::SendInt(1);
     while(true)
         CameraController::SendImageToProcessing();
 #else
@@ -52,7 +53,7 @@ void setup()
     #endif
 
     CameraController::Init(CAM_SLAVE_PIN);
-    CameraController::Recalibrate();
+    CameraController::ManualCalibrate(5,10,5);
 }
 
 
