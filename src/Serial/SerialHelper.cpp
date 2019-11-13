@@ -1,6 +1,6 @@
-#if USE_IMG_DIS
 #include "SerialHelper.h"
 
+#if USE_IMG_DIS
 void SerialHelper::AwaitSignal()
 {
     while (!Serial.available()) { delay(2); }

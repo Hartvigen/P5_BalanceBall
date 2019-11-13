@@ -4,7 +4,7 @@ bool ballFound = false;
 int16_t xCo, yCo;
 int16_t xAng, yAng;
 
-uint32_t time = 0;
+uint32_t time;
 
 
 int main()
@@ -14,7 +14,7 @@ int main()
 
 #if USE_IMG_DIS
     while(true)
-        CameraController::SendImage();
+        CameraController::SendImageToProcessing();
 #else
     while (true)
         loop();
