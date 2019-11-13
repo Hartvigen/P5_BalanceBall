@@ -1,3 +1,6 @@
+#include "Setup.h"
+#if USE_IMG_DIS
+
 #ifndef SERIAL_HELPER_H_INCLUDE
 #define SERIAL_HELPER_H_INCLUDE
 
@@ -13,3 +16,5 @@ class SerialHelper
 };
 
 #endif
+
+#endif // USE_IMG_DIS

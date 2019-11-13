@@ -1,14 +1,14 @@
 #include "CameraController.h"
-#include "Serial/SerialHelper.h"
 
 namespace RollingTable
 {
     ArduCAM CameraController::camera;
-    uint8_t CameraController::minR, CameraController::minG, CameraController::minB;
+    uint8_t CameraController::minR;
+    uint8_t CameraController::minG;
+    uint8_t CameraController::minB;
 
-    float xAvgPart, yAvgPart;
-    uint32_t pointsAveragedPart;
-    uint16_t rowPart;
+    uint32_t pointsAveraged; // Is uint32 since 240*320 > UINT16_MAX
+    float avgX, avgY;
 
 
     void CameraController::Init(int slavePin)
@@ -33,12 +33,20 @@ namespace RollingTable
 
     void CameraController::Capture()
     {
+        SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+
         camera.flush_fifo();
         camera.start_capture();
-        while (!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) { }
-
+        
+        camera.CS_LOW();
+        do SPI.transfer(ARDUCHIP_TRIG); 
+        while (!(SPI.transfer(0x00) & CAP_DONE_MASK));
+        camera.CS_HIGH();
+        
         // Skip dummy byte here
         camera.read_fifo();
+        
+        SPI.endTransaction();
     }
 
     void CameraController::SkipRows(uint16_t count)
@@ -82,18 +90,20 @@ namespace RollingTable
         for (uint16_t row = 0; row < IMAGE_HEIGHT; row++)
         {
             SkipColumns(LEFT_MARGIN);
-
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
                 uint16_t c565 = SPI.transfer16(0x00);
 
-                uint8_t R = (c565 & 0x1f);
-                uint8_t G = ((c565 >> 5) & 0x3f);
-                uint8_t B = ((c565 >> 11) & 0x1f);
+                uint8_t R = (c565 & 0x1F);
+                uint8_t G = ((c565 >> 5) & 0x3F);
+                uint8_t B = ((c565 >> 11) & 0x1F);
 
-                if (R > 5 && R < minR) minR = R;
-                if (G > 10 && G < minG) minG = G;
-                if (B > 5 && B < minB) minB = B;
+                if ((R > 4 && G > 8 && B > 4) && (R < minR && G < minG && B < minB))
+                {
+                    minR = R;
+                    minG = G;
+                    minB = B;
+                }
             }
 
             SkipColumns(RIGHT_MARGIN);
@@ -101,52 +111,46 @@ namespace RollingTable
 
         EndRead();
 
-        ///*
-        Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
-        Serial.print("minG: "); Serial.print(minG); Serial.print("  ");
-        Serial.print("minB: "); Serial.print(minB); Serial.println();
-        //*/
-
-        /*
+#if USE_IMG_DIS
         Serial.write(minR);
         SerialHelper::AwaitSignal();
         Serial.write(minG);
         SerialHelper::AwaitSignal();
         Serial.write(minB);
-        //*/
+#else
+        Serial.print("minR: "); Serial.print(minR); Serial.print("  ");
+        Serial.print("minG: "); Serial.print(minG); Serial.print("  ");
+        Serial.print("minB: "); Serial.print(minB); Serial.println();
+#endif  
     }
 
 
     bool CameraController::GetBallLocation(int16_t& xCo, int16_t& yCo)
     {
-        uint32_t pointsAveraged = 0; // Is uint32 since 240*320 > UINT16_MAX
-        float avgX = 0, avgY = 0;
+        pointsAveraged = 0;
+        avgX = avgY = 0;
 
         Capture();
         BeginRead();
 
         SkipRows(TOP_MARGIN);
-        for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (FULL_SKIP_COUNT+1))
+        for (uint16_t row = 0; row < IMAGE_HEIGHT; row += (ROW_SKIP_COUNT+1))
         {
             SkipColumns(LEFT_MARGIN);
-
             for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
             {
                 uint16_t c565 = SPI.transfer16(0x00);
-                
-                if (col % (FULL_SKIP_COUNT+1) == 0)
+
+                if ((c565 & 0x1F) < minR && ((c565 >> 5) & 0x3F) < minG && ((c565 >> 11) & 0x1F) < minB)
                 {
-                    if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
-                    {
-                        pointsAveraged += 1;
-                        avgX += (col - avgX) / pointsAveraged;
-                        avgY += (row - avgY) / pointsAveraged;
-                    }
+                    ++pointsAveraged;
+                    avgX += (col - avgX) / pointsAveraged;
+                    avgY += (row - avgY) / pointsAveraged;
                 }
             }
 
             SkipColumns(RIGHT_MARGIN);
-            SkipRows(FULL_SKIP_COUNT);
+            SkipRows(ROW_SKIP_COUNT);
         }
         
         EndRead();
@@ -166,10 +170,11 @@ namespace RollingTable
     }
 
 
-    void CameraController::SendImage()
+#if USE_IMG_DIS
+    void CameraController::SendImageToProcessing()
     {
-        uint32_t pointsAveraged = 0; // Is uint32 since 240*320 > UINT16_MAX
-        float avgX = 0, avgY = 0;
+        pointsAveraged = 0;
+        avgX = avgY = 0;
 
         uint8_t* bytes = (uint8_t*)malloc(IMAGE_WIDTH * 3);
 
@@ -189,18 +194,18 @@ namespace RollingTable
             {
                 uint16_t c565 = SPI.transfer16(0x00);
 
-                bytes[col*3+0] = (c565 & 0x1f);         // R
-                bytes[col*3+1] = ((c565 >> 5) & 0x3f);  // G
-                bytes[col*3+2] = ((c565 >> 11) & 0x1f); // B
+                bytes[col*3+0] = (c565 & 0x1F);         // R
+                bytes[col*3+1] = ((c565 >> 5) & 0x3F);  // G
+                bytes[col*3+2] = ((c565 >> 11) & 0x1F); // B
 
-                if (row % (FULL_SKIP_COUNT+1) == 0 && 
-                    bytes[col*3+0] < minR && (bytes[col*3+1] & 0x3f) < minG && (bytes[col*3+2] & 0x1f) < minB)
+                if (row % (ROW_SKIP_COUNT+1) == 0 &&
+                    bytes[col*3+0] < minR && bytes[col*3+1] < minG && bytes[col*3+2] < minB)
                 {
                     bytes[col*3+0] = 31;
                     bytes[col*3+1] = 0;
                     bytes[col*3+2] = 0;
 
-                    pointsAveraged += 1;
+                    ++pointsAveraged;
                     avgX += (col - avgX) / pointsAveraged;
                     avgY += (row - avgY) / pointsAveraged;
                 }
@@ -221,64 +226,5 @@ namespace RollingTable
         SerialHelper::AwaitSignal();
         SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2)));
     }
-
-
-    void CameraController::StartTracking()
-    {
-        xAvgPart = 0;
-        yAvgPart = 0;
-        rowPart = 0;
-        pointsAveragedPart = 0;
-        
-        Capture();
-
-        BeginRead();
-        SkipRows(TOP_MARGIN);
-        EndRead();
-    }
-
-    void CameraController::ProceedTracking(uint16_t trackTimes)
-    {
-        BeginRead();
-        
-        for (uint16_t row = 0; row < trackTimes; row++)
-        {
-            SkipColumns(LEFT_MARGIN);
-            for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
-            {
-                uint16_t c565 = SPI.transfer16(0x00);
-                
-                if (col % (PART_SKIP_COUNT+1) == 0)
-                {
-                    if ((c565 & 0x1f) < minR && ((c565 >> 5) & 0x3f) < minG && ((c565 >> 11) & 0x1f) < minB)
-                    {
-                        pointsAveragedPart += 1;
-                        xAvgPart += (col - xAvgPart) / pointsAveragedPart;
-                        yAvgPart += (rowPart - yAvgPart) / pointsAveragedPart;
-                    }
-                }
-            }
-            SkipColumns(RIGHT_MARGIN);
-            SkipRows(PART_SKIP_COUNT);
-
-            rowPart += (PART_SKIP_COUNT+1);
-        }
-
-        EndRead();
-    }
-
-    bool CameraController::EndTracking(int16_t& xCo, int16_t& yCo)
-    {
-        if (pointsAveragedPart != 0)
-        {
-            xCo = (int16_t)round(xAvgPart) - (int16_t)(IMAGE_WIDTH/2);
-            yCo = (int16_t)round(yAvgPart) - (int16_t)(IMAGE_HEIGHT/2);
-            return true;
-        }
-        else
-        {
-            xCo = yCo = 0;
-            return false;
-        }
-    }
+#endif
 }
