@@ -23,7 +23,7 @@ class Tipping implements ActivationFunction
 {
   float compute(float x)
   {
-    return 5*(pow(x/500,3));
+    return 5*(pow(x/5,3));
   }
 }
 

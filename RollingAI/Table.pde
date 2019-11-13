@@ -78,12 +78,13 @@ class Table
     }
 
     // Find starting velocity
-    float speed = (20f + random(50)) / framerate;
+    float speed = (200f + random(400)) / framerate;
     float angle = atan2(ballx - pos.x, bally - pos.y) + random(PI/2) - PI/4;
     if (angle < 0)
       angle += 2*PI;
 
     ball = new Ball(ballRadius, new PVector(ballx, bally), new PVector(-sin(angle)*speed, -cos(angle)*speed));
+    PVector checking = ball.vel;
   }
 
   boolean update() // Return true if ball is dead
@@ -95,14 +96,15 @@ class Table
         decisionTime = currentTime + delayTime;
         float relX = ball.center.x - pos.x;
         float relY = ball.center.y - pos.y;
+        println(" X = " + relX + ", Y = " + relY + ", velX = " + ball.vel.x + ", velY = " + ball.vel.y + ", D(x,e) = " + ((relX < 0 ? halfSize : -halfSize) + relX) + ", D(y,e) = " +  ((relY < 0 ? halfSize : -halfSize) + relY));  
         decision = brain.percieve(relX, relY, ball.vel.x, ball.vel.y, (relX < 0 ? halfSize : -halfSize) + relX, (relY < 0 ? halfSize : -halfSize) + relY);
       } else if (decisionTime < currentTime)
-      {
+      { //<>//
         desiredX = decision[0] * maxAngle;
         desiredY = decision[1] * maxAngle;
-        println("X = " + desiredX + ", Y = " + desiredY);
         powerX = decision[2];
         powerY = decision[3];
+        //println("X = " + desiredX + ", Y = " + desiredY + ", powerX = " + powerX + ", powerY = " + powerY);
         decisionTime = 0;
       }
 
@@ -121,17 +123,17 @@ class Table
         z++;
         println(z + ": " + dist);
       }
-      fitness += timestep/1000f;
+      fitness += timestep/1000f; //<>//
       fitness += min(0.5f*timestep, 5/dist);
 
       if (dist <= 50 && ball.vel.mag() <= 0.75f*Math.tanh(dist/20)+0.25f)
         fitness += min(0.75f, (0.1f+dist) / (0.05f+ball.vel.mag())) * timestep;
 
-      if (ball.vel.mag() > 8)
-        fitness -= ball.vel.mag() / 2;
+      if (ball.vel.mag() > 250)
+        fitness -= ball.vel.mag() / 8;
 
-      if (angleX > 10 || angleY > 10)
-        fitness -= max(angleX, angleY)/frameRate;
+      //if (angleX > 10 || angleY > 10)
+        //fitness -= max(angleX, angleY)/frameRate;
 
       if (fitness < 0)
         fitness = 0;
@@ -231,7 +233,11 @@ class Ball
   {
     if (!dead)
     {
+      println("vel + acc = vel_a");
+      print(vel.mag() + " + " + _acc.mag() +  " = ");
       vel.add(_acc);
+      println(" " + vel.mag());
+      
       //vel.mult(vel.mag() > 0.1 ? 0.997 : 0);
       center.add(vel.copy().mult(timestep/1000f));
     }
