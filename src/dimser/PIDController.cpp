@@ -8,11 +8,11 @@ double setPoint; //we only have one setpoint as the desired value for both inner
 double innerInput, outerInput; //ball posistion for both inner and outer
 double innerOutput, outerOutput; //motor turn
 int period = 5;
-double integralSum = 0;
-float lastInput = 0;
-double output = 0;
+double integralSumInner = 0, integralSumOuter = 0;
+float lastInputInner = 0, lastInputOuter = 0;
+double outputInner = 0, outputOuter = 0;
 
-double IKp = 0.1, OKp = 0.175, IKi = 0, OKi = 0, IKd = 0, OKd = 2;
+double IKp = 0.25, OKp = 0.2, IKi = 0, OKi = 0, IKd = 0, OKd = 0;
 
 //We use two seperate PID Controllers as the input for 
 PID innerPid(&innerInput, &innerOutput, &setPoint, IKp, IKi, IKd, DIRECT);
@@ -27,28 +27,27 @@ void initPID()
     outerPid.SetMode(AUTOMATIC);
 }
 
-void PIDMotors(int8_t &xAng, int8_t &yAng)
-{
-
-}
-
 void runPID(float xCo, float yCo, int8_t &xAng, int8_t &yAng)
 {
-    double proportional = IKp * xCo;
-    double integral     = integralSum + IKi * xCo * period;
-    double derivative   = IKd * (xCo - lastInput) / period;
+    //calculate PID values for inner then outer motors
+    double proportionalInner = IKp * xCo;
+    double integralInner     = integralSumInner + IKi * xCo * period;
+    double derivativeInner   = IKd * (xCo - lastInputInner) / period;
 
-    integralSum = integral;
-    lastInput = xCo;
+    double proportionalOuter = OKp * yCo;
+    double integralOuter     = integralSumOuter + OKi * yCo * period;
+    double derivativeOuter   = OKd * (yCo - lastInputOuter) / period;
 
-    double result = proportional + integral + derivative;
+    integralSumInner = integralInner;
+    integralSumOuter = integralOuter;
 
-    output = result;
+    lastInputInner = xCo;
+    lastInputOuter = yCo;
 
-    xAng = output;
+    outputInner = proportionalInner + integralInner + derivativeInner;
+    outputOuter = proportionalOuter + integralOuter + derivativeOuter;
 
-    Serial.print("Posistion: ");
-    Serial.print(xCo);
-
+    xAng = outputInner > 10 ? 10 : outputInner;
+    yAng = outputOuter > 10 ? 10 : outputOuter;
 
 }

@@ -59,14 +59,13 @@ void setup()
 
 void loop()
 {
-
     time = millis();
     ballFound = CameraController::GetBallLocation(xCo, yCo);
     Serial.print(millis() - time); Serial.print(" "); 
     delay(10);
     if (ballFound)
     { 
-        Serial.print(xCo); Serial.print(" "); Serial.println(yCo);
+        Serial.print(xCo); Serial.print(" "); Serial.print(yCo);
 
         #if USE_PID
         runPID(xCo, yCo, xAng, yAng);

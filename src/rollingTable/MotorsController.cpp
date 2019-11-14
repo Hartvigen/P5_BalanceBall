@@ -56,6 +56,11 @@ namespace RollingTable
         //Move(shield.bank_b, outerAngle, outerDir, outerSpeed);
     }
 
+    void MotorsController::HaltInner()
+    {
+        shield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
+    }
+
 
     void MotorsController::Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed)
     {
@@ -65,7 +70,7 @@ namespace RollingTable
 
         angleError = abs(angleError);
 
-        if (dir != 0 && angleError <= 1)
+        /*if (dir != 0 && angleError <= 1)
         {
             dir = 0;
             bank.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
@@ -74,8 +79,8 @@ namespace RollingTable
         {
             dir = 0;
             bank.motorStop(SH_Motor_Both, SH_Next_Action_Float);
-        }
-        else if (dir != nextDir)
+        }*/
+        if (dir != nextDir)
         {
             dir = nextDir;
             bank.motorRunUnlimited(

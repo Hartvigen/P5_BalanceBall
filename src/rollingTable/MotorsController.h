@@ -28,6 +28,8 @@ namespace RollingTable
 
             static void Reset();
 
+            static void HaltInner();
+
             static void SetInnerAngle(int8_t targetAngle);
             static void SetInnerSpeed(int8_t speed);
 
