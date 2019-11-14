@@ -3,9 +3,10 @@ class Table
   int size, halfSize;
   PVector pos;
 
-  float desiredX, desiredY;
+  int desiredX, desiredY;
   float angleX, angleY;
   float maxAngle = 15;
+  float degreeVelocity = timestep * 0.05;
 
   float powerX, powerY;
   int z = 0;
@@ -18,6 +19,18 @@ class Table
   float[] decision;
   long decisionTime = 0;
   int delayTime = 150;
+  
+  //values for PID
+  double setPoint;
+  double innerInput, outerInput;
+  double innerOutput, outerOutput;
+  int period = 5;
+  double integralSumInner = 0, integralSumOuter = 0;
+  double lastInputInner = 0, lastInputOuter = 0;
+  double outputInner = 0, outputOuter = 0;
+  
+  //tuning values for PID
+  double IKp = 0.1, OKp = 0.1, IKi = 0, OKi = 0, IKd = 13, OKd = 13;
 
   float fitness = 0f;
   float allTimeBest = 0f;
@@ -43,7 +56,7 @@ class Table
 
   void reset()
   {
-    angleX = angleY = maxAngle;
+    angleX = angleY = 0;
 
     // Find starting point
     float mod = float(halfSize-ballRadius-3)/halfSize;
@@ -66,7 +79,7 @@ class Table
     ball = new Ball(ballRadius, new PVector(ballx, bally), new PVector(-sin(angle)*speed, -cos(angle)*speed));
   }
 
-  boolean update() // Return true if ball is dead
+  boolean update() // posReturn true if ball is dead
   {
     if (ball != null && !ball.dead)
     {
@@ -79,7 +92,8 @@ class Table
       {
         decisionTime = 0;
       }
-
+      
+      calculatePID();
       updateTilt();
 
       PVector acc = getAcceleration();
@@ -95,18 +109,34 @@ class Table
 
   void updateTilt()
   {
+    
     float xDiff = desiredX - angleX;
-    
-    xDiff *= powerX;
-    
-    angleX += min(5, max(-5, xDiff));
-    angleX = min(maxAngle, max(-maxAngle, angleX));
-    float yDiff = desiredY - angleY;
-    yDiff *= powerY;
-    angleY += min(5, max(-5, yDiff));
-    angleY = min(maxAngle, max(-maxAngle, angleY));
+    if (abs(xDiff) > degreeVelocity) {
+      if (xDiff < 0 && angleX - degreeVelocity >= -maxAngle) {
+        angleX -= degreeVelocity;
+      } else if (angleX + degreeVelocity <= maxAngle)
+        angleX += degreeVelocity;
+    } else
+    {
+      if (-maxAngle <= angleX - xDiff && angleX + xDiff <= maxAngle)
+        angleX += xDiff;
+      else
+        angleX = maxAngle;
+    }
 
-    //println(desiredX, desiredY, ":", angleX, angleY, ":", xDiff, yDiff);
+    float yDiff = desiredY - angleY;
+    if (abs(yDiff) > degreeVelocity) {
+      if (yDiff < 0 && angleY - degreeVelocity >= -maxAngle) {
+        angleY -= degreeVelocity;
+      } else if (angleY + degreeVelocity <= maxAngle)
+        angleY += degreeVelocity;
+    } else
+    {
+      if (-maxAngle <= angleY - yDiff && angleY + yDiff <= maxAngle)
+        angleY += yDiff;
+      else
+        angleY = maxAngle;
+    }
   }
 
   PVector getAcceleration()
@@ -160,6 +190,44 @@ class Table
     else
       text(_ang, _pos.x- 50, _pos.y);
   }
+  
+  void calculatePID(){
+    double curX = ball.center.x - pos.x;
+    double curY = ball.center.y - pos.y;
+    
+    double proportionalInner = IKp * curX;
+    double integralInner     = integralSumInner + IKi * curX * period;
+    double derivativeInner   = IKd * (curX - lastInputInner) / period;
+
+    double proportionalOuter = OKp * curY;
+    double integralOuter     = integralSumOuter + OKi * curY * period;
+    double derivativeOuter   = OKd * (curY - lastInputOuter) / period;
+
+    integralSumInner = integralInner;
+    integralSumOuter = integralOuter;
+
+    lastInputInner = curX;
+    lastInputOuter = curY;
+
+    outputInner = proportionalInner + integralInner + derivativeInner;
+    outputOuter = proportionalOuter + integralOuter + derivativeOuter;
+    
+    if(outputInner >= 0){
+      desiredX = outputInner >= maxAngle ? (int)maxAngle : (int)outputInner;
+    }
+    else{
+      desiredX = outputInner <= -maxAngle ? -(int)maxAngle : (int)outputInner;
+    }
+      
+    if(outputInner >= 0){
+      desiredY = outputOuter >= maxAngle ? (int)maxAngle : (int)outputOuter;
+    }
+    else{
+      desiredY = outputOuter <= -maxAngle ? -(int)maxAngle : (int)outputOuter;
+    }
+      
+    
+  }
 }
 
 
@@ -193,4 +261,6 @@ class Ball
     fill(0, 0, 0);
     circle(center.x, center.y, radius);
   }
+  
 }
+ 
