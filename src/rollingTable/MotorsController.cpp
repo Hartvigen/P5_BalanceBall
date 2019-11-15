@@ -23,8 +23,16 @@ namespace RollingTable
     {
         shield.bank_a.motorReset();
         shield.bank_b.motorReset();
+
+        shield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
+        shield.bank_b.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
     }
 
+
+    int32_t MotorsController::GetInnerEncoder()
+    {
+        return shield.bank_a.motorGetEncoderPosition(SH_Motor_Both);
+    }
 
     void MotorsController::SetInnerAngle(int8_t targetAngle) 
     {
@@ -37,6 +45,11 @@ namespace RollingTable
         innerSpeed = speed;
     }
 
+
+    int32_t MotorsController::GetOuterEncoder()
+    {
+        return shield.bank_b.motorGetEncoderPosition(SH_Motor_Both);
+    }
 
     void MotorsController::SetOuterAngle(int8_t targetAngle) 
     {
@@ -53,12 +66,13 @@ namespace RollingTable
     void MotorsController::Move()
     {
         Move(shield.bank_a, innerAngle, innerDir, innerSpeed);
-        //Move(shield.bank_b, outerAngle, outerDir, outerSpeed);
+        Move(shield.bank_b, outerAngle, outerDir, outerSpeed);
     }
 
-    void MotorsController::HaltInner()
+    void MotorsController::Stop()
     {
         shield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
+        shield.bank_b.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
     }
 
 
@@ -66,21 +80,28 @@ namespace RollingTable
     {
         int8_t encoder = bank.motorGetEncoderPosition(SH_Motor_Both);
         int8_t angleError = angle - encoder;
-        int8_t nextDir = angleError > 0 ? 1 : -1;
+        int8_t nextDir = (angleError > 0 ? 1 : (angleError < 0 ? -1 : 0));
 
         angleError = abs(angleError);
-
-        /*if (dir != 0 && angleError <= 1)
+        
+        //Serial.print(angleError); Serial.print(" "); Serial.print(innerDir); Serial.print(" "); Serial.println(outerDir);
+        
+        if (angleError <= 1)
         {
-            dir = 0;
-            bank.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
+            if (dir != 0)
+            {
+                dir = 0;
+                bank.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
+            }
         }
-        else if (dir != 0 && angleError <= 3)
+        /*
+        else if (dir != 0 && angleError <= 2)
         {
             dir = 0;
             bank.motorStop(SH_Motor_Both, SH_Next_Action_Float);
-        }*/
-        if (dir != nextDir)
+        }
+        //*/
+        else if (dir != nextDir)
         {
             dir = nextDir;
             bank.motorRunUnlimited(
@@ -91,31 +112,30 @@ namespace RollingTable
         }
     }
 
+
     void MotorsController::MoveCircleTest()
     {
         float angle = 0;
-        float mod = 3;
+        float mod = 0.75;
         uint64_t calibrateTime = 0;
 
-        MotorsController motors;
-        motors.Reset();
-        motors.SetInnerSpeed(10);
-        motors.SetOuterSpeed(10);
+        Reset();
+        SetInnerSpeed(20);
+        SetOuterSpeed(20);
         
         while (true)
         {
-            delay(10);
             angle += mod;
 
             if (millis() > calibrateTime)
             {
-                motors.SetInnerAngle(cos(angle*0.0174532925)*10);
-                motors.SetOuterAngle(sin(angle*0.0174532925)*10);
+                calibrateTime =+ 145;
 
-                calibrateTime = millis() + 50;
+                SetInnerAngle(cos(angle*0.0174532925)*15);
+                SetOuterAngle(sin(angle*0.0174532925)*15);
+
+                Move();
             }
-
-            motors.Move();
         }
     }
 }
