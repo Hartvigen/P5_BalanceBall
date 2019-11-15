@@ -19,6 +19,7 @@ class Table
   float[] decision;
   long decisionTime = 0;
   int delayTime = 150;
+  int takePicTime = 120;
   
   //values for PID
   double setPoint;
@@ -28,14 +29,14 @@ class Table
   double integralSumInner = 0, integralSumOuter = 0;
   double lastInputInner = 0, lastInputOuter = 0;
   double outputInner = 0, outputOuter = 0;
+  int sameCount = 0;
+  double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 0.1, OKp = 0.1, IKi = 0, OKi = 0, IKd = 13, OKd = 13;
+  double IKp = 0.1, OKp = 0.1, IKi = 0, OKi = 0, IKd = 15, OKd = 15;
 
   float fitness = 0f;
   float allTimeBest = 0f;
-
-  float prevX = 0f, prevY = 0f;
 
 
   Table(int _size, PVector _pos)
@@ -100,7 +101,17 @@ class Table
       ball.update(acc);
       if (abs(ball.center.x - pos.x) > halfSize || abs(ball.center.y - pos.y) > halfSize)
         ball.dead = true;
-
+      
+      if((int)curX == (int)prevX && (int)curY == (int)prevY)
+        sameCount++;
+      else
+        sameCount = 0;
+      if(sameCount > 30)
+        return true;
+      
+      prevX = curX;
+      prevY = curY;
+      
       return ball.dead;
     }
 
@@ -192,8 +203,8 @@ class Table
   }
   
   void calculatePID(){
-    double curX = ball.center.x - pos.x;
-    double curY = ball.center.y - pos.y;
+    curX = ball.center.x - pos.x;
+    curY = ball.center.y - pos.y;
     
     double proportionalInner = IKp * curX;
     double integralInner     = integralSumInner + IKi * curX * period;
