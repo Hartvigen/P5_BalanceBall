@@ -1,6 +1,6 @@
 #include "Setup.h"
 
-#if USE_IMG_DIS
+#if USE_IMG_DIS || INTF_RVIEWER
 #include "Serial/SerialHelper.h"
 #endif
 
@@ -15,4 +15,6 @@ using namespace RollingTable;
 
 void initialize();
 void setup();
+
 void loop();
+void printInfo();

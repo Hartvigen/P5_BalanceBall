@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <NXShield.h>
 
-#define MAX_ANGLE (int8_t)15
+#define MAX_ANGLE (int8_t)10
 
 namespace RollingTable
 {
@@ -25,18 +25,19 @@ namespace RollingTable
 
         public:
             static void Init();
-
             static void Reset();
 
-            static void HaltInner();
-
+            static int32_t GetInnerEncoder();
             static void SetInnerAngle(int8_t targetAngle);
             static void SetInnerSpeed(int8_t speed);
 
+            static int32_t GetOuterEncoder();
             static void SetOuterAngle(int8_t targetAngle);
             static void SetOuterSpeed(int8_t speed);
 
             static void Move();
+            static void Stop();
+
             static void MoveCircleTest();
     };
 }
