@@ -12,7 +12,7 @@ double integralSumInner = 0, integralSumOuter = 0;
 float lastInputInner = 0, lastInputOuter = 0;
 double outputInner = 0, outputOuter = 0;
 
-double IKp = 0.25, OKp = 0.2, IKi = 0, OKi = 0, IKd = 0, OKd = 0;
+double IKp = 0.8, OKp = 0.8, IKi = 0, OKi = 0, IKd = 0.14, OKd = 0.14;
 
 //We use two seperate PID Controllers as the input for 
 PID innerPid(&innerInput, &innerOutput, &setPoint, IKp, IKi, IKd, DIRECT);
@@ -47,7 +47,6 @@ void runPID(float xCo, float yCo, int8_t &xAng, int8_t &yAng)
     outputInner = proportionalInner + integralInner + derivativeInner;
     outputOuter = proportionalOuter + integralOuter + derivativeOuter;
 
-    xAng = outputInner > 10 ? 10 : outputInner;
-    yAng = outputOuter > 10 ? 10 : outputOuter;
-
+    xAng = (int8_t)(outputInner / 2);
+    yAng = -(int8_t)(outputOuter / 2);
 }

@@ -49,8 +49,9 @@ void setup()
 {
     MotorsController::Init();
     MotorsController::Reset();
-    MotorsController::SetInnerSpeed(10);
-    MotorsController::SetOuterSpeed(10);
+
+    CameraController::Init(CAM_SLAVE_PIN);
+    CameraController::ManualCalibrate(3,6,3);
     
 #if !CTRL_MANUAL
     #if CTRL_PID
@@ -59,25 +60,26 @@ void setup()
     // Init AI
     #endif
 #endif
-
-    CameraController::Init(CAM_SLAVE_PIN);
-    CameraController::ManualCalibrate(3,6,3);
 }
 
 
 void loop()
 {
     startTime = millis();
-    ballFound = CameraController::GetBallLocation(xCo, yCo);
 
-    if (ballFound)
+    CameraController::StartTracking();
+    for (int i = 13; i--;)
     {
-        #if CTRL_PID
-        runPID(xCo, yCo, xAng, yAng);
-        #elif CTRL_AI
-        // Use AI
-        #endif
+        CameraController::ProceedTracking(3);
+        MotorsController::Move();
     }
+    ballFound = CameraController::EndTracking(xCo, yCo);
+
+    #if CTRL_PID
+    runPID(xCo, yCo, xAng, yAng);
+    #elif CTRL_AI
+    // Use AI
+    #endif
 
     MotorsController::SetInnerAngle(xAng);
     MotorsController::SetOuterAngle(yAng);
@@ -86,6 +88,7 @@ void loop()
     endTime = millis();
     printInfo();
 }
+
 
 void printInfo()
 {
@@ -96,7 +99,7 @@ void printInfo()
     else { Serial.println("Tracking..."); }
 
     Serial.print("Actual angles: Inner = "); Serial.print(MotorsController::GetInnerEncoder()); Serial.print(" Outer = "); Serial.println(MotorsController::GetOuterEncoder());
-    Serial.print("Desired angles: Inner = "); Serial.print(xAng); Serial.print(" Outer = "); Serial.println(yAng);
+    Serial.print("Desired angles: Inner = "); Serial.print(xAng); Serial.print(" Outer = "); Serial.println(yAng); // May show too large or small values, I know
 #elif INTF_RVIEWER
     
 #endif

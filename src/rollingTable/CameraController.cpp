@@ -7,6 +7,8 @@ namespace RollingTable
     uint8_t CameraController::minG;
     uint8_t CameraController::minB;
 
+
+    uint16_t currentRow;
     uint32_t pointsAveraged; // Is uint32 since 240*320 > UINT16_MAX
     float avgX, avgY;
 
@@ -165,6 +167,63 @@ namespace RollingTable
         EndRead();
 
         // Return coordinates offset to have center in (0,0)
+        if (pointsAveraged != 0)
+        {
+            xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2);
+            yCo = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2);
+            return true;
+        }
+        else
+        {
+            xCo = yCo = 0;
+            return false;
+        }
+    }
+
+
+    void CameraController::StartTracking()
+    {
+        pointsAveraged = 0;
+        avgX = avgY = 0;
+        currentRow = 0;
+        
+        Capture();
+
+        BeginRead();
+        SkipRows(TOP_MARGIN);
+        EndRead();
+    }
+
+    void CameraController::ProceedTracking(uint16_t trackTimes)
+    {
+        BeginRead();
+        
+        for (uint16_t row = 0; row < trackTimes; row++)
+        {
+            SkipColumns(LEFT_MARGIN);
+            for (uint16_t col = 0; col < IMAGE_WIDTH; col++)
+            {
+                uint16_t c565 = SPI.transfer16(0x00);
+
+                if ((c565 & 0x1F) < minR && ((c565 >> 5) & 0x3F) < minG && ((c565 >> 11) & 0x1F) < minB)
+                {
+                    ++pointsAveraged;
+                    avgX += (col - avgX) / pointsAveraged;
+                    avgY += (currentRow - avgY) / pointsAveraged;
+                }
+            }
+
+            SkipColumns(RIGHT_MARGIN);
+            SkipRows(ROW_SKIP_COUNT);
+
+            currentRow += (ROW_SKIP_COUNT+1);
+        }
+
+        EndRead();
+    }
+
+    bool CameraController::EndTracking(int16_t& xCo, int16_t& yCo)
+    {
         if (pointsAveraged != 0)
         {
             xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2);

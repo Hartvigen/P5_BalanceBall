@@ -6,11 +6,9 @@ namespace RollingTable
 
     int8_t MotorsController::innerAngle;
     int8_t MotorsController::innerDir;
-    int8_t MotorsController::innerSpeed;
 
     int8_t MotorsController::outerAngle;
     int8_t MotorsController::outerDir;
-    int8_t MotorsController::outerSpeed;
 
     void MotorsController::Init()
     {
@@ -40,11 +38,6 @@ namespace RollingTable
         innerAngle = max(innerAngle, -MAX_ANGLE);
     }
 
-    void MotorsController::SetInnerSpeed(int8_t speed) 
-    {
-        innerSpeed = speed;
-    }
-
 
     int32_t MotorsController::GetOuterEncoder()
     {
@@ -57,16 +50,11 @@ namespace RollingTable
         outerAngle = max(outerAngle, -MAX_ANGLE);
     }
 
-    void MotorsController::SetOuterSpeed(int8_t speed) 
-    {
-        outerSpeed = speed;
-    }
-
 
     void MotorsController::Move()
     {
-        Move(shield.bank_a, innerAngle, innerDir, innerSpeed);
-        Move(shield.bank_b, outerAngle, outerDir, outerSpeed);
+        Move(shield.bank_a, innerAngle, innerDir, INNER_SPEED);
+        Move(shield.bank_b, outerAngle, outerDir, OUTER_SPEED);
     }
 
     void MotorsController::Stop()
@@ -84,8 +72,6 @@ namespace RollingTable
 
         angleError = abs(angleError);
         
-        //Serial.print(angleError); Serial.print(" "); Serial.print(innerDir); Serial.print(" "); Serial.println(outerDir);
-        
         if (angleError <= 1)
         {
             if (dir != 0)
@@ -94,20 +80,13 @@ namespace RollingTable
                 bank.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
             }
         }
-        /*
-        else if (dir != 0 && angleError <= 2)
-        {
-            dir = 0;
-            bank.motorStop(SH_Motor_Both, SH_Next_Action_Float);
-        }
-        //*/
         else if (dir != nextDir)
         {
             dir = nextDir;
             bank.motorRunUnlimited(
                 SH_Motor_Both, 
                 (dir > 0 ? SH_Direction_Forward : SH_Direction_Reverse), 
-                speed
+                (angleError <= 4 ? speed/2 : speed)
             );
         }
     }
@@ -117,25 +96,50 @@ namespace RollingTable
     {
         float angle = 0;
         float mod = 0.75;
-        uint64_t calibrateTime = 0;
+        uint64_t calibrateTime = 0; 
+        uint32_t time;
+
+        int8_t xAng = 0, yAng = 0;
 
         Reset();
-        SetInnerSpeed(20);
-        SetOuterSpeed(20);
+        SetOuterAngle(0);
         
         while (true)
         {
+            time = millis();
             angle += mod;
 
+            delay(6);
             if (millis() > calibrateTime)
             {
-                calibrateTime =+ 145;
+                //calibrateTime =+ 145;
 
-                SetInnerAngle(cos(angle*0.0174532925)*15);
-                SetOuterAngle(sin(angle*0.0174532925)*15);
+                //SetInnerAngle(cos(angle*0.0174532925)*15);
+                //SetOuterAngle(sin(angle*0.0174532925)*15);
 
-                Move();
+                calibrateTime = millis() + 1000;
+                
+                if (xAng != -15 && xAng != 0)
+                {
+                    xAng = -15;
+                }
+                else if (xAng == -15)
+                    xAng = 0;
+                else
+                {
+                    xAng = 15;
+                }
+
+                SetInnerAngle(xAng);
             }
+
+            Move();
+
+            Serial.print((millis() - time));
+            Serial.print("  ");
+            Serial.print(GetInnerEncoder());
+            Serial.print("  ");
+            Serial.println(xAng);
         }
     }
 }
