@@ -11,6 +11,7 @@ class Table
   int z = 0;
   float avgV = 0;
   float maxV = 0;
+  float degreeVelocity = timestep*0.05;
 
   Ball ball = null;
   int ballRadius = 10;
@@ -19,6 +20,8 @@ class Table
   float[] decision;
   long decisionTime = 0;
   int delayTime = 150;
+  int aliveTime = 0;
+  
 
   float fitness = 0f;
   float allTimeBest = 0f;
@@ -63,7 +66,7 @@ class Table
 
   void reset()
   {
-    angleX = angleY = maxAngle;
+    angleX = angleY = 0;
 
     // Find starting point
     float mod = float(halfSize-ballRadius-3)/halfSize;
@@ -78,33 +81,37 @@ class Table
     }
 
     // Find starting velocity
-    float speed = (200f + random(400)) / framerate;
+    float speed = (330 + random(330)) / framerate;
     float angle = atan2(ballx - pos.x, bally - pos.y) + random(PI/2) - PI/4;
     if (angle < 0)
       angle += 2*PI;
 
     ball = new Ball(ballRadius, new PVector(ballx, bally), new PVector(-sin(angle)*speed, -cos(angle)*speed));
-    PVector checking = ball.vel;
+    aliveTime = 0;
   }
 
   boolean update() // Return true if ball is dead
   {
     if (ball != null && !ball.dead)
     {
-      if (decisionTime == 0)
+      aliveTime++;
+      println("Alive = " + aliveTime);
+      if(aliveTime > 5000){
+        ball.dead = true;
+        return true;
+      }
+      //if (decisionTime == 0)
       {
-        decisionTime = currentTime + delayTime;
+        //decisionTime = currentTime + delayTime;
         float relX = ball.center.x - pos.x;
         float relY = ball.center.y - pos.y;
-        println(" X = " + relX + ", Y = " + relY + ", velX = " + ball.vel.x + ", velY = " + ball.vel.y + ", D(x,e) = " + ((relX < 0 ? halfSize : -halfSize) + relX) + ", D(y,e) = " +  ((relY < 0 ? halfSize : -halfSize) + relY));  
+        //println(" X = " + relX + ", Y = " + relY + ", velX = " + ball.vel.x + ", velY = " + ball.vel.y + ", D(x,e) = " + ((relX < 0 ? halfSize : -halfSize) + relX) + ", D(y,e) = " +  ((relY < 0 ? halfSize : -halfSize) + relY));  
         decision = brain.percieve(relX, relY, ball.vel.x, ball.vel.y, (relX < 0 ? halfSize : -halfSize) + relX, (relY < 0 ? halfSize : -halfSize) + relY);
-      } else if (decisionTime < currentTime)
-      { //<>//
-        desiredX = decision[0] * maxAngle;
-        desiredY = decision[1] * maxAngle;
-        powerX = decision[2];
-        powerY = decision[3];
-        //println("X = " + desiredX + ", Y = " + desiredY + ", powerX = " + powerX + ", powerY = " + powerY);
+      }// else if (decisionTime < currentTime)
+      {
+        desiredX = int(decision[0] * maxAngle);
+        desiredY = int(decision[1] * maxAngle); //<>//
+        //println("Time = " + currentTime);
         decisionTime = 0;
       }
 
@@ -115,15 +122,13 @@ class Table
       if (abs(ball.center.x - pos.x) > halfSize || abs(ball.center.y - pos.y) > halfSize)
         ball.dead = true;
 
-      //println(ball.vel);
-
       // Calculate fitness
+      //Fitness = lost dist from center
       float dist = ball.center.dist(pos);
       if (dist == 0.0) {
         z++;
-        println(z + ": " + dist);
       }
-      fitness += timestep/1000f; //<>//
+      fitness += timestep/1000f;
       fitness += min(0.5f*timestep, 5/dist);
 
       if (dist <= 50 && ball.vel.mag() <= 0.75f*Math.tanh(dist/20)+0.25f)
@@ -132,8 +137,8 @@ class Table
       if (ball.vel.mag() > 250)
         fitness -= ball.vel.mag() / 8;
 
-      //if (angleX > 10 || angleY > 10)
-        //fitness -= max(angleX, angleY)/frameRate;
+      if (angleX > 10 || angleY > 10)
+        fitness -= max(angleX, angleY)/framerate;
 
       if (fitness < 0)
         fitness = 0;
@@ -147,17 +152,32 @@ class Table
   void updateTilt()
   {
     float xDiff = desiredX - angleX;
-    
-    xDiff *= powerX;
-    
-    angleX += min(5, max(-5, xDiff));
-    angleX = min(maxAngle, max(-maxAngle, angleX));
-    float yDiff = desiredY - angleY;
-    yDiff *= powerY;
-    angleY += min(5, max(-5, yDiff));
-    angleY = min(maxAngle, max(-maxAngle, angleY));
+    if (abs(xDiff) > degreeVelocity) {
+      if (xDiff < 0 && angleX - degreeVelocity >= -maxAngle) {
+        angleX -= degreeVelocity;
+      } else if (angleX + degreeVelocity <= maxAngle)
+        angleX += degreeVelocity;
+    } else
+    {
+      if (-maxAngle <= angleX - xDiff && angleX + xDiff <= maxAngle)
+        angleX += xDiff;
+      else
+        angleX = maxAngle;
+    }
 
-    //println(desiredX, desiredY, ":", angleX, angleY, ":", xDiff, yDiff);
+    float yDiff = desiredY - angleY;
+    if (abs(yDiff) > degreeVelocity) {
+      if (yDiff < 0 && angleY - degreeVelocity >= -maxAngle) {
+        angleY -= degreeVelocity;
+      } else if (angleY + degreeVelocity <= maxAngle)
+        angleY += degreeVelocity;
+    } else
+    {
+      if (-maxAngle <= angleY - yDiff && angleY + yDiff <= maxAngle)
+        angleY += yDiff;
+      else
+        angleY = maxAngle;
+    }
   }
 
   PVector getAcceleration()
@@ -233,11 +253,9 @@ class Ball
   {
     if (!dead)
     {
-      println("vel + acc = vel_a");
-      print(vel.mag() + " + " + _acc.mag() +  " = ");
       vel.add(_acc);
-      println(" " + vel.mag());
-      
+
+
       //vel.mult(vel.mag() > 0.1 ? 0.997 : 0);
       center.add(vel.copy().mult(timestep/1000f));
     }

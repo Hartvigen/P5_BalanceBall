@@ -13,30 +13,45 @@ class Linear implements ActivationFunction
 
 class Sigmoid implements ActivationFunction
 {
+  int limit, div, low;
+  Sigmoid(int _limit, int _div, int _low){
+    limit = _limit;
+    div = _div;
+    low = _low;
+  }
+  
   float compute(float x)
   {
-    return (2 / (1 + exp(-x))) - 1;
+    return (limit / (1 + exp((-x)/div))) - low;
   }
 }
 
 class Tipping implements ActivationFunction
 {
+  
+  float coeff, div, poly;
+  Tipping(float c, int d, int p){
+    coeff = c;
+    div = d;
+    poly = p;
+  }
+  
   float compute(float x)
   {
-    return 5*(pow(x/5,3));
+    return coeff*(pow(x/div, poly));
   }
 }
 
 class Composite implements ActivationFunction
 {
   ActivationFunction f1, f2;
-  
+
   Composite(ActivationFunction _f1, ActivationFunction _f2)
   {
     f1 = _f1;
     f2 = _f2;
   }
-  
+
   float compute(float x)
   {
     return f1.compute(f2.compute(x));
@@ -46,22 +61,29 @@ class Composite implements ActivationFunction
 class Inverse implements ActivationFunction
 {
   float numerator;
-  
+
   Inverse(float _numerator)
   {
     numerator = _numerator;
   }
-  
+
   float compute(float x)
   {
     return numerator/x;
   }
 }
 
-class ReLU implements ActivationFunction{
+class ReLU implements ActivationFunction {
   float compute(float x)
   {
     return x < 0 ? 0 : x;
   }
-  
+}
+class HyperTangent implements ActivationFunction {
+  float compute(float x)
+  {
+    float cosh = (exp(x)+exp(-x))/2;
+    float sinh = (exp(x)-exp(-x))/2;
+    return sinh/cosh;
+  }
 }

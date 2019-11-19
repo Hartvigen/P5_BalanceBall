@@ -32,42 +32,28 @@ void setup()
 void initialize()
 {
   tables = new Table[genSize];
-  InputStream input = createInput("Weights.txt");
-  int data = 0;
-  try {
-    data = input.read();
-    input.close();
-  }
-  catch(IOException e) {
-    e.printStackTrace();
-  }
+  int data = checkRun();
   if (data == -1)
-  {
+  {*/
     println("Starting new training session...");
     for (int i = 0; i < genSize; i++) 
       tables[i] = new Table(250, new PVector(width/2, height/2));
-  } else {
+  /*} else {
     println("Continuing training session");
-    input = createInput("Weights.txt");
+    InputStream input = createInput("Weights.txt");
     readMaxFit(input);
     readEpoch(input);
 
     tables[0] = new Table(250, new PVector(width/2, height/2), new FirstBrain(loadBrain(input)), maxFitness);
     try {
       input.read();
+      for (int i = 1; i < genSize; i++) {
+        tables[i] = new Table(250, new PVector(width/2, height/2), new FirstBrain(loadBrain(input)));
+        input.read();
+      }
     }
     catch(IOException e) {
       e.printStackTrace();
-    }
-
-    for (int i = 1; i < genSize; i++) {
-      tables[i] = new Table(250, new PVector(width/2, height/2), new FirstBrain(loadBrain(input)));
-      try {
-        input.read();
-      }
-      catch(IOException e) {
-        e.printStackTrace();
-      }
     }
   }
 }
@@ -91,7 +77,7 @@ void mutate()
   }
 
   for (int i = 1; i < genSize - 1; i++)
-    newTables[i].brain.mutate(0.3, 0.12);
+    newTables[i].brain.mutate(0.5, 0.3);
 
   newTables[genSize-1] = new Table(250, new PVector(width/2, height/2));
 
@@ -104,15 +90,15 @@ Table getParent()
 {
   float fitnessSum = 0f;
   for (int i = 0; i < genSize; i++)
-    if (tables[i].fitness > 20)
-      fitnessSum += tables[i].fitness;
+    //if (tables[i].fitness > min(float(epoch)/10, 20))
+    fitnessSum += tables[i].fitness;
 
-  if(fitnessSum == 0)
+  if (fitnessSum == 0)
     return tables[int(random(0, 19))];
   float probability = random(0f, fitnessSum);
   float runningSum = 0f;
   for (int i = 0; i < genSize; i++)
-    if (tables[i].fitness > 20)
+    //if (tables[i].fitness > min(float(epoch)/10, 20))
     {
       runningSum += tables[i].fitness;
       if (runningSum >= probability)
@@ -320,7 +306,7 @@ void loadOutputLayer(InputStream input, float[][] weights)
   int data = 0;
   try {
     int neuronCount = 0;
-    while (data != 10 && data != 13 && neuronCount < 4)
+    while (data != 10 && data != 13 && neuronCount < 2)
     {
       data = loadNeuron(input, weights[neuronCount]);
 
@@ -357,10 +343,29 @@ int loadNeuron(InputStream input, float[] weights)
         weight += char(data);
         data = input.read();
       }
-      weights[i] = float(weight);
+      try{
+        weights[i] = float(weight);
+      }catch(ArrayIndexOutOfBoundsException e)
+    {
+      e.printStackTrace(); //<>//
+    }
       weight = "";
       i++;
     }
+  }
+  catch(IOException e) {
+    e.printStackTrace();
+  }
+  return data;
+}
+
+int checkRun()
+{
+  InputStream input = createInput("Weights.txt");
+  int data = 0;
+  try {
+    data = input.read();
+    input.close();
   }
   catch(IOException e) {
     e.printStackTrace();
