@@ -12,18 +12,6 @@ int stillRunning = genSize;
 int triesPerGen = 1000;
 int tryNr = 1;
 
-//values for PID
-double setPoint;
-double innerInput, outerInput;
-double innerOutput, outerOutput;
-int period = 5;
-double integralSumInnner = 0, integralSumOuter = 0;
-float lastInputInner = 0, lastInputOuter = 0;
-double outputInner = 0, outputeOuter = 0;
-
-//tuning values for PID
-double IKp = 0.25, Okp = 0.25, IKi = 0, OKi = 0, IKd = 0, OKd = 0;
-
 int showOption = 0;
 int showSpecificIndex = 0;
 int shownIndex = -1;

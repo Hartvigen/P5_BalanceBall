@@ -33,7 +33,7 @@ class Table
   double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 0.12, OKp = 0.12, IKi = 0, OKi = 0, IKd = 14, OKd = 14;
+  double IKp = 0.8, OKp = 0.8, IKi = 0, OKi = 0, IKd = 14, OKd = 14;
 
   float fitness = 0f;
   float allTimeBest = 0f;

@@ -50,40 +50,43 @@ class FirstBrain implements Brain
 
     hl1Length = hl1.length;
     outputLength = output.length;
-    
   }
-  /*
+
   FirstBrain(float[][][] weights)
-   {
-   Linear linear = new Linear();
-   Sigmoid sigmoid = new Sigmoid();
-   Tipping tipping = new Tipping();
-   ReLU relu = new ReLU();
-   Composite tipInv = new Composite(tipping, new Composite(sigmoid, new Inverse(-30f)));
-   Composite resig = new Composite(sigmoid, relu);
-   
-   
-   hl1 = new Neuron[] {
-   new Neuron(sigmoid, input, weights[0][0]), 
-   new Neuron(sigmoid, input, weights[0][1]), 
-   new Neuron(sigmoid, input, weights[0][2]), 
-   new Neuron(sigmoid, input, weights[0][3]), 
-   new Neuron(tipInv, input, weights[0][4]), 
-   new Neuron(tipInv, input, weights[0][5]), 
-   };
-   
-   output = new Neuron[] {
-   new Neuron(tipping, hl1, weights[1][0]), 
-   new Neuron(tipping, hl1, weights[1][1]), 
-   new Neuron(tipping, hl1, weights[1][2]), 
-   new Neuron(tipping, hl1, weights[1][3]), 
-   };
-   
-   hl1Length = hl1.length;
-   outputLength = output.length;
-   }
-   
-   */
+  {
+    Linear linear = new Linear();
+    Sigmoid sigmoid = new Sigmoid(2, 1, 1);
+    Sigmoid sigout = new Sigmoid(30, 1, 15);
+    Tipping tipping = new Tipping(5, 5, 3);
+    Tipping tip2elecBoo = new Tipping(100, 8, 3);
+    ReLU relu = new ReLU();
+    Composite tipInv = new Composite(tipping, new Composite(sigmoid, new Inverse(-15f)));
+    Composite resig = new Composite(sigmoid, relu);
+    Tipping tipout = new Tipping(1, 5, 3);
+    Composite relin = new Composite(linear, relu);
+    Composite sigtip = new Composite(tipping, sigmoid);
+    Composite retip = new Composite(tipping, relu);
+
+
+    hl1 = new Neuron[] {
+      new Neuron(relu, input, weights[0][0]), 
+      new Neuron(relu, input, weights[0][1]), 
+      new Neuron(relu, input, weights[0][2]), 
+      new Neuron(relu, input, weights[0][3]), 
+      new Neuron(tipInv, input, weights[0][4]), 
+      new Neuron(tipInv, input, weights[0][5]), 
+    };
+
+    output = new Neuron[] {
+      new Neuron(tipping, hl1, weights[1][0]), 
+      new Neuron(tipping, hl1, weights[1][1]), 
+    };
+
+    hl1Length = hl1.length;
+    outputLength = output.length;
+  }
+
+
   float[] percieve(float... _input)
   {
     for (int i = 0; i < inputLength; i++)

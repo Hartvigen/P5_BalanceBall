@@ -94,8 +94,7 @@ class Table
   {
     if (ball != null && !ball.dead)
     {
-      aliveTime++;
-      println("Alive = " + aliveTime);
+      aliveTime += timestep;
       if(aliveTime > 5000){
         ball.dead = true;
         return true;

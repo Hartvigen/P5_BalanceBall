@@ -1,4 +1,4 @@
-int framerate = 60; //<>// //<>// //<>// //<>// //<>//
+int framerate = 60; //<>// //<>// //<>// //<>// //<>// //<>//
 long currentTime = 0;
 int timestep = 1000/framerate;
 int infoBoxHeight = 65;
@@ -29,16 +29,18 @@ void setup()
   initialize();
 }
 
+
 void initialize()
 {
   tables = new Table[genSize];
   int data = checkRun();
   if (data == -1)
-  {*/
+  {
+
     println("Starting new training session...");
     for (int i = 0; i < genSize; i++) 
       tables[i] = new Table(250, new PVector(width/2, height/2));
-  /*} else {
+  } else {
     println("Continuing training session");
     InputStream input = createInput("Weights.txt");
     readMaxFit(input);
@@ -99,11 +101,11 @@ Table getParent()
   float runningSum = 0f;
   for (int i = 0; i < genSize; i++)
     //if (tables[i].fitness > min(float(epoch)/10, 20))
-    {
-      runningSum += tables[i].fitness;
-      if (runningSum >= probability)
-        return tables[i];
-    }
+  {
+    runningSum += tables[i].fitness;
+    if (runningSum >= probability)
+      return tables[i];
+  }
 
   return null; // Should never get here
 }
@@ -220,7 +222,7 @@ void SaveWeights(Table[] currentGen, int currentEpoch, float maxFitness)
       weights += "! ";
     }
     weights += "#";
-    for (Neuron n : brain.output)
+    for (Neuron n : brain.output) //<>//
     {
       weights += n.bias;
       for (float f : n.weights)
@@ -343,12 +345,13 @@ int loadNeuron(InputStream input, float[] weights)
         weight += char(data);
         data = input.read();
       }
-      try{
+      try {
         weights[i] = float(weight);
-      }catch(ArrayIndexOutOfBoundsException e)
-    {
-      e.printStackTrace(); //<>//
-    }
+      } //<>//
+      catch(ArrayIndexOutOfBoundsException e)
+      {
+        e.printStackTrace(); //<>//
+      }
       weight = "";
       i++;
     }
