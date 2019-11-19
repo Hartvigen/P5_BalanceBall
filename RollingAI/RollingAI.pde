@@ -34,11 +34,11 @@ void initialize()
   tables = new Table[genSize];
   int data = checkRun();
   if (data == -1)
-  {
+  {*/
     println("Starting new training session...");
     for (int i = 0; i < genSize; i++) 
       tables[i] = new Table(250, new PVector(width/2, height/2));
-  } else {
+  /*} else {
     println("Continuing training session");
     InputStream input = createInput("Weights.txt");
     readMaxFit(input);
@@ -99,11 +99,11 @@ Table getParent()
   float runningSum = 0f;
   for (int i = 0; i < genSize; i++)
     //if (tables[i].fitness > min(float(epoch)/10, 20))
-  {
-    runningSum += tables[i].fitness;
-    if (runningSum >= probability)
-      return tables[i];
-  }
+    {
+      runningSum += tables[i].fitness;
+      if (runningSum >= probability)
+        return tables[i];
+    }
 
   return null; // Should never get here
 }
