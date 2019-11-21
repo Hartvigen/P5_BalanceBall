@@ -1,4 +1,4 @@
-class Table
+class Table //<>//
 {
   int size, halfSize;
   PVector pos;
@@ -21,12 +21,13 @@ class Table
   long decisionTime = 0;
   int delayTime = 150;
   int aliveTime = 0;
-  
+
 
   float fitness = 0f;
+  float Closest = 250;
+  float relativeScore;
   float allTimeBest = 0f;
 
-  float prevX = 0f, prevY = 0f;
 
 
   Table(int _size, PVector _pos)
@@ -87,6 +88,7 @@ class Table
       angle += 2*PI;
 
     ball = new Ball(ballRadius, new PVector(ballx, bally), new PVector(-sin(angle)*speed, -cos(angle)*speed));
+    relativeScore = 125/ball.center.dist(pos);
     aliveTime = 0;
   }
 
@@ -95,7 +97,8 @@ class Table
     if (ball != null && !ball.dead)
     {
       aliveTime += timestep;
-      if(aliveTime > 5000){
+      println("Alive = " + aliveTime);
+      if (aliveTime > 60000) {
         ball.dead = true;
         return true;
       }
@@ -109,7 +112,7 @@ class Table
       }// else if (decisionTime < currentTime)
       {
         desiredX = int(decision[0] * maxAngle);
-        desiredY = int(decision[1] * maxAngle); //<>//
+        desiredY = int(decision[1] * maxAngle);
         //println("Time = " + currentTime);
         decisionTime = 0;
       }
@@ -127,20 +130,13 @@ class Table
       if (dist == 0.0) {
         z++;
       }
-      fitness += timestep/1000f;
-      fitness += min(0.5f*timestep, 5/dist);
-
-      if (dist <= 50 && ball.vel.mag() <= 0.75f*Math.tanh(dist/20)+0.25f)
-        fitness += min(0.75f, (0.1f+dist) / (0.05f+ball.vel.mag())) * timestep;
-
-      if (ball.vel.mag() > 250)
-        fitness -= ball.vel.mag() / 8;
-
-      if (angleX > 10 || angleY > 10)
-        fitness -= max(angleX, angleY)/framerate;
-
-      if (fitness < 0)
-        fitness = 0;
+      if (dist < Closest)
+        fitness += (Closest - dist)*relativeScore/currentTime;
+      if (dist < 25)
+      {
+        fitness += timestep;
+        println(ball.vel.mag());
+      }
 
       return ball.dead;
     }
