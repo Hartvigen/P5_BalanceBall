@@ -10,6 +10,7 @@ namespace RollingTable
     int8_t MotorsController::outerAngle;
     int8_t MotorsController::outerDir;
 
+
     void MotorsController::Init()
     {
         shield.init(SH_HardwareI2C);
@@ -56,13 +57,6 @@ namespace RollingTable
         Move(shield.bank_a, innerAngle, innerDir, INNER_SPEED);
         Move(shield.bank_b, outerAngle, outerDir, OUTER_SPEED);
     }
-
-    void MotorsController::Stop()
-    {
-        shield.bank_a.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
-        shield.bank_b.motorStop(SH_Motor_Both, SH_Next_Action_BrakeHold);
-    }
-
 
     void MotorsController::Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed)
     {

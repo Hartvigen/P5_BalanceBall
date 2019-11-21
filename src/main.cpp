@@ -1,7 +1,7 @@
 #include "main.h"
 
-bool ballFound = false;
 int16_t xCo, yCo;
+bool ballFound = false;
 int8_t xAng = 0, yAng = 0;
 
 uint64_t startTime, endTime;
@@ -13,8 +13,7 @@ int main()
     setup();
 
 #if USE_IMG_DIS
-    SerialHelper::SendInt(1);
-    while(true)
+    while (true)
         CameraController::SendImageToProcessing();
 #elif !CTRL_MANUAL
     while (true)
@@ -40,26 +39,21 @@ void initialize()
         Serial.read();
     delay(1000);
 
-    #if INTF_RVIEWER
-    SerialHelper::SendInt();
+    #if INTF_RVIEWER || USE_IMG_DIS
+    SerialHelper::SendInt(1);
     #endif
 }
 
 void setup()
 {
+    CameraController::Init(CAM_SLAVE_PIN, 3,6,3);
+
     MotorsController::Init();
     MotorsController::Reset();
 
-    CameraController::Init(CAM_SLAVE_PIN);
-    CameraController::ManualCalibrate(3,6,3);
-    
-#if !CTRL_MANUAL
-    #if CTRL_PID
-    initPID();
-    #elif CTRL_AI
+    #if !CTRL_MANUAL && CTRL_AI
     // Init AI
     #endif
-#endif
 }
 
 
@@ -76,9 +70,9 @@ void loop()
     ballFound = CameraController::EndTracking(xCo, yCo);
 
     #if CTRL_PID
-    runPID(xCo, yCo, xAng, yAng);
+    PIDController::RunPID(xCo, yCo, xAng, yAng);
     #elif CTRL_AI
-    // Use AI
+    // AIController::RunAI();
     #endif
 
     MotorsController::SetInnerAngle(xAng);

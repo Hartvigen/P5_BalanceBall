@@ -34,7 +34,6 @@ namespace RollingTable
             static void SetOuterAngle(int8_t targetAngle);
 
             static void Move();
-            static void Stop();
 
             static void MoveCircleTest();
     };

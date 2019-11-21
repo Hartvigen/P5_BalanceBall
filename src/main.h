@@ -4,7 +4,7 @@
 #include "Serial/SerialHelper.h"
 #endif
 
-#include "headers/PIDController.h"
+#include "rollingTable/PIDController.h"
 #include "rollingTable/MotorsController.h"
 #include "rollingTable/CameraController.h"
 #include <Wire.h>
@@ -15,6 +15,6 @@ using namespace RollingTable;
 
 void initialize();
 void setup();
-
 void loop();
+
 void printInfo();

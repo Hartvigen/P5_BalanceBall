@@ -22,7 +22,9 @@
 #define IMAGE_WIDTH (CAPTURE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN)
 #define IMAGE_HEIGHT (CAPTURE_HEIGHT - TOP_MARGIN)
 
-#define ROW_SKIP_COUNT (uint16_t)2
+#define ROW_SKIP_COUNT (uint8_t)2
+
+#define MAX_AVERAGED_POINTS (uint8_t)20
 
 
 namespace RollingTable
@@ -32,8 +34,7 @@ namespace RollingTable
         private:
             static ArduCAM camera;
             static uint8_t minR, minG, minB;
-
-            static void Capture();
+            
             static void SkipRows(uint16_t count);
             static void SkipColumns(uint16_t count);
 
@@ -41,12 +42,9 @@ namespace RollingTable
             static void EndRead();
 
         public:
-            static void Init(int slavePin);
-            static void AutoCalibrate();
-            static void ManualCalibrate(uint8_t r, uint8_t g, uint8_t b);
-
-            static bool GetBallLocation(int16_t& xCo, int16_t& yCo);
-
+            static void Init(int slavePin, uint8_t r, uint8_t g, uint8_t b);
+            
+            static void BeginCapture();
             static void StartTracking();
             static void ProceedTracking(uint16_t trackTimes);
             static bool EndTracking(int16_t& xCo, int16_t& yCo);
