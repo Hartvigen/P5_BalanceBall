@@ -39,8 +39,8 @@ class FirstBrain implements Brain
       new Neuron(relu, input), //Reason for up
       new Neuron(relu, input), //Reason for up
       new Neuron(relu, input), //Reason for up
-      new Neuron(tipInv, input), 
-      new Neuron(tipInv, input), 
+      new Neuron(tipInv, input),  //tipInv
+      new Neuron(tipInv, input),  //tipInv
     };
 
     output = new Neuron[] {
@@ -158,22 +158,22 @@ class Neuron
 
   Neuron(ActivationFunction _func, Neuron[] _inputs, float[] _weights, float _bias)
   {
-    func = _func;
-    inputs = _inputs;
-    weights = _weights;
-    bias = _bias;
+    this.func = _func;   //manglede this.???
+    this.inputs = _inputs;
+    this.weights = _weights;
+    this.bias = _bias;
   }
 
   Neuron(ActivationFunction _func, Neuron[] _inputs, float[] _weights)
   {
-    func = _func;
-    inputs = _inputs;
+    this.func = _func;
+    this.inputs = _inputs;
     int wl = _weights.length;
     float[] w = new float[wl-1];
     for (int i = 0; i < wl - 1; i++)
       w[i] = _weights[i + 1];
-    weights = w;
-    bias = _weights[0];
+    this.weights = w;
+    this.bias = _weights[0];
   }
 
 

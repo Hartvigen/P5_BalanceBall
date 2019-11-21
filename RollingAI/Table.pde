@@ -5,10 +5,10 @@ class Table
 
   float desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 15;
+  float maxAngle = 3; //15
 
   float powerX, powerY;
-  int z = 0;
+  //int z = 0;
   float avgV = 0;
   float maxV = 0;
   float degreeVelocity = timestep*0.05;
@@ -26,7 +26,7 @@ class Table
   float fitness = 0f;
   float allTimeBest = 0f;
 
-  float prevX = 0f, prevY = 0f;
+  int xyZeroCounter = 0;
 
 
   Table(int _size, PVector _pos)
@@ -94,26 +94,40 @@ class Table
   {
     if (ball != null && !ball.dead)
     {
+      //println(aliveTime);
       aliveTime += timestep;
-      if(aliveTime > 5000){
+      //println("Alive = " + aliveTime);
+      if (aliveTime > 60000) {
         ball.dead = true;
         return true;
       }
-      //if (decisionTime == 0)
+      if (decisionTime == 0)
       {
-        //decisionTime = currentTime + delayTime;
+        decisionTime = currentTime + delayTime;
         float relX = ball.center.x - pos.x;
         float relY = ball.center.y - pos.y;
         //println(" X = " + relX + ", Y = " + relY + ", velX = " + ball.vel.x + ", velY = " + ball.vel.y + ", D(x,e) = " + ((relX < 0 ? halfSize : -halfSize) + relX) + ", D(y,e) = " +  ((relY < 0 ? halfSize : -halfSize) + relY));  
         decision = brain.percieve(relX, relY, ball.vel.x, ball.vel.y, (relX < 0 ? halfSize : -halfSize) + relX, (relY < 0 ? halfSize : -halfSize) + relY);
-      }// else if (decisionTime < currentTime)
+      } else if (decisionTime < currentTime)
       {
         desiredX = int(decision[0] * maxAngle);
-        desiredY = int(decision[1] * maxAngle); //<>//
-        //println("Time = " + currentTime);
+        desiredY = int(decision[1] * maxAngle);
+        
+
         decisionTime = 0;
       }
-
+      
+      float dist = ball.center.dist(pos);
+      
+      if(desiredX == 0 && desiredY == 0 && dist > 25){ //When the x-y degrees are stuck at zero.
+        xyZeroCounter += 1;
+        //println("Error " + xyZeroCounter);
+        if(xyZeroCounter>500){
+          fitness = 0;
+          ball.dead = true;
+        }
+          //xyZeroCounter = 0;
+      }
       updateTilt();
 
       PVector acc = getAcceleration();
@@ -123,25 +137,27 @@ class Table
 
       // Calculate fitness
       //Fitness = lost dist from center
-      float dist = ball.center.dist(pos);
-      if (dist == 0.0) {
-        z++;
+      
+
+      
+      
+      if (dist < 250)
+      {
+        float value = (250-dist)/100;   
+        fitness += value;
+        //println(fitness);
       }
-      fitness += timestep/1000f;
-      fitness += min(0.5f*timestep, 5/dist);
 
-      if (dist <= 50 && ball.vel.mag() <= 0.75f*Math.tanh(dist/20)+0.25f)
-        fitness += min(0.75f, (0.1f+dist) / (0.05f+ball.vel.mag())) * timestep;
+      
+      //if (dist < Closest)
+       // fitness += (Closest - dist)*relativeScore/currentTime;
+      //if (dist < 25)
+      //{
+      //  fitness += timestep*10;
+       // println(ball.vel.mag());
+      //}
 
-      if (ball.vel.mag() > 250)
-        fitness -= ball.vel.mag() / 8;
-
-      if (angleX > 10 || angleY > 10)
-        fitness -= max(angleX, angleY)/framerate;
-
-      if (fitness < 0)
-        fitness = 0;
-
+      
       return ball.dead;
     }
 
@@ -157,12 +173,12 @@ class Table
       } else if (angleX + degreeVelocity <= maxAngle)
         angleX += degreeVelocity;
     } else
-    {
+      {
       if (-maxAngle <= angleX - xDiff && angleX + xDiff <= maxAngle)
         angleX += xDiff;
       else
         angleX = maxAngle;
-    }
+      }
 
     float yDiff = desiredY - angleY;
     if (abs(yDiff) > degreeVelocity) {
@@ -204,10 +220,23 @@ class Table
   {
     // Ball and board
     noFill();
+    strokeWeight(4);
     rect(pos.x - halfSize, pos.y - halfSize, size, size);
-    if (ball != null)
+    strokeWeight(1);
+    //fill(255);
+    
+    circle(pos.x - halfSize/8+size/8/2, pos.y - halfSize/8+size/8/2, 50);
+    if (ball != null){
+      
+      //ball.show();
+      if(ball.center.dist(pos) < 25){
+        fill(0,255,0);
+        circle(pos.x - halfSize/8+size/8/2, pos.y - halfSize/8+size/8/2, 50);      
+      }
+      
+      
       ball.show();
-
+    }
     // Tilt info
     int offset = halfSize + 20;
     drawTiltMeter(angleX, new PVector(pos.x + offset, pos.y));

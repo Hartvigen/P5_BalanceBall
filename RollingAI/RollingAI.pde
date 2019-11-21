@@ -6,9 +6,9 @@ int infoBoxHeight = 65;
 Table[] tables;
 
 int epoch = 1;
-int genSize = 20;
+int genSize = 5000; //20
 int stillRunning = genSize;
-int triesPerGen = 15;
+int triesPerGen = 5; //15
 int tryNr = 1;
 
 int showOption = 0;
@@ -38,7 +38,7 @@ void initialize()
   {
 
     println("Starting new training session...");
-    for (int i = 0; i < genSize; i++) 
+    for (int i = 0; i < genSize; i++)  //100 replaced with genSize
       tables[i] = new Table(250, new PVector(width/2, height/2));
   } else {
     println("Continuing training session");
@@ -69,8 +69,8 @@ void mutate()
   Table[] newTables = new Table[genSize];
   newTables[0] = getBestFit();
   maxFitness = newTables[0].fitness;
-  if (epoch % 5 == 0)
-    SaveWeights(tables, epoch, maxFitness);
+  //if (epoch % 5 == 0)            Udkommenteret, for at teste stor genstørrelse
+  //  SaveWeights(tables, epoch, maxFitness);
 
   for (int i = 1; i < genSize - 1; i++)
   {
