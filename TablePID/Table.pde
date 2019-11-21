@@ -25,7 +25,7 @@ class Table
   double setPoint;
   double innerInput, outerInput;
   double innerOutput, outerOutput;
-  int period = 5;
+  double period = 4;
   double integralSumInner = 0, integralSumOuter = 0;
   double lastInputInner = 0, lastInputOuter = 0;
   double outputInner = 0, outputOuter = 0;
