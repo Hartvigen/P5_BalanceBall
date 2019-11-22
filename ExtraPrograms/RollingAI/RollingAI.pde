@@ -6,7 +6,7 @@ int infoBoxHeight = 65;
 Table[] tables;
 
 int epoch = 1;
-int genSize = 5000; //20
+int genSize = 500; //20 //5000
 int stillRunning = genSize;
 int triesPerGen = 5; //15
 int tryNr = 1;
@@ -69,8 +69,8 @@ void mutate()
   Table[] newTables = new Table[genSize];
   newTables[0] = getBestFit();
   maxFitness = newTables[0].fitness;
-  //if (epoch % 5 == 0)            Udkommenteret, for at teste stor genstørrelse
-  //  SaveWeights(tables, epoch, maxFitness);
+  if (epoch % 5 == 0)            //Udkommenteret, for at teste stor genstørrelse
+    SaveWeights(tables, epoch, maxFitness);
 
   for (int i = 1; i < genSize - 1; i++)
   {
@@ -193,7 +193,8 @@ void drawInfo()
   fill(0);
   text("FPS:     " + (int)frameRate, 5, 10);
   text("Running: " + stillRunning + "/" + genSize, 5, 20);
-  text("Showing: " + shownIndex + "(" + (shownIndex != -1 ? tables[shownIndex].fitness : 0f) + ")", 5, 30);
+  text("Showing: " + shownIndex + "(" + (shownIndex != -1 ? tables[shownIndex].fitness : 0f) + ")" + " (" +
+  (shownIndex != -1 ? tables[shownIndex].aliveTime : 0f)+ ")", 5, 30);
   text("Epoch:   " + epoch, 5, 40);
   text("Max fit: " + maxFitness, 5, 50);
   text("Try nr.: " + tryNr + "/" + triesPerGen, 5, 60);

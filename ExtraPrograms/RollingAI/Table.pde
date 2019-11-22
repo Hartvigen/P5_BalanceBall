@@ -5,10 +5,9 @@ class Table
 
   float desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 3; //15
+  float maxAngle = 3; 
 
   float powerX, powerY;
-  //int z = 0;
   float avgV = 0;
   float maxV = 0;
   float degreeVelocity = timestep*0.05;
@@ -94,9 +93,7 @@ class Table
   {
     if (ball != null && !ball.dead)
     {
-      //println(aliveTime);
       aliveTime += timestep;
-      //println("Alive = " + aliveTime);
       if (aliveTime > 60000) {
         ball.dead = true;
         return true;
@@ -121,12 +118,10 @@ class Table
       
       if(desiredX == 0 && desiredY == 0 && dist > 25){ //When the x-y degrees are stuck at zero.
         xyZeroCounter += 1;
-        //println("Error " + xyZeroCounter);
         if(xyZeroCounter>500){
           fitness = 0;
           ball.dead = true;
         }
-          //xyZeroCounter = 0;
       }
       updateTilt();
 
@@ -138,25 +133,11 @@ class Table
       // Calculate fitness
       //Fitness = lost dist from center
       
-
-      
-      
-      if (dist < 250)
+      if (dist < 25) // 150
       {
-        float value = (250-dist)/100;   
+        float value = (25-dist)/100;   //150
         fitness += value;
-        //println(fitness);
       }
-
-      
-      //if (dist < Closest)
-       // fitness += (Closest - dist)*relativeScore/currentTime;
-      //if (dist < 25)
-      //{
-      //  fitness += timestep*10;
-       // println(ball.vel.mag());
-      //}
-
       
       return ball.dead;
     }
@@ -223,12 +204,12 @@ class Table
     strokeWeight(4);
     rect(pos.x - halfSize, pos.y - halfSize, size, size);
     strokeWeight(1);
-    //fill(255);
     
+    
+    //Inner green circle
     circle(pos.x - halfSize/8+size/8/2, pos.y - halfSize/8+size/8/2, 50);
     if (ball != null){
       
-      //ball.show();
       if(ball.center.dist(pos) < 25){
         fill(0,255,0);
         circle(pos.x - halfSize/8+size/8/2, pos.y - halfSize/8+size/8/2, 50);      
