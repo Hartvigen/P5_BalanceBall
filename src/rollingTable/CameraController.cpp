@@ -3,9 +3,9 @@
 namespace RollingTable
 {
     ArduCAM CameraController::camera;
-    uint8_t CameraController::minR;
-    uint8_t CameraController::minG;
-    uint8_t CameraController::minB;
+    uint8_t CameraController::limitR;
+    uint8_t CameraController::limitG;
+    uint8_t CameraController::limitB;
 
     uint8_t currentRow;
     uint16_t pointsAveraged;
@@ -28,9 +28,9 @@ namespace RollingTable
 
         camera.OV2640_set_Special_effects(BW);
         
-        minR = r;
-        minG = g;
-        minB = b;
+        limitR = r;
+        limitG = g;
+        limitB = b;
     }
 
 
@@ -94,7 +94,7 @@ namespace RollingTable
             {
                 uint16_t c565 = SPI.transfer16(0x00);
 
-                if ((c565 & 0x1F) < minR && ((c565 >> 5) & 0x3F) < minG && ((c565 >> 11) & 0x1F) < minB)
+                if ((c565 & 0x1F) < limitR && ((c565 >> 5) & 0x3F) < limitG && ((c565 >> 11) & 0x1F) < limitB)
                 {
                     if (++pointsAveraged > MAX_AVERAGED_POINTS)
                         return;

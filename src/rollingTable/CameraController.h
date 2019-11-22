@@ -33,7 +33,7 @@ namespace RollingTable
     {
         private:
             static ArduCAM camera;
-            static uint8_t minR, minG, minB;
+            static uint8_t limitR, limitG, limitB;
             
             static void SkipRows(uint16_t count);
             static void SkipColumns(uint16_t count);
