@@ -14,6 +14,7 @@ namespace RollingTable
 
     void CameraController::Init(int slavePin, uint8_t r, uint8_t g, uint8_t b)
     {
+        //Lines 18 to 28 are standard for the ArduCam, and taken from examples thereof.
         camera = ArduCAM(OV2640, slavePin);
         pinMode(slavePin, OUTPUT);
         digitalWrite(slavePin, HIGH);
@@ -28,19 +29,21 @@ namespace RollingTable
 
         camera.OV2640_set_Special_effects(BW);
         
+        //Set the colour limits for point tracking.
         limitR = r;
         limitG = g;
         limitB = b;
     }
 
-
+    //Function skips 'count' rows.
     void CameraController::SkipRows(uint16_t count)
     {
         for (uint16_t row = 0; row < count; row++)
             for (uint16_t col = 0; col < CAPTURE_WIDTH; col++)
                 SPI.transfer16(0x00);
     }
-
+    
+    //Functions skips 'count' pixels in current row.
     void CameraController::SkipColumns(uint16_t count)
     {
         for (uint16_t col = 0; col < count; col++)
@@ -48,6 +51,7 @@ namespace RollingTable
     }
 
 
+    //Prepares SPI connection and camera for transmission of pixel bytes.
     void CameraController::BeginRead()
     {
         // The value of 8_000_000 MUST NOT be exceeded due to ArduCAM hardware
@@ -56,33 +60,41 @@ namespace RollingTable
         camera.set_fifo_burst();
     }
 
+    //releases hold of SPI and camera resources.
     void CameraController::EndRead()
     {
         camera.CS_HIGH();
         SPI.endTransaction();
     }
 
-
+    //Orders camera to begin capturing.
     void CameraController::BeginCapture()
     {
         camera.flush_fifo();
         camera.start_capture();
     }
 
+    //Prepares system for tracking process.
     void CameraController::StartTracking()
     {
+        //Resets tracking variables for this tracking process.
         pointsAveraged = 0;
         avgX = avgY = 0;
         currentRow = 0;
 
+        
         BeginRead();
         SPI.transfer(0x00); // Skip dummy byte
         SkipRows(TOP_MARGIN);
         EndRead();
     }
 
+    //Function runs tracking process over 'trackTimes' rows.
     void CameraController::ProceedTracking(uint16_t trackTimes)
     {
+        //If a sufficiently large amount of points have already been identified for the tracking,
+        //then no more points will be included.
+        //The function is still called to ensure that the major cycle is executed correctly.
         if (pointsAveraged > MAX_AVERAGED_POINTS)
             return;
 
@@ -94,6 +106,7 @@ namespace RollingTable
             {
                 uint16_t c565 = SPI.transfer16(0x00);
 
+                //each subexpression of the boolean expression converts c565 into the corresponing colours value
                 if ((c565 & 0x1F) < limitR && ((c565 >> 5) & 0x3F) < limitG && ((c565 >> 11) & 0x1F) < limitB)
                 {
                     if (++pointsAveraged > MAX_AVERAGED_POINTS)
@@ -111,6 +124,7 @@ namespace RollingTable
         EndRead();
     }
 
+    //Concludes the tracking by extracting the 
     bool CameraController::EndTracking(int16_t& xCo, int16_t& yCo)
     {
         if (pointsAveraged != 0)
@@ -128,11 +142,13 @@ namespace RollingTable
 
 
 #if USE_IMG_DIS
+    //Function is used to send image to a processing program capable of displaying it.
     void CameraController::SendImageToProcessing()
     {
         pointsAveraged = 0;
         avgX = avgY = 0;
 
+        //Array to contain pixels of row. A pixel is stored as three bytes, one for each color.
         uint8_t* bytes = (uint8_t*)malloc(IMAGE_WIDTH * 3);
 
         SerialHelper::AwaitSignal();
@@ -143,6 +159,7 @@ namespace RollingTable
         BeginRead();
 
         SkipRows(TOP_MARGIN);
+        //Sends an entire row of pixels to Processing.
         for (uint16_t row = 0; row < IMAGE_HEIGHT; row++)
         {
             SkipColumns(LEFT_MARGIN);
@@ -155,8 +172,10 @@ namespace RollingTable
                 bytes[col*3+1] = ((c565 >> 5) & 0x3F);  // G
                 bytes[col*3+2] = ((c565 >> 11) & 0x1F); // B
 
+                //Since the entire image is sent to processing, then the number of tracked points
+                //can exceed the desired limit as time is not a factor.
                 if (row % (ROW_SKIP_COUNT+1) == 0 &&
-                    bytes[col*3+0] < minR && bytes[col*3+1] < minG && bytes[col*3+2] < minB)
+                    bytes[col*3+0] < limitR && bytes[col*3+1] < limitG && bytes[col*3+2] < limitB)
                 {
                     bytes[col*3+0] = 31;
                     bytes[col*3+1] = 0;
@@ -178,6 +197,8 @@ namespace RollingTable
 
         delete bytes;
 
+        //The tracked centre is checked to see if it was discovered, and if it was, converted to the 
+        //coordinate system of the processing system.
         SerialHelper::AwaitSignal();
         SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2)));
         SerialHelper::AwaitSignal();
