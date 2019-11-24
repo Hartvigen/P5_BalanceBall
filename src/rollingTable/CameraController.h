@@ -23,7 +23,6 @@
 #define IMAGE_HEIGHT (CAPTURE_HEIGHT - TOP_MARGIN)
 
 #define ROW_SKIP_COUNT (uint8_t)2
-
 #define MAX_AVERAGED_POINTS (uint8_t)20
 
 

@@ -14,16 +14,14 @@ namespace RollingTable
 
     void CameraController::Init(int slavePin, uint8_t r, uint8_t g, uint8_t b)
     {
-        //Lines 18 to 28 are standard for the ArduCam, and taken from examples thereof.
+        //Lines 18 to 26 are standard for the ArduCam, and taken from examples thereof.
         camera = ArduCAM(OV2640, slavePin);
-        pinMode(slavePin, OUTPUT);
-        digitalWrite(slavePin, HIGH);
         
         // Resets the camera's processor
         camera.write_reg(0x07, 0x80); delay(100);
         camera.write_reg(0x07, 0x00); delay(100);
         
-        camera.set_format(BMP); 
+        camera.set_format(BMP);
         camera.InitCAM();
         delay(100);
 
@@ -82,7 +80,6 @@ namespace RollingTable
         avgX = avgY = 0;
         currentRow = 0;
 
-        
         BeginRead();
         SPI.transfer(0x00); // Skip dummy byte
         SkipRows(TOP_MARGIN);
@@ -127,17 +124,15 @@ namespace RollingTable
     //Concludes the tracking by extracting the 
     bool CameraController::EndTracking(int16_t& xCo, int16_t& yCo)
     {
-        if (pointsAveraged != 0)
+        if (pointsAveraged != 0 && pointsAveraged <= MAX_AVERAGED_POINTS)
         {
             xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2);
             yCo = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2);
             return true;
         }
-        else
-        {
-            xCo = yCo = 0;
-            return false;
-        }
+
+        xCo = yCo = 0;
+        return false;
     }
 
 
