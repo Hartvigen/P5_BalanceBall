@@ -1,3 +1,4 @@
+#ifndef UNIT_TEST
 #include "main.h"
 
 int16_t xCo, yCo;
@@ -98,3 +99,4 @@ void printInfo()
     
 #endif
 }
+#endif

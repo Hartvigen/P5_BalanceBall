@@ -1,3 +1,4 @@
+#ifndef UNIT_TEST
 #include "Setup.h"
 
 #if USE_IMG_DIS || INTF_RVIEWER
@@ -18,3 +19,4 @@ void setup();
 void loop();
 
 void printInfo();
+#endif
