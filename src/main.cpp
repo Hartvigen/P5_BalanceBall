@@ -36,35 +36,36 @@ void initialize()
     SPI.begin();
     Serial.begin(691200L);
 
-    while (!Serial) { }
+    while (!Serial)
+    {
+    }
     while (Serial.available() > 0)
         Serial.read();
     delay(1000);
 
-    //If desired, starts communication with viewing program.
-    #if INTF_RVIEWER || USE_IMG_DIS
+//If desired, starts communication with viewing program.
+#if INTF_RVIEWER || USE_IMG_DIS
     SerialHelper::SendInt(1);
-    #endif
+#endif
 }
 
 //Function initializes program controllers.
 void setup()
 {
-    CameraController::Init(CAM_SLAVE_PIN, 3,6,3);
+    CameraController::Init(CAM_SLAVE_PIN, 3, 6, 3);
 
     MotorsController::Init();
     MotorsController::Reset();
-
-    #if !CTRL_MANUAL && CTRL_AI
-    // Init AI
-    #endif
 }
 
 //function representing the major cycle of the schedule
 void loop()
 {
     startTime = millis();
-
+    CameraController::BeginCapture();
+    while(){
+        MotorsController::Move();
+    }
     CameraController::StartTracking();
     for (int i = 13; i--;)
     {
@@ -73,32 +74,47 @@ void loop()
     }
     ballFound = CameraController::EndTracking(xCo, yCo);
 
-    #if CTRL_PD
-    PDController::RunPD(xCo, yCo, innerAng, outerAng);
-    #elif CTRL_AI
-    // AIController::RunAI();
-    #endif
+#if CTRL_PID
+    PIDController::RunPID(xCo, yCo, innerAng, outerAng);
+#elif CTRL_AI
+    if (ballFound)
+        AIController::RunNN(xCo, yCo, innerAng, outerAng);
+#endif
 
     MotorsController::SetInnerAngle(innerAng);
     MotorsController::SetOuterAngle(outerAng);
     MotorsController::Move();
-    
+
     endTime = millis();
     printInfo();
 }
 
-
 void printInfo()
 {
 #if INTF_TERMINAL
-    Serial.print("Time: "); Serial.println((uint32_t)(endTime - startTime));
-    Serial.print("Ball: "); 
-    if (ballFound) { Serial.print(xCo); Serial.print(" "); Serial.println(yCo); }
-    else { Serial.println("Tracking..."); }
+    Serial.print("Time: ");
+    Serial.println((uint32_t)(endTime - startTime));
+    Serial.print("Ball: ");
+    if (ballFound)
+    {
+        Serial.print(xCo);
+        Serial.print(" ");
+        Serial.println(yCo);
+    }
+    else
+    {
+        Serial.println("Tracking...");
+    }
 
-    Serial.print("Actual angles: Inner = "); Serial.print(MotorsController::GetInnerEncoder()); Serial.print(" Outer = "); Serial.println(MotorsController::GetOuterEncoder());
-    Serial.print("Desired angles: Inner = "); Serial.print(innerAng); Serial.print(" Outer = "); Serial.println(outerAng);
+    Serial.print("Actual angles: Inner = ");
+    Serial.print(MotorsController::GetInnerEncoder());
+    Serial.print(" Outer = ");
+    Serial.println(MotorsController::GetOuterEncoder());
+    Serial.print("Desired angles: Inner = ");
+    Serial.print(innerAng);
+    Serial.print(" Outer = ");
+    Serial.println(outerAng);
 #elif INTF_RVIEWER
-    
+
 #endif
 }

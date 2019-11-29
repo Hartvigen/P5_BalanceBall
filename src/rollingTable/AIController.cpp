@@ -1,6 +1,6 @@
 #include "AIController.h"
 
-namespace rollingTable
+namespace RollingTable
 {
     double xEdge, yEdge;
     double xVel, yVel;
@@ -20,7 +20,7 @@ namespace rollingTable
     double output[2];
     double input[6];
 
-    void RunNN(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng)
+    void AIController::RunNN(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng)
     {
         xEdge = (xCo < 0 ? -HALF_SIZE : HALF_SIZE) + xCo;
         yEdge = (yCo < 0 ? -HALF_SIZE : HALF_SIZE) + yCo;
@@ -69,12 +69,12 @@ namespace rollingTable
             }
             output[i] = Tipping(output[i]);
         }
-        innerAng = output[0];
-        outerAng = output[1];
+        innerAng = max(output[0], 10);
+        outerAng = max(output[1], 10);
     }
 
-    double Rectifier(double input){return (input < 0 ? 0 : input);}
-    double Sigmoid(double input){return 2 / (1 + exp(input))- 1;}
-    double Tipping(double input){return 5*pow(input/5, 3);}
-    double Inverse(double input){return -15/input;}
-} // namespace rollingTable
+    double AIController::Rectifier(double input){return (input < 0 ? 0 : input);}
+    double AIController::Sigmoid(double input){return 2 / (1 + exp(input))- 1;}
+    double AIController::Tipping(double input){return 5*pow(input/5, 3);}
+    double AIController::Inverse(double input){return -15/input;}
+} // namespace RollingTable
