@@ -17,4 +17,4 @@ class SerialHelper
 
 #endif
 
-#endif // USE_IMG_DIS
+#endif

@@ -21,20 +21,29 @@ namespace RollingTable
             static int8_t outerAngle;
             static int8_t outerDir;
 
+            //Moves the motor "angle" degrees in "dir" direction at "speed" velocity.
             static void Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed);
 
         public:
+            //Initializes the motor controller
             static void Init();
+            //Resets the motor encoders, and stops any movement.
             static void Reset();
 
+            //Returns current inner motor encoder value as degrees
             static int32_t GetInnerEncoder();
+            //Sets desired angle of inner motors
             static void SetInnerAngle(int8_t targetAngle);
 
+            //Returns current outer motor encoder value as degrees
             static int32_t GetOuterEncoder();
+            //Sets desired angle of outer motors
             static void SetOuterAngle(int8_t targetAngle);
 
+            //Moves motors towards desired angle.
             static void Move();
 
+            //Test function which moves the board in circles.
             static void MoveCircleTest();
     };
 }

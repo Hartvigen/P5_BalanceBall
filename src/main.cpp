@@ -1,17 +1,19 @@
 #include "main.h"
 
+//Declaration of Variables used for the tracking and tilting processes.
 int16_t xCo, yCo;
-bool ballFound = false;
-int8_t xAng = 0, yAng = 0;
+bool ballFound;
+int8_t innerAng, outerAng;
 
+//Variables used for timing the "loop" function.
 uint64_t startTime, endTime;
-
 
 int main()
 {
     initialize();
     setup();
 
+//See "Setup.h" for explanation of values used in pre-processor directive.
 #if USE_IMG_DIS
     while (true)
         CameraController::SendImageToProcessing();
@@ -25,7 +27,7 @@ int main()
     return 0;
 }
 
-
+//Function initializes the Arduino board, and prepares all communication channels
 void initialize()
 {
     init();
@@ -39,11 +41,13 @@ void initialize()
         Serial.read();
     delay(1000);
 
+    //If desired, starts communication with viewing program.
     #if INTF_RVIEWER || USE_IMG_DIS
     SerialHelper::SendInt(1);
     #endif
 }
 
+//Function initializes program controllers.
 void setup()
 {
     CameraController::Init(CAM_SLAVE_PIN, 3,6,3);
@@ -56,7 +60,7 @@ void setup()
     #endif
 }
 
-
+//function representing the major cycle of the schedule
 void loop()
 {
     startTime = millis();
@@ -70,13 +74,13 @@ void loop()
     ballFound = CameraController::EndTracking(xCo, yCo);
 
     #if CTRL_PID
-    PIDController::RunPID(xCo, yCo, xAng, yAng);
+    PIDController::RunPID(xCo, yCo, innerAng, outerAng);
     #elif CTRL_AI
     // AIController::RunAI();
     #endif
 
-    MotorsController::SetInnerAngle(xAng);
-    MotorsController::SetOuterAngle(yAng);
+    MotorsController::SetInnerAngle(innerAng);
+    MotorsController::SetOuterAngle(outerAng);
     MotorsController::Move();
     
     endTime = millis();
@@ -93,7 +97,7 @@ void printInfo()
     else { Serial.println("Tracking..."); }
 
     Serial.print("Actual angles: Inner = "); Serial.print(MotorsController::GetInnerEncoder()); Serial.print(" Outer = "); Serial.println(MotorsController::GetOuterEncoder());
-    Serial.print("Desired angles: Inner = "); Serial.print(xAng); Serial.print(" Outer = "); Serial.println(yAng); // May show too large or small values, I know
+    Serial.print("Desired angles: Inner = "); Serial.print(innerAng); Serial.print(" Outer = "); Serial.println(outerAng);
 #elif INTF_RVIEWER
     
 #endif

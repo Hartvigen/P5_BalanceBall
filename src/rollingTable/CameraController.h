@@ -34,18 +34,26 @@ namespace RollingTable
             static ArduCAM camera;
             static uint8_t limitR, limitG, limitB;
             
+            //Skips "count" rows during the tracking process.
             static void SkipRows(uint16_t count);
+            //Skips "count" pixels in the current row during the tracking process.
             static void SkipColumns(uint16_t count);
 
+            //Reserves SPI communication for tracking process.
             static void BeginRead();
+            //Releases SPI communication.
             static void EndRead();
 
         public:
             static void Init(int slavePin, uint8_t r, uint8_t g, uint8_t b);
             
+            //Orders ArduCAM to begin capturing a picture.
             static void BeginCapture();
+            //Begins tracking process.
             static void StartTracking();
+            //Progress tracking process "trackTimes"
             static void ProceedTracking(uint16_t trackTimes);
+            //End tracking process, and output xCo and yCo coordinates of ball.
             static bool EndTracking(int16_t& xCo, int16_t& yCo);
 
 #if USE_IMG_DIS

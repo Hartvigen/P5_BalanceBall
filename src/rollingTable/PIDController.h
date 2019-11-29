@@ -8,7 +8,8 @@ namespace RollingTable
     class PIDController 
     {
         public:
-            static void RunPID(double xCo, double yCo, int8_t &xAng, int8_t &yAng);
+            //Calculates a desired angle using PID controllers
+            static void RunPID(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng);
     };
 }
 

@@ -69,8 +69,6 @@ void mutate()
   Table[] newTables = new Table[genSize];
   newTables[0] = getBestFit();
   maxFitness = newTables[0].fitness;
-  if (epoch % 5 == 0)            //Udkommenteret, for at teste stor genstørrelse
-    SaveWeights(tables, epoch, maxFitness);
 
   for (int i = 1; i < genSize - 1; i++)
   {
@@ -84,6 +82,8 @@ void mutate()
   newTables[genSize-1] = new Table(250, new PVector(width/2, height/2));
 
   tables = newTables;
+  if (epoch % 5 == 0)            //Udkommenteret, for at teste stor genstørrelse
+    SaveWeights(tables, epoch, maxFitness);
   tables[0].reset();
   tables[0].fitness = 0;
 }

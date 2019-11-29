@@ -93,7 +93,7 @@ namespace RollingTable
         uint64_t calibrateTime = 0; 
         uint32_t time;
 
-        int8_t xAng = 0, yAng = 0;
+        int8_t innerAng = 0, outerAng = 0;
 
         Reset();
         SetOuterAngle(0);
@@ -113,18 +113,18 @@ namespace RollingTable
 
                 calibrateTime = millis() + 1000;
                 
-                if (xAng != -15 && xAng != 0)
+                if (innerAng != -15 && innerAng != 0)
                 {
-                    xAng = -15;
+                    innerAng = -15;
                 }
-                else if (xAng == -15)
-                    xAng = 0;
+                else if (innerAng == -15)
+                    innerAng = 0;
                 else
                 {
-                    xAng = 15;
+                    innerAng = 15;
                 }
 
-                SetInnerAngle(xAng);
+                SetInnerAngle(innerAng);
             }
 
             Move();
@@ -133,7 +133,7 @@ namespace RollingTable
             Serial.print("  ");
             Serial.print(GetInnerEncoder());
             Serial.print("  ");
-            Serial.println(xAng);
+            Serial.println(innerAng);
         }
     }
 }

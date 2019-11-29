@@ -27,7 +27,7 @@ namespace RollingTable
 
         camera.OV2640_set_Special_effects(BW);
         
-        //Set the colour limits for point tracking.
+        //Set the colour limits for tracking.
         limitR = r;
         limitG = g;
         limitB = b;
