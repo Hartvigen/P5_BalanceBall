@@ -5,7 +5,7 @@
 #define USE_IMG_DIS false
 
 // How should the table be controlled
-#define CTRL_PID true
+#define CTRL_PD true
 #define CTRL_AI false
 #define CTRL_MANUAL false
 

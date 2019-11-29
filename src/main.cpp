@@ -73,8 +73,8 @@ void loop()
     }
     ballFound = CameraController::EndTracking(xCo, yCo);
 
-    #if CTRL_PID
-    PIDController::RunPID(xCo, yCo, innerAng, outerAng);
+    #if CTRL_PD
+    PDController::RunPD(xCo, yCo, innerAng, outerAng);
     #elif CTRL_AI
     // AIController::RunAI();
     #endif

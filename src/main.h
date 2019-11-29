@@ -4,10 +4,11 @@
 #include "Serial/SerialHelper.h"
 #endif
 
-#include "rollingTable/PIDController.h"
+#include "rollingTable/PDController.h"
 #include "rollingTable/MotorsController.h"
 #include "rollingTable/CameraController.h"
 #include <Wire.h>
+#include <SPI.h>
 
 using namespace RollingTable;
 
