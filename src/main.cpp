@@ -52,17 +52,22 @@ void initialize()
 //Function initializes program controllers.
 void setup()
 {
-    CameraController::Init(CAM_SLAVE_PIN, 3, 6, 3);
+    CameraController::Init(CAM_SLAVE_PIN, 4, 8, 4);
 
     MotorsController::Init();
     MotorsController::Reset();
 }
 
 //function representing the major cycle of the schedule
-void loop()
+inline void loop()
 {
     startTime = millis();
     CameraController::BeginCapture();
+    for (int i = 9; i--;)
+    {
+        delay(6);
+        MotorsController::Move();
+    }
     CameraController::StartTracking();
     for (int i = 13; i--;)
     {
@@ -71,22 +76,28 @@ void loop()
     }
     ballFound = CameraController::EndTracking(xCo, yCo);
 
-#if CTRL_PD
-    PDController::RunPD(xCo, yCo, innerAng, outerAng);
-#elif CTRL_AI
     if (ballFound)
+    {
+#if CTRL_PD
+        PDController::RunPD(xCo, yCo, innerAng, outerAng);
+#elif CTRL_AI
         AIController::RunNN(xCo, yCo, innerAng, outerAng);
 #endif
-
-    MotorsController::SetInnerAngle(innerAng);
-    MotorsController::SetOuterAngle(outerAng);
+        MotorsController::SetInnerAngle(innerAng);
+        MotorsController::SetOuterAngle(outerAng);
+    }
+    else
+    {
+        MotorsController::SetInnerAngle(0);
+        MotorsController::SetOuterAngle(0);
+    }
     MotorsController::Move();
 
     endTime = millis();
     printInfo();
 }
 
-void printInfo()
+inline void printInfo()
 {
 #if INTF_TERMINAL
     Serial.print("Time: ");

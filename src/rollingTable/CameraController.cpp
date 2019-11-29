@@ -124,6 +124,8 @@ namespace RollingTable
     //Concludes the tracking by extracting the 
     bool CameraController::EndTracking(int16_t& xCo, int16_t& yCo)
     {
+        Serial.print("PointsAveraged: "); Serial.println(pointsAveraged);
+        
         if (pointsAveraged != 0 && pointsAveraged <= MAX_AVERAGED_POINTS)
         {
             xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2);
@@ -150,8 +152,11 @@ namespace RollingTable
         SerialHelper::SendInt(IMAGE_HEIGHT);
         SerialHelper::SendInt(IMAGE_WIDTH);
         
-        Capture();
+        BeginCapture();
+        while (!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK)) { }
+
         BeginRead();
+        SPI.transfer(0x00); // Skip dummy byte
 
         SkipRows(TOP_MARGIN);
         //Sends an entire row of pixels to Processing.

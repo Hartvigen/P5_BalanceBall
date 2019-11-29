@@ -2,8 +2,8 @@
 
 namespace RollingTable
 {
-    double IKp = 0.24, IKd = 28.0;
-    double OKp = 0.24, OKd = 28.0;
+    double IKp = 0.2, IKd = 0.4;
+    double OKp = 0.2, OKd = 0.4;
     
     double xPrev = 0, yPrev = 0;
 
