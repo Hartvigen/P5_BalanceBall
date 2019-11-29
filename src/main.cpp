@@ -63,9 +63,6 @@ void loop()
 {
     startTime = millis();
     CameraController::BeginCapture();
-    while(){
-        MotorsController::Move();
-    }
     CameraController::StartTracking();
     for (int i = 13; i--;)
     {
@@ -74,8 +71,8 @@ void loop()
     }
     ballFound = CameraController::EndTracking(xCo, yCo);
 
-#if CTRL_PID
-    PIDController::RunPID(xCo, yCo, innerAng, outerAng);
+#if CTRL_PD
+    PDController::RunPD(xCo, yCo, innerAng, outerAng);
 #elif CTRL_AI
     if (ballFound)
         AIController::RunNN(xCo, yCo, innerAng, outerAng);

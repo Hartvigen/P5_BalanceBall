@@ -4,7 +4,7 @@
 #include "Serial/SerialHelper.h"
 #endif
 
-#include "rollingTable/PIDController.h"
+#include "rollingTable/PDController.h"
 #include "rollingTable/AIController.h"
 #include "rollingTable/MotorsController.h"
 #include "rollingTable/CameraController.h"
