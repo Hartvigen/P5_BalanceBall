@@ -5,6 +5,11 @@
 
 #define PERIOD 5
 
+#define IN_KP 0.2
+#define IN_KD 0.2
+#define OUT_KP 0.4
+#define OUT_KD 0.4
+
 namespace RollingTable
 {
     class PDController 
