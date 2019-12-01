@@ -5,3 +5,5 @@
 using namespace RollingTable;
 void TestAll_CameraController();
 void Test_SizeOfCameraFIFO();
+void Test_CameraTest();
+inline const char * const BoolToString(bool b);

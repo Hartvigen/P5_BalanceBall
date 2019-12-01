@@ -1,6 +1,5 @@
 #ifdef UNIT_TEST
 #include <Wire.h>
-#include "../../src/main.h"
 #include "test_rollingTable/test_CameraController.h"
 #include "test_rollingTable/test_MotorsController.h"
 #include "test_rollingTable/test_PIDController.h"
@@ -37,7 +36,8 @@ void setup()
     #endif
 }
 
-int main(){
+int main()
+{
     
     initialize();
     setup();
