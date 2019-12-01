@@ -1,3 +1,4 @@
+#ifndef UNIT_TEST
 #include "main.h"
 
 //Declaration of Variables used for the tracking and tilting processes.
@@ -126,3 +127,4 @@ inline void printInfo()
 
 #endif
 }
+#endif
