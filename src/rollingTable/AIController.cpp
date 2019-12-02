@@ -48,7 +48,7 @@ namespace RollingTable
         input[4] = xEdge;
         input[5] = yEdge;
         for(int i = 0; i < 6; i++)
-            Serial.println(input[i],10);
+            
         for (int i = 0; i < 6; i++)
         {
             hlOut[i] = hlBias[i];
@@ -56,16 +56,11 @@ namespace RollingTable
             {
                 hlOut[i] += hlWeights[i][j] * input[j];
             }
-            Serial.println(i);
-            Serial.println(hlOut[i]);
+            
             if(i < 4)
                 hlOut[i] = Rectifier(hlOut[i]);
             else
                 hlOut[i] = Tipping(Sigmoid(Inverse(hlOut[i])));
-            Serial.print("hli = ");
-            Serial.print(i);
-            Serial.print(" = ");
-            Serial.println(hlOut[i], 10);
         }
         for (int i = 0; i < 2; i++)
         {
@@ -74,30 +69,11 @@ namespace RollingTable
             {
                 output[i] += outputWeights[i][j] * hlOut[j];
             }
-            Serial.println(i);
-            Serial.println(output[i]);
+            
             output[i] = Tipping(output[i]);
-            Serial.print("outi = ");
-            Serial.print(i);
-            Serial.print(" = ");
-            Serial.println(output[i], 10);
         }
         innerAng = (output[0] * 3);
         outerAng = (output[1] * 3);
-    }
-
-    void AIController::AITest()
-    {
-        Serial.println();
-        firstTrack = false;
-        int8_t X = 0, Y = 0;
-        oldX = 195.5057675;
-        oldY = 215.217485;
-        AIController::RunNN(60.9756775, 47.740845, X, Y);
-        Serial.print("X = ");
-        Serial.print((double)X, 10);
-        Serial.print(", Y = ");
-        Serial.println((double)Y, 10);
     }
 
     double AIController::Rectifier(double input){return (input < 0 ? 0 : input);}
