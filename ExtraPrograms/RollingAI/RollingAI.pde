@@ -32,7 +32,7 @@ void setup()
 
 void initialize()
 {
-  /*
+  
   tables = new Table[genSize];
   int data = checkRun();
   if (data == -1)
@@ -58,8 +58,7 @@ void initialize()
     catch(IOException e) {
       e.printStackTrace();
     }
-  }*/
-  AITest();
+  }
 }
 
 void mutate()
@@ -377,18 +376,4 @@ int checkRun()
     e.printStackTrace();
   }
   return data;
-}
-
-void AITest()
-{
-  InputStream input = createInput("Weights.txt");
-    readMaxFit(input);
-    readEpoch(input);
-    float xEdge = (60.9756775 < 0 ? 65 : -65) + 60.9756775;
-    float yEdge = (47.740845 < 0 ? 65 : -65) + 47.740845;
-    println("Xe = " + xEdge + ", Ye = " + yEdge);
-    Table table = new Table(250, new PVector(width/2, height/2), new FirstBrain(loadBrain(input)), maxFitness);
-    float[] decision = table.brain.percieve(60.9756775, 47.740845, -134.53009, -167.47664, xEdge, yEdge); //<>//
-    println("X = " + (decision[0]*3) + ", Y = " + (decision[1]*3));
-    exit();
-}
+} //<>//
