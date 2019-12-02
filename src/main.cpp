@@ -12,7 +12,10 @@ int main()
 {
     initialize();
     setup();
-
+    AIController::AITest();
+    double test = 0.0000001;
+    Serial.println(test, 10);
+    return 0;/*
 //See "Setup.h" for explanation of values used in pre-processor directive.
 #if USE_IMG_DIS
     while (true)
@@ -24,7 +27,7 @@ int main()
 
 #endif
 
-    return 0;
+    return 0;*/
 }
 
 //Function initializes the Arduino board, and prepares all communication channels

@@ -5,7 +5,7 @@ class Table
 
   float desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 3; 
+  float maxAngle = 5; 
 
   float powerX, powerY;
   float avgV = 0;
@@ -103,7 +103,7 @@ class Table
         decisionTime = currentTime + delayTime;
         float relX = ball.center.x - pos.x;
         float relY = ball.center.y - pos.y;
-        //println(" X = " + relX + ", Y = " + relY + ", velX = " + ball.vel.x + ", velY = " + ball.vel.y + ", D(x,e) = " + ((relX < 0 ? halfSize : -halfSize) + relX) + ", D(y,e) = " +  ((relY < 0 ? halfSize : -halfSize) + relY));  
+        println(" X = " + relX + ", Y = " + relY + ", velX = " + ball.vel.x + ", velY = " + ball.vel.y + ", D(x,e) = " + ((relX < 0 ? halfSize : -halfSize) + relX) + ", D(y,e) = " +  ((relY < 0 ? halfSize : -halfSize) + relY));  
         decision = brain.percieve(relX, relY, ball.vel.x, ball.vel.y, (relX < 0 ? halfSize : -halfSize) + relX, (relY < 0 ? halfSize : -halfSize) + relY);
       } else if (decisionTime < currentTime)
       {

@@ -18,6 +18,7 @@ namespace RollingTable
         public:
             //Runs Neural network to get desired angle
             static void RunNN(double xCo, double yCo, int8_t& innerAng, int8_t& outerAng);
+            static void AITest();
     };
 }
 

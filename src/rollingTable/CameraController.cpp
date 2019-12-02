@@ -11,22 +11,23 @@ namespace RollingTable
     uint16_t pointsAveraged;
     float avgX, avgY;
 
-
     void CameraController::Init(int slavePin, uint8_t r, uint8_t g, uint8_t b)
     {
         //Lines 18 to 26 are standard for the ArduCam, and taken from examples thereof.
         camera = ArduCAM(OV2640, slavePin);
-        
+
         // Resets the camera's processor
-        camera.write_reg(0x07, 0x80); delay(100);
-        camera.write_reg(0x07, 0x00); delay(100);
-        
+        camera.write_reg(0x07, 0x80);
+        delay(100);
+        camera.write_reg(0x07, 0x00);
+        delay(100);
+
         camera.set_format(BMP);
         camera.InitCAM();
         delay(100);
 
         camera.OV2640_set_Special_effects(BW);
-        
+
         //Set the colour limits for tracking.
         limitR = r;
         limitG = g;
@@ -40,14 +41,13 @@ namespace RollingTable
             for (uint16_t col = 0; col < CAPTURE_WIDTH; col++)
                 SPI.transfer16(0x00);
     }
-    
+
     //Functions skips 'count' pixels in current row.
     void CameraController::SkipColumns(uint16_t count)
     {
         for (uint16_t col = 0; col < count; col++)
             SPI.transfer16(0x00);
     }
-
 
     //Prepares SPI connection and camera for transmission of pixel bytes.
     void CameraController::BeginRead()
@@ -93,7 +93,7 @@ namespace RollingTable
         //then no more points will be included.
         //The function is still called to ensure that the major cycle is executed correctly.
         if (pointsAveraged > MAX_AVERAGED_POINTS)
-            return;
+        return;
 
         BeginRead();
         for (uint16_t row = 0; row < trackTimes; row++)
@@ -107,8 +107,8 @@ namespace RollingTable
                 if ((c565 & 0x1F) < limitR && ((c565 >> 5) & 0x3F) < limitG && ((c565 >> 11) & 0x1F) < limitB)
                 {
                     if (++pointsAveraged > MAX_AVERAGED_POINTS)
-                        return;
-                    
+                      return;
+
                     avgX += (col - avgX) / pointsAveraged;
                     avgY += (currentRow - avgY) / pointsAveraged;
                 }
@@ -116,18 +116,18 @@ namespace RollingTable
             SkipColumns(RIGHT_MARGIN);
             SkipRows(ROW_SKIP_COUNT);
 
-            currentRow += (ROW_SKIP_COUNT+1);
+            currentRow += (ROW_SKIP_COUNT + 1);
         }
         EndRead();
     }
 
-    //Concludes the tracking by extracting the 
-    bool CameraController::EndTracking(int16_t& xCo, int16_t& yCo)
+    //Concludes the tracking by extracting the
+    bool CameraController::EndTracking(int16_t &xCo, int16_t &yCo)
     {
         if (pointsAveraged != 0 && pointsAveraged <= MAX_AVERAGED_POINTS)
         {
-            xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2);
-            yCo = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2);
+            xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH / 2);
+            yCo = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT / 2);
             return true;
         }
 
@@ -135,8 +135,7 @@ namespace RollingTable
         return false;
     }
 
-
-#if USE_IMG_DIS
+    #if USE_IMG_DIS
     //Function is used to send image to a processing program capable of displaying it.
     void CameraController::SendImageToProcessing()
     {
@@ -144,13 +143,16 @@ namespace RollingTable
         avgX = avgY = 0;
 
         //Array to contain pixels of row. A pixel is stored as three bytes, one for each color.
-        uint8_t* bytes = (uint8_t*)malloc(IMAGE_WIDTH * 3);
+        uint8_t *bytes = (uint8_t *)malloc(IMAGE_WIDTH * 3);
 
         SerialHelper::AwaitSignal();
         SerialHelper::SendInt(IMAGE_HEIGHT);
         SerialHelper::SendInt(IMAGE_WIDTH);
-        
-        Capture();
+
+        BeginCapture();
+        while (!camera.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
+        {
+        }
         BeginRead();
 
         SkipRows(TOP_MARGIN);
@@ -163,18 +165,18 @@ namespace RollingTable
             {
                 uint16_t c565 = SPI.transfer16(0x00);
 
-                bytes[col*3+0] = (c565 & 0x1F);         // R
-                bytes[col*3+1] = ((c565 >> 5) & 0x3F);  // G
-                bytes[col*3+2] = ((c565 >> 11) & 0x1F); // B
+                bytes[col * 3 + 0] = (c565 & 0x1F);         // R
+                bytes[col * 3 + 1] = ((c565 >> 5) & 0x3F);  // G
+                bytes[col * 3 + 2] = ((c565 >> 11) & 0x1F); // B
 
                 //Since the entire image is sent to processing, then the number of tracked points
                 //can exceed the desired limit as time is not a factor.
-                if (row % (ROW_SKIP_COUNT+1) == 0 &&
-                    bytes[col*3+0] < limitR && bytes[col*3+1] < limitG && bytes[col*3+2] < limitB)
+                if (row % (ROW_SKIP_COUNT + 1) == 0 &&
+                    bytes[col * 3 + 0] < limitR && bytes[col * 3 + 1] < limitG && bytes[col * 3 + 2] < limitB)
                 {
-                    bytes[col*3+0] = 31;
-                    bytes[col*3+1] = 0;
-                    bytes[col*3+2] = 0;
+                    bytes[col * 3 + 0] = 31;
+                    bytes[col * 3 + 1] = 0;
+                    bytes[col * 3 + 2] = 0;
 
                     ++pointsAveraged;
                     avgX += (col - avgX) / pointsAveraged;
@@ -192,12 +194,12 @@ namespace RollingTable
 
         delete bytes;
 
-        //The tracked centre is checked to see if it was discovered, and if it was, converted to the 
+        //The tracked centre is checked to see if it was discovered, and if it was, converted to the
         //coordinate system of the processing system.
         SerialHelper::AwaitSignal();
-        SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH/2)));
+        SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH / 2)));
         SerialHelper::AwaitSignal();
-        SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT/2)));
+        SerialHelper::SendInt(pointsAveraged == 0 ? 0 : ((int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT / 2)));
     }
-#endif
-}
+    #endif
+} // namespace RollingTable
