@@ -32,6 +32,7 @@ void setup()
 
 void initialize()
 {
+  
   tables = new Table[genSize];
   int data = checkRun();
   if (data == -1)
@@ -348,7 +349,7 @@ int loadNeuron(InputStream input, float[] weights)
       }
       try {
         weights[i] = float(weight);
-      } //<>//
+      }
       catch(ArrayIndexOutOfBoundsException e)
       {
         e.printStackTrace(); //<>//
@@ -375,4 +376,4 @@ int checkRun()
     e.printStackTrace();
   }
   return data;
-}
+} //<>//

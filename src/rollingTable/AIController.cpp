@@ -22,8 +22,8 @@ namespace RollingTable
 
     void AIController::RunNN(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng)
     {
-        xEdge = (xCo < 0 ? -HALF_SIZE : HALF_SIZE) + xCo;
-        yEdge = (yCo < 0 ? -HALF_SIZE : HALF_SIZE) + yCo;
+        xEdge = (xCo < 0 ? HALF_SIZE : -HALF_SIZE) + xCo;
+        yEdge = (yCo < 0 ? HALF_SIZE : -HALF_SIZE) + yCo;
 
         if (firstTrack)
         {
@@ -47,7 +47,8 @@ namespace RollingTable
         input[3] = yVel;
         input[4] = xEdge;
         input[5] = yEdge;
-
+        for(int i = 0; i < 6; i++)
+            
         for (int i = 0; i < 6; i++)
         {
             hlOut[i] = hlBias[i];
@@ -55,7 +56,8 @@ namespace RollingTable
             {
                 hlOut[i] += hlWeights[i][j] * input[j];
             }
-            if(i > 3)
+            
+            if(i < 4)
                 hlOut[i] = Rectifier(hlOut[i]);
             else
                 hlOut[i] = Tipping(Sigmoid(Inverse(hlOut[i])));
@@ -67,10 +69,11 @@ namespace RollingTable
             {
                 output[i] += outputWeights[i][j] * hlOut[j];
             }
+            
             output[i] = Tipping(output[i]);
         }
-        innerAng = max(output[0], 10);
-        outerAng = max(output[1], 10);
+        innerAng = (output[0] * 3);
+        outerAng = (output[1] * 3);
     }
 
     double AIController::Rectifier(double input){return (input < 0 ? 0 : input);}

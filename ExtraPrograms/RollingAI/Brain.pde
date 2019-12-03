@@ -102,7 +102,7 @@ class FirstBrain implements Brain
     for (int i = 0; i < outputLength; i++)
       result[i] = output[i].output;
 
-    return result;
+    return result; //<>//
   }
 
   Brain getChild(Brain _with)
@@ -162,6 +162,7 @@ class Neuron
     this.inputs = _inputs;
     this.weights = _weights;
     this.bias = _bias;
+    inputCount = inputs.length;
   }
 
   Neuron(ActivationFunction _func, Neuron[] _inputs, float[] _weights)
@@ -174,6 +175,7 @@ class Neuron
       w[i] = _weights[i + 1];
     this.weights = w;
     this.bias = _weights[0];
+    inputCount = inputs.length;
   }
 
 

@@ -13,7 +13,6 @@ int main()
 {
     initialize();
     setup();
-
 //See "Setup.h" for explanation of values used in pre-processor directive.
 #if USE_IMG_DIS
     while (true)
