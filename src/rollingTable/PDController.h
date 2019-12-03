@@ -15,7 +15,7 @@ namespace RollingTable
     class PDController 
     {
         public:
-            //Calculates a desired angle using PID controllers
+            //Calculates the desired angles using PD controllers
             static void RunPD(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng);
     };
 }

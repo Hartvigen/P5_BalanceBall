@@ -14,10 +14,10 @@ namespace RollingTable
         proportionalOuter = OUT_KP * yCo;
         derivativeOuter   = OUT_KD * (yCo - yPrev) / PERIOD;
 
-        xPrev = xCo;
-        yPrev = yCo;
-
         innerAng = (int8_t)(proportionalInner + derivativeInner);
         outerAng = -(int8_t)(proportionalOuter + derivativeOuter); // Motors were inverted unintentionally
+
+        xPrev = xCo;
+        yPrev = yCo;
     }
 }

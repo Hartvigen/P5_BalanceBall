@@ -58,7 +58,7 @@ namespace RollingTable
         Move(shield.bank_b, outerAngle, outerDir, OUTER_SPEED);
     }
 
-    void MotorsController::Move(NXShieldBank& bank, int8_t& angle, int8_t& dir, int8_t speed)
+    void MotorsController::Move(NXShieldBank bank, int8_t& angle, int8_t& dir, int8_t speed)
     {
         int8_t encoder = bank.motorGetEncoderPosition(SH_Motor_Both);
         int8_t angleError = angle - encoder;

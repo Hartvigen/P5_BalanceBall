@@ -51,7 +51,7 @@ namespace RollingTable
             static void BeginCapture();
             //Begins tracking process.
             static void StartTracking();
-            //Progress tracking process "trackTimes"
+            //Progress tracking process by "trackTimes" times
             static void ProceedTracking(uint16_t trackTimes);
             //End tracking process, and output xCo and yCo coordinates of ball.
             static bool EndTracking(int16_t& xCo, int16_t& yCo);
