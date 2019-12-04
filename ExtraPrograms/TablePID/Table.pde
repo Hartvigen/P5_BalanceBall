@@ -5,7 +5,7 @@ class Table
 
   int desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 15;
+  float maxAngle = 5;
   float degreeVelocity = timestep * 0.05;
 
   float powerX, powerY;
@@ -19,13 +19,12 @@ class Table
   float[] decision;
   long decisionTime = 0;
   int delayTime = 150;
-  int takePicTime = 120;
   
   //values for PID
   double setPoint;
   double innerInput, outerInput;
   double innerOutput, outerOutput;
-  double period = 4;
+  double period = timestep;
   double integralSumInner = 0, integralSumOuter = 0;
   double lastInputInner = 0, lastInputOuter = 0;
   double outputInner = 0, outputOuter = 0;
@@ -33,7 +32,7 @@ class Table
   double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 0.8, OKp = 0.8, IKi = 0, OKi = 0, IKd = 14, OKd = 14;
+  double IKp = 1.25, OKp = 1.25, IKi = 0, OKi = 0, IKd = 24 * timestep, OKd = 24 * timestep;
 
   float fitness = 0f;
   float allTimeBest = 0f;
@@ -86,15 +85,18 @@ class Table
     {
       if (decisionTime == 0)
       {
+        calculatePID();
         decisionTime = currentTime + delayTime;
       }
       
       else if (decisionTime < currentTime)
       {
         decisionTime = 0;
+        
+          desiredX = (int)outputInner; 
+          desiredY = (int)outputOuter;
       }
       
-      calculatePID();
       updateTilt();
 
       PVector acc = getAcceleration();
@@ -122,7 +124,8 @@ class Table
   {
     
     float xDiff = desiredX - angleX;
-    if (abs(xDiff) > degreeVelocity) {
+    if(abs(xDiff) <= 3){}
+    else if (abs(xDiff) > degreeVelocity) {
       if (xDiff < 0 && angleX - degreeVelocity >= -maxAngle) {
         angleX -= degreeVelocity;
       } else if (angleX + degreeVelocity <= maxAngle)
@@ -136,7 +139,8 @@ class Table
     }
 
     float yDiff = desiredY - angleY;
-    if (abs(yDiff) > degreeVelocity) {
+    if(abs(yDiff) <= 3){}
+    else if (abs(yDiff) > degreeVelocity) {
       if (yDiff < 0 && angleY - degreeVelocity >= -maxAngle) {
         angleY -= degreeVelocity;
       } else if (angleY + degreeVelocity <= maxAngle)
@@ -222,20 +226,6 @@ class Table
 
     outputInner = proportionalInner + integralInner + derivativeInner;
     outputOuter = proportionalOuter + integralOuter + derivativeOuter;
-    
-    if(outputInner >= 0){
-      desiredX = outputInner >= maxAngle ? (int)maxAngle : (int)outputInner;
-    }
-    else{
-      desiredX = outputInner <= -maxAngle ? -(int)maxAngle : (int)outputInner;
-    }
-      
-    if(outputInner >= 0){
-      desiredY = outputOuter >= maxAngle ? (int)maxAngle : (int)outputOuter;
-    }
-    else{
-      desiredY = outputOuter <= -maxAngle ? -(int)maxAngle : (int)outputOuter;
-    }
       
     
   }
