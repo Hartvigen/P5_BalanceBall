@@ -207,9 +207,11 @@ class Table
   }
   
   void calculatePID(){
+    //the current posistions of the ball are saved such that we use the save values for all controllers
     curX = ball.center.x - pos.x;
     curY = ball.center.y - pos.y;
     
+    //The inner and outer PID values are calculated respectively
     double proportionalInner = IKp * curX;
     double integralInner     = integralSumInner + IKi * curX * period;
     double derivativeInner   = IKd * (curX - lastInputInner) / period;
@@ -217,17 +219,18 @@ class Table
     double proportionalOuter = OKp * curY;
     double integralOuter     = integralSumOuter + OKi * curY * period;
     double derivativeOuter   = OKd * (curY - lastInputOuter) / period;
-
+    
+    //Integral sum is updated
     integralSumInner = integralInner;
     integralSumOuter = integralOuter;
 
+    //The just used coordinates are set as the previous input for the next call of CalculatePID
     lastInputInner = curX;
     lastInputOuter = curY;
 
+    //output values are set to the sum of the 3 controllers
     outputInner = proportionalInner + integralInner + derivativeInner;
     outputOuter = proportionalOuter + integralOuter + derivativeOuter;
-      
-    
   }
 }
 
