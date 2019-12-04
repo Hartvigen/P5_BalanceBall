@@ -25,10 +25,8 @@ namespace RollingTable
             static void Move(NXShieldBank bank, int8_t& angle, int8_t& dir, int8_t speed);
 
         public:
-            //Initializes the motor controller
+            //Initializes the motor controller, resets the motor encoders to zero degrees, and stops any movement.
             static void Init();
-            //Resets the motor encoders to zero degrees, and stops any movement.
-            static void Reset();
 
             //Returns current inner motor encoder value as degrees
             static int32_t GetInnerEncoder();
@@ -42,9 +40,6 @@ namespace RollingTable
 
             //Moves motors towards desired angles.
             static void Move();
-
-            //Test function which moves the board in circles.
-            static void MoveCircleTest();
     };
 }
 

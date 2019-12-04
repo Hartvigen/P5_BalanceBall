@@ -52,9 +52,7 @@ void initialize()
 void setup()
 {
     CameraController::Init(CAM_SLAVE_PIN, 4, 8, 4);
-
     MotorsController::Init();
-    MotorsController::Reset();
 }
 
 //Function representing the major cycle of the schedule

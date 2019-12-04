@@ -16,10 +16,7 @@ namespace RollingTable
         shield.init(SH_HardwareI2C);
         shield.bank_a.motorStartBothInSync();
         shield.bank_b.motorStartBothInSync();
-    }
 
-    void MotorsController::Reset() 
-    {
         shield.bank_a.motorReset();
         shield.bank_b.motorReset();
 
@@ -82,58 +79,6 @@ namespace RollingTable
                 (dir > 0 ? SH_Direction_Forward : SH_Direction_Reverse), 
                 (angleError <= 4 ? speed/2 : speed)
             );
-        }
-    }
-
-
-    void MotorsController::MoveCircleTest()
-    {
-        float angle = 0;
-        float mod = 0.75;
-        uint64_t calibrateTime = 0; 
-        uint32_t time;
-
-        int8_t innerAng = 0, outerAng = 0;
-
-        Reset();
-        SetOuterAngle(0);
-        
-        while (true)
-        {
-            time = millis();
-            angle += mod;
-
-            delay(6);
-            if (millis() > calibrateTime)
-            {
-                //calibrateTime =+ 145;
-
-                //SetInnerAngle(cos(angle*0.0174532925)*15);
-                //SetOuterAngle(sin(angle*0.0174532925)*15);
-
-                calibrateTime = millis() + 1000;
-                
-                if (innerAng != -15 && innerAng != 0)
-                {
-                    innerAng = -15;
-                }
-                else if (innerAng == -15)
-                    innerAng = 0;
-                else
-                {
-                    innerAng = 15;
-                }
-
-                SetInnerAngle(innerAng);
-            }
-
-            Move();
-
-            Serial.print((millis() - time));
-            Serial.print("  ");
-            Serial.print(GetInnerEncoder());
-            Serial.print("  ");
-            Serial.println(innerAng);
         }
     }
 }
