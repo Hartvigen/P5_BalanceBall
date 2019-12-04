@@ -13,6 +13,7 @@ int main()
 {
     initialize();
     setup();
+
 //See "Setup.h" for explanation of values used in pre-processor directive.
 #if USE_IMG_DIS
     while (true)
@@ -36,9 +37,7 @@ void initialize()
     SPI.begin();
     Serial.begin(691200L);
 
-    while (!Serial)
-    {
-    }
+    while (!Serial) { }
     while (Serial.available() > 0)
         Serial.read();
     delay(1000);
@@ -49,7 +48,7 @@ void initialize()
 #endif
 }
 
-//Function initializes program controllers.
+//Function initializes controllers.
 void setup()
 {
     CameraController::Init(CAM_SLAVE_PIN, 4, 8, 4);
@@ -58,7 +57,7 @@ void setup()
     MotorsController::Reset();
 }
 
-//function representing the major cycle of the schedule
+//Function representing the major cycle of the schedule
 inline void loop()
 {
     startTime = millis();

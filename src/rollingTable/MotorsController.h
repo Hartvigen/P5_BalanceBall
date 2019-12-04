@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <NXShield.h>
 
-#define MAX_ANGLE (int8_t)10
+#define MAX_ANGLE (int8_t)5
 #define INNER_SPEED (uint8_t)10
 #define OUTER_SPEED (uint8_t)10
 

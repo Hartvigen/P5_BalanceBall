@@ -35,7 +35,7 @@ namespace RollingTable
     }
 
     //Function skips 'count' rows.
-    void CameraController::SkipRows(uint16_t count)
+    inline void CameraController::SkipRows(uint16_t count)
     {
         for (uint16_t row = 0; row < count; row++)
             for (uint16_t col = 0; col < CAPTURE_WIDTH; col++)
@@ -43,14 +43,14 @@ namespace RollingTable
     }
 
     //Functions skips 'count' pixels in current row.
-    void CameraController::SkipColumns(uint16_t count)
+    inline void CameraController::SkipColumns(uint16_t count)
     {
         for (uint16_t col = 0; col < count; col++)
             SPI.transfer16(0x00);
     }
 
     //Prepares SPI connection and camera for transmission of pixel bytes.
-    void CameraController::BeginRead()
+    inline void CameraController::BeginRead()
     {
         // The value of 8_000_000 MUST NOT be exceeded due to ArduCAM hardware
         SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
@@ -59,7 +59,7 @@ namespace RollingTable
     }
 
     //releases hold of SPI and camera resources.
-    void CameraController::EndRead()
+    inline void CameraController::EndRead()
     {
         camera.CS_HIGH();
         SPI.endTransaction();
