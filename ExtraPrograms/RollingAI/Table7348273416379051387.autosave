@@ -3,42 +3,37 @@ class Table
   int size, halfSize;
   PVector pos;
 
-  int desiredX, desiredY;
+  float desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 3;
-  float degreeVelocity = timestep * 0.05;
+  float maxAngle = 5; 
 
   float powerX, powerY;
-  int z = 0;
   float avgV = 0;
   float maxV = 0;
+  float degreeVelocity = timestep*0.05;
 
   Ball ball = null;
   int ballRadius = 10;
 
+  Brain brain;
   float[] decision;
   long decisionTime = 0;
-  int delayTime = 170;
+  int delayTime = 150;
+  int aliveTime = 0;
   
-  //values for PID
-  double setPoint;
-  double innerInput, outerInput;
-  double innerOutput, outerOutput;
-  double period = 5;
-  double integralSumInner = 0, integralSumOuter = 0;
-  double lastInputInner = 0, lastInputOuter = 0;
-  double outputInner = 0, outputOuter = 0;
-  int sameCount = 0;
-  double curX = 0, curY = 0, prevX = 0, prevY = 0;
-  
-  //tuning values for PID
-  double IKp = 0.1, OKp = 0.1, IKi = 0, OKi = 0, IKd = 4, OKd = 4;
 
   float fitness = 0f;
   float allTimeBest = 0f;
 
+  int xyZeroCounter = 0;
+
 
   Table(int _size, PVector _pos)
+  {
+    this(_size, _pos, new FirstBrain());
+  }
+
+  Table(int _size, PVector _pos, Brain _brain)
   {
     size = _size;
     pos = _pos;
@@ -46,6 +41,20 @@ class Table
     halfSize = size/2;
     angleX = angleY = 0;
 
+    brain = _brain;
+    reset();
+  }
+
+  Table(int _size, PVector _pos, Brain _brain, float maxFit)
+  {
+    size = _size;
+    pos = _pos;
+
+    halfSize = size/2;
+    angleX = angleY = 0;
+
+    brain = _brain;
+    allTimeBest = maxFit;
     reset();
   }
 
@@ -71,48 +80,64 @@ class Table
     }
 
     // Find starting velocity
-    float speed = (0.5f + random(2.5f)) / timestep;
+    float speed = (0.5 + random(2.5)) / timestep;
     float angle = atan2(ballx - pos.x, bally - pos.y) + random(PI/2) - PI/4;
     if (angle < 0)
       angle += 2*PI;
 
     ball = new Ball(ballRadius, new PVector(ballx, bally), new PVector(-sin(angle)*speed, -cos(angle)*speed));
+    aliveTime = 0;
   }
 
-  boolean update() // posReturn true if ball is dead
+  boolean update() // Return true if ball is dead
   {
     if (ball != null && !ball.dead)
     {
+      aliveTime += timestep;
+      if (aliveTime > 60000) {
+        ball.dead = true;
+        return true;
+      }
       if (decisionTime == 0)
       {
-        calculatePID();
         decisionTime = currentTime + delayTime;
-      }
-      
-      else if (decisionTime < currentTime)
+        float relX = ball.center.x - pos.x;
+        float relY = ball.center.y - pos.y;
+        println(" X = " + relX + ", Y = " + relY + ", velX = " + ball.vel.x + ", velY = " + ball.vel.y + ", D(x,e) = " + ((relX < 0 ? halfSize : -halfSize) + relX) + ", D(y,e) = " +  ((relY < 0 ? halfSize : -halfSize) + relY));  
+        decision = brain.percieve(relX, relY, ball.vel.x, ball.vel.y, (relX < 0 ? halfSize : -halfSize) + relX, (relY < 0 ? halfSize : -halfSize) + relY);
+      } else if (decisionTime < currentTime)
       {
-        decisionTime = 0;
+        desiredX = int(decision[0] * maxAngle);
+        desiredY = int(decision[1] * maxAngle);
         
-          desiredX = (int)outputInner; 
-          desiredY = (int)outputOuter;
+
+        decisionTime = 0;
       }
       
+      float dist = ball.center.dist(pos);
+      
+      if(desiredX == 0 && desiredY == 0 && dist > 25){ //When the x-y degrees are stuck at zero.
+        xyZeroCounter += 1;
+        if(xyZeroCounter>500){
+          fitness = 0;
+          ball.dead = true;
+        }
+      }
       updateTilt();
 
       PVector acc = getAcceleration();
       ball.update(acc);
       if (abs(ball.center.x - pos.x) > halfSize || abs(ball.center.y - pos.y) > halfSize)
         ball.dead = true;
+
+      // Calculate fitness
+      //Fitness = lost dist from center
       
-      if((int)curX == (int)prevX && (int)curY == (int)prevY)
-        sameCount++;
-      else
-        sameCount = 0;
-      if(sameCount > 30)
-        return true;
-      
-      prevX = curX;
-      prevY = curY;
+      if (dist < 25) // 150
+      {
+        float value = (25-dist)/100;   //150
+        fitness += value;
+      }
       
       return ball.dead;
     }
@@ -122,25 +147,22 @@ class Table
 
   void updateTilt()
   {
-    
     float xDiff = desiredX - angleX;
-    if(abs(xDiff) <= 3){}
-    else if (abs(xDiff) > degreeVelocity) {
+    if (abs(xDiff) > degreeVelocity) {
       if (xDiff < 0 && angleX - degreeVelocity >= -maxAngle) {
         angleX -= degreeVelocity;
       } else if (angleX + degreeVelocity <= maxAngle)
         angleX += degreeVelocity;
     } else
-    {
+      {
       if (-maxAngle <= angleX - xDiff && angleX + xDiff <= maxAngle)
         angleX += xDiff;
       else
         angleX = maxAngle;
-    }
+      }
 
     float yDiff = desiredY - angleY;
-    if(abs(yDiff) <= 3){}
-    else if (abs(yDiff) > degreeVelocity) {
+    if (abs(yDiff) > degreeVelocity) {
       if (yDiff < 0 && angleY - degreeVelocity >= -maxAngle) {
         angleY -= degreeVelocity;
       } else if (angleY + degreeVelocity <= maxAngle)
@@ -159,7 +181,7 @@ class Table
     float cosX = cos(angleX*0.0174532925);
     float sinX = sin(angleX*0.0174532925);
     float sinY = sin(angleY*0.0174532925);
-    float accMag = 5f/7f * 0.009807f;
+    float accMag = 5f/7f * 0.009801;
 
     float xr2d = -sinX + 0f;
     float yr2d = -sinY*cosX + 0f;
@@ -174,10 +196,23 @@ class Table
   {
     // Ball and board
     noFill();
+    strokeWeight(4);
     rect(pos.x - halfSize, pos.y - halfSize, size, size);
-    if (ball != null)
+    strokeWeight(1);
+    
+    
+    //Inner green circle
+    circle(pos.x - halfSize/8+size/8/2, pos.y - halfSize/8+size/8/2, 50);
+    if (ball != null){
+      
+      if(ball.center.dist(pos) < 25){
+        fill(0,255,0);
+        circle(pos.x - halfSize/8+size/8/2, pos.y - halfSize/8+size/8/2, 50);      
+      }
+      
+      
       ball.show();
-
+    }
     // Tilt info
     int offset = halfSize + 20;
     drawTiltMeter(angleX, new PVector(pos.x + offset, pos.y));
@@ -199,33 +234,6 @@ class Table
       text(_ang, _pos.x + 15, _pos.y);
     else
       text(_ang, _pos.x- 50, _pos.y);
-  }
-  
-  void calculatePID(){
-    //the current posistions of the ball are saved such that we use the save values for all controllers
-    curX = ball.center.x - pos.x;
-    curY = ball.center.y - pos.y;
-    
-    //The inner and outer PID values are calculated respectively
-    double proportionalInner = IKp * curX;
-    double integralInner     = integralSumInner + IKi * curX * period;
-    double derivativeInner   = IKd * (curX - lastInputInner) / period;
-
-    double proportionalOuter = OKp * curY;
-    double integralOuter     = integralSumOuter + OKi * curY * period;
-    double derivativeOuter   = OKd * (curY - lastInputOuter) / period;
-    
-    //Integral sum is updated
-    integralSumInner = integralInner;
-    integralSumOuter = integralOuter;
-
-    //The just used coordinates are set as the previous input for the next call of CalculatePID
-    lastInputInner = curX;
-    lastInputOuter = curY;
-
-    //output values are set to the sum of the 3 controllers
-    outputInner = proportionalInner + integralInner + derivativeInner;
-    outputOuter = proportionalOuter + integralOuter + derivativeOuter;
   }
 }
 
@@ -260,6 +268,4 @@ class Ball
     fill(0, 0, 0);
     circle(center.x, center.y, radius);
   }
-  
 }
- 

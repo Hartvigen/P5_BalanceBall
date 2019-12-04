@@ -5,7 +5,7 @@ class Table
 
   float desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 5; 
+  float maxAngle = 3; 
 
   float powerX, powerY;
   float avgV = 0;
