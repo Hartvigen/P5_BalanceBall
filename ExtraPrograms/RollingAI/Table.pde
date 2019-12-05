@@ -135,7 +135,7 @@ class Table
       
       if (dist < 25) // 150
       {
-        float value = (25-dist)/100;   //150
+        float value = (25 - dist)/100;   //150
         fitness += value;
       }
       
