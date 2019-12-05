@@ -18,7 +18,7 @@ class Table
 
   float[] decision;
   long decisionTime = 0;
-  int delayTime = 150;
+  int delayTime = 0;
   
   //values for PID
   double setPoint;
@@ -32,7 +32,7 @@ class Table
   double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 1.25, OKp = 1.25, IKi = 0, OKi = 0, IKd = 24 * timestep, OKd = 24 * timestep;
+  double IKp = 0.25, OKp = 0.25, IKi = 0, OKi = 0, IKd = 4 * timestep, OKd = 4 * timestep;
 
   float fitness = 0f;
   float allTimeBest = 0f;
