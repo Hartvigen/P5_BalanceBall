@@ -83,8 +83,10 @@ void mutate()
   newTables[genSize-1] = new Table(250, new PVector(width/2, height/2));
 
   tables = newTables;
-  if (epoch % 5 == 0)            //Udkommenteret, for at teste stor genstørrelse
+  if (epoch % 5 == 0){            //Udkommenteret, for at teste stor genstørrelse
     SaveWeights(tables, epoch, maxFitness);
+    SaveWeightsToFolder(tables, epoch, maxFitness);
+  }
   tables[0].reset();
   tables[0].fitness = 0;
 }
@@ -377,3 +379,39 @@ int checkRun()
   }
   return data;
 } //<>//
+
+void SaveWeightsToFolder(Table[] currentGen, int currentEpoch, float maxFitness)
+{
+  String file = "weights\\weights" + epoch/5 + ".txt";
+  PrintWriter output = createWriter(file);
+  String weights = "" + maxFitness + "," + currentEpoch + "\n";
+  FirstBrain brain;
+  for (Table t : currentGen)
+  {
+    brain = (FirstBrain) t.brain;
+    for (Neuron n : brain.hl1)
+    {
+
+      weights += n.bias;
+      for (float f : n.weights)
+      {
+        weights += "," + f;
+      }
+      weights += "! ";
+    }
+    weights += "#";
+    for (Neuron n : brain.output)
+    {
+      weights += n.bias;
+      for (float f : n.weights)
+      {
+        weights +="," + f;
+      }
+      weights += "! ";
+    }
+    weights += "\n";
+  }
+  output.write(weights);
+  output.flush();
+  output.close();
+}
