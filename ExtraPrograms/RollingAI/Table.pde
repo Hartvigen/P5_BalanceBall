@@ -5,7 +5,7 @@ class Table
 
   float desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 3; 
+  float maxAngle = 5; 
 
   float powerX, powerY;
   float avgV = 0;
@@ -135,7 +135,7 @@ class Table
       
       if (dist < 25) // 150
       {
-        float value = (25 - dist)/100;   //150
+        float value = (25-dist)/100;   //150
         fitness += value;
       }
       

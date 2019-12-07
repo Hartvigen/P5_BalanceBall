@@ -5,7 +5,7 @@ class Table
 
   int desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 3;
+  float maxAngle = 5;
   float degreeVelocity = timestep * 0.05;
 
   float powerX, powerY;
@@ -18,13 +18,13 @@ class Table
 
   float[] decision;
   long decisionTime = 0;
-  int delayTime = 170;
+  int delayTime = 150;
   
   //values for PID
   double setPoint;
   double innerInput, outerInput;
   double innerOutput, outerOutput;
-  double period = 5;
+  double period = timestep;
   double integralSumInner = 0, integralSumOuter = 0;
   double lastInputInner = 0, lastInputOuter = 0;
   double outputInner = 0, outputOuter = 0;
@@ -32,7 +32,7 @@ class Table
   double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 0.1, OKp = 0.1, IKi = 0, OKi = 0, IKd = 4, OKd = 4;
+  double IKp = 1.25, OKp = 1.25, IKi = 0, OKi = 0, IKd = 24 * timestep, OKd = 24 * timestep;
 
   float fitness = 0f;
   float allTimeBest = 0f;
@@ -71,7 +71,7 @@ class Table
     }
 
     // Find starting velocity
-    float speed = (0.5f + random(2.5f)) / timestep;
+    float speed = (20f + random(50)) / framerate;
     float angle = atan2(ballx - pos.x, bally - pos.y) + random(PI/2) - PI/4;
     if (angle < 0)
       angle += 2*PI;
@@ -157,15 +157,20 @@ class Table
   PVector getAcceleration()
   {
     float cosX = cos(angleX*0.0174532925);
+    float cosY = cos(angleY*0.0174532925);
     float sinX = sin(angleX*0.0174532925);
     float sinY = sin(angleY*0.0174532925);
-    float accMag = 5f/7f * 0.009807f;
+    float sineIncline = sin(acos(cosX * cosY));
+    float accMag = 5f/7f * 9807f * sineIncline;
 
     float xr2d = -sinX + 0f;
     float yr2d = -sinY*cosX + 0f;
 
     PVector acc = new PVector(xr2d, yr2d);
+    if (acc.mag() != 0)
+      acc.div(acc.mag());
     acc.mult(accMag);
+    acc.mult(timestep/1000f);
 
     return acc;
   }
@@ -202,11 +207,9 @@ class Table
   }
   
   void calculatePID(){
-    //the current posistions of the ball are saved such that we use the save values for all controllers
     curX = ball.center.x - pos.x;
     curY = ball.center.y - pos.y;
     
-    //The inner and outer PID values are calculated respectively
     double proportionalInner = IKp * curX;
     double integralInner     = integralSumInner + IKi * curX * period;
     double derivativeInner   = IKd * (curX - lastInputInner) / period;
@@ -214,18 +217,17 @@ class Table
     double proportionalOuter = OKp * curY;
     double integralOuter     = integralSumOuter + OKi * curY * period;
     double derivativeOuter   = OKd * (curY - lastInputOuter) / period;
-    
-    //Integral sum is updated
+
     integralSumInner = integralInner;
     integralSumOuter = integralOuter;
 
-    //The just used coordinates are set as the previous input for the next call of CalculatePID
     lastInputInner = curX;
     lastInputOuter = curY;
 
-    //output values are set to the sum of the 3 controllers
     outputInner = proportionalInner + integralInner + derivativeInner;
     outputOuter = proportionalOuter + integralOuter + derivativeOuter;
+      
+    
   }
 }
 
@@ -249,9 +251,9 @@ class Ball
   {
     if (!dead)
     {
-      _acc.mult(timestep);
       vel.add(_acc);
-      center.add(vel.copy().mult(timestep));
+      //vel.mult(vel.mag() > 0.1 ? 0.997 : 0);
+      center.add(vel.copy().mult(timestep/1000f));
     }
   }
 
