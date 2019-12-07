@@ -80,7 +80,7 @@ class Table
     }
 
     // Find starting velocity
-    float speed = (330 + random(330)) / framerate;
+    float speed = (0.5 + random(2.5)) / timestep;
     float angle = atan2(ballx - pos.x, bally - pos.y) + random(PI/2) - PI/4;
     if (angle < 0)
       angle += 2*PI;
@@ -179,20 +179,15 @@ class Table
   PVector getAcceleration()
   {
     float cosX = cos(angleX*0.0174532925);
-    float cosY = cos(angleY*0.0174532925);
     float sinX = sin(angleX*0.0174532925);
     float sinY = sin(angleY*0.0174532925);
-    float sineIncline = sin(acos(cosX * cosY));
-    float accMag = 5f/7f * 9807f * sineIncline;
+    float accMag = 5f/7f * 0.009801;
 
     float xr2d = -sinX + 0f;
     float yr2d = -sinY*cosX + 0f;
 
     PVector acc = new PVector(xr2d, yr2d);
-    if (acc.mag() != 0)
-      acc.div(acc.mag());
     acc.mult(accMag);
-    acc.mult(timestep/1000f);
 
     return acc;
   }
@@ -262,11 +257,9 @@ class Ball
   {
     if (!dead)
     {
+      _acc.mult(timestep);
       vel.add(_acc);
-
-
-      //vel.mult(vel.mag() > 0.1 ? 0.997 : 0);
-      center.add(vel.copy().mult(timestep/1000f));
+      center.add(vel.copy().mult(timestep));
     }
   }
 

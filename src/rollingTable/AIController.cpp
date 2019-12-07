@@ -72,8 +72,8 @@ namespace RollingTable
             
             output[i] = Tipping(output[i]);
         }
-        innerAng = (output[0] * 3);
-        outerAng = (output[1] * 3);
+        innerAng = (output[0] * MAX_ANGLE);
+        outerAng = (output[1] * MAX_ANGLE);
     }
 
     double AIController::Rectifier(double input){return (input < 0 ? 0 : input);}
