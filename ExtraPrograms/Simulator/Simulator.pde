@@ -8,6 +8,8 @@ int stillRunning;
 int triesPerEpoch = 5;
 int tryNr = 1;
 
+float maxFitness;
+
 PVector tablePos = new PVector(250, 250);
 Table[] tables;
 Table bestTable, firstAlive;
@@ -44,7 +46,7 @@ void initialize()
     {
       println("Continuing training session");
       InputStream input = createInput("Weights.txt");
-      float maxFitness = readMaxFit(input);
+      readMaxFit(input);
       readEpoch(input);
   
       tables[0] = new Table(new AI(loadBrain(input)), maxFitness);
@@ -82,7 +84,7 @@ void draw()
     (showBestElseFirstAlive ? bestTable : firstAlive).show(tablePos);
   else if (tryNr < triesPerEpoch)
   {
-    tryNr++; //<>//
+    tryNr++;
     stillRunning = runAI ? genSize : 1;
     for (Table t : tables) 
       t.reset();
@@ -111,6 +113,9 @@ void update()
     t.update();
     if (t.fitness > bestTable.fitness)
       bestTable = t;
+      
+    if (t.fitness > maxFitness)
+      maxFitness = t.fitness;
       
     if (!t.isRunning())
       stillRunning--;
@@ -152,8 +157,8 @@ void mutate()
 
   if (epoch % 5 == 0)
   {
-    SaveWeights(tables, epoch, bestTable.allTimeBestFit);
-    SaveWeightsToFolder(tables, epoch, bestTable.allTimeBestFit);
+    SaveWeights(tables, epoch, maxFitness);
+    SaveWeightsToFolder(tables, epoch, maxFitness);
   }
 }
 
@@ -197,7 +202,7 @@ AI getParent()
 void drawInfo()
 {
   fill(200);
-  rect(-1, -1, width+1, runAI ? 55 : 35);
+  rect(-1, -1, width+1, runAI ? 65 : 35);
   fill(0);
   
   if (runAI)
@@ -205,8 +210,9 @@ void drawInfo()
     text("Epoch:     " + epoch, 5, 10);
     text("Try nr.:   " + tryNr + "/" + triesPerEpoch, 5, 30);
     text("Running:   " + stillRunning + "/" + genSize, 5, 20);
-    text("Max fit:   " + bestTable.fitness, 5, 40);
-    text("Live-time: " + (showBestElseFirstAlive ? bestTable : firstAlive).aliveTime, 5, 50);
+    text("Max fit:   " + maxFitness, 5, 40);
+    text("Fitness:   " + (showBestElseFirstAlive ? bestTable : firstAlive).fitness, 5, 50);
+    text("Live-time: " + (showBestElseFirstAlive ? bestTable : firstAlive).aliveTime, 5, 60);
   }
   else
   {
@@ -257,7 +263,7 @@ void SaveWeights(Table[] currentGen, int currentEpoch, float maxFitness)
   output.close();
 }
 
-float readMaxFit(InputStream input)
+void readMaxFit(InputStream input)
 {
   try {
     String maxFitString = "";
@@ -267,18 +273,15 @@ float readMaxFit(InputStream input)
       maxFitString += char(data);
       data = input.read();
     }
-    return float(maxFitString);
+    maxFitness = float(maxFitString);
   }
   catch(IOException e) {
     e.printStackTrace();
   }
-  
-  return 0f;
 }
 
 void readEpoch(InputStream input)
 {
-
   try {
     String epochString = "";
     int data = input.read();
