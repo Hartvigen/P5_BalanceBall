@@ -22,7 +22,7 @@ namespace RollingTable
             static int8_t outerDir;
 
             //Moves the motor to "angle" at "speed" velocity. "dir" is the current movement direction.
-            static void Move(NXShieldBank bank, int8_t& angle, int8_t& dir, int8_t speed);
+            static void Move(NXShieldBank bank, int8_t angle, int8_t& dir, int8_t speed);
 
         public:
             //Initializes the motor controller, resets the motor encoders to zero degrees, and stops any movement.
@@ -31,12 +31,12 @@ namespace RollingTable
             //Returns current inner motor encoder value as degrees
             static int32_t GetInnerEncoder();
             //Sets desired angle of inner motors
-            static void SetInnerAngle(int8_t targetAngle);
+            static void SetInnerAngle(int8_t desiredAngle);
 
             //Returns current outer motor encoder value as degrees
             static int32_t GetOuterEncoder();
             //Sets desired angle of outer motors
-            static void SetOuterAngle(int8_t targetAngle);
+            static void SetOuterAngle(int8_t desiredAngle);
 
             //Moves motors towards desired angles.
             static void Move();

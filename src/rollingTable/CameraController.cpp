@@ -11,6 +11,7 @@ namespace RollingTable
     uint16_t pointsAveraged;
     float avgX, avgY;
 
+
     void CameraController::Init(int slavePin, uint8_t r, uint8_t g, uint8_t b)
     {
         //Lines 18 to 26 are standard for the ArduCam, and taken from examples thereof.
@@ -34,6 +35,7 @@ namespace RollingTable
         limitB = b;
     }
 
+
     //Function skips 'count' rows.
     inline void CameraController::SkipRows(uint16_t count)
     {
@@ -48,6 +50,7 @@ namespace RollingTable
         for (uint16_t col = 0; col < count; col++)
             SPI.transfer16(0x00);
     }
+
 
     //Prepares SPI connection and camera for transmission of pixel bytes.
     inline void CameraController::BeginRead()
@@ -64,6 +67,7 @@ namespace RollingTable
         camera.CS_HIGH();
         SPI.endTransaction();
     }
+
 
     //Orders camera to begin capturing.
     void CameraController::BeginCapture()
@@ -93,7 +97,7 @@ namespace RollingTable
         //then no more points will be included.
         //The function is still called to ensure that the major cycle is executed correctly.
         if (pointsAveraged > MAX_AVERAGED_POINTS)
-        return;
+            return;
 
         BeginRead();
         for (uint16_t row = 0; row < trackTimes; row++)
@@ -107,7 +111,7 @@ namespace RollingTable
                 if ((c565 & 0x1F) < limitR && ((c565 >> 5) & 0x3F) < limitG && ((c565 >> 11) & 0x1F) < limitB)
                 {
                     if (++pointsAveraged > MAX_AVERAGED_POINTS)
-                      return;
+                        return;
 
                     avgX += (col - avgX) / pointsAveraged;
                     avgY += (currentRow - avgY) / pointsAveraged;
@@ -124,8 +128,6 @@ namespace RollingTable
     //Concludes the tracking by extracting the
     bool CameraController::EndTracking(int16_t &xCo, int16_t &yCo)
     {
-        Serial.print("PointsAveraged: "); Serial.println(pointsAveraged);
-        
         if (pointsAveraged != 0 && pointsAveraged <= MAX_AVERAGED_POINTS)
         {
             xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH / 2);

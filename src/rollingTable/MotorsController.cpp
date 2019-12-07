@@ -4,11 +4,11 @@ namespace RollingTable
 {
     NXShield MotorsController::shield;
 
-    int8_t MotorsController::innerAngle;
-    int8_t MotorsController::innerDir;
+    int8_t MotorsController::innerAngle = 0;
+    int8_t MotorsController::innerDir = 0;
 
-    int8_t MotorsController::outerAngle;
-    int8_t MotorsController::outerDir;
+    int8_t MotorsController::outerAngle = 0;
+    int8_t MotorsController::outerDir = 0;
 
 
     void MotorsController::Init()
@@ -30,9 +30,9 @@ namespace RollingTable
         return shield.bank_a.motorGetEncoderPosition(SH_Motor_Both);
     }
 
-    void MotorsController::SetInnerAngle(int8_t targetAngle) 
+    void MotorsController::SetInnerAngle(int8_t desiredAngle) 
     {
-        innerAngle = min(targetAngle, MAX_ANGLE);
+        innerAngle = min(desiredAngle, MAX_ANGLE);
         innerAngle = max(innerAngle, -MAX_ANGLE);
     }
 
@@ -42,9 +42,9 @@ namespace RollingTable
         return shield.bank_b.motorGetEncoderPosition(SH_Motor_Both);
     }
 
-    void MotorsController::SetOuterAngle(int8_t targetAngle) 
+    void MotorsController::SetOuterAngle(int8_t desiredAngle) 
     {
-        outerAngle = min(targetAngle, MAX_ANGLE);
+        outerAngle = min(desiredAngle, MAX_ANGLE);
         outerAngle = max(outerAngle, -MAX_ANGLE);
     }
 
@@ -55,10 +55,10 @@ namespace RollingTable
         Move(shield.bank_b, outerAngle, outerDir, OUTER_SPEED);
     }
 
-    void MotorsController::Move(NXShieldBank bank, int8_t& angle, int8_t& dir, int8_t speed)
+    void MotorsController::Move(NXShieldBank bank, int8_t desiredAngle, int8_t& dir, int8_t speed)
     {
-        int8_t encoder = bank.motorGetEncoderPosition(SH_Motor_Both);
-        int8_t angleError = angle - encoder;
+        int8_t currentAngle = bank.motorGetEncoderPosition(SH_Motor_Both);
+        int8_t angleError = desiredAngle - currentAngle;
         int8_t nextDir = (angleError > 0 ? 1 : (angleError < 0 ? -1 : 0));
 
         angleError = abs(angleError);

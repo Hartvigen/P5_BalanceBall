@@ -7,7 +7,6 @@
 #include <Arduino.h>
 #include <ArduCAM.h>
 #include <SPI.h>
-#include "MotorsController.h"
 
 #if USE_IMG_DIS
 #include "Serial/SerialHelper.h"
