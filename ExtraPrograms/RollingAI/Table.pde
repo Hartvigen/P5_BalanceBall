@@ -5,7 +5,7 @@ class Table
 
   float desiredX, desiredY;
   float angleX, angleY;
-  float maxAngle = 3; 
+  float maxAngle = 5; 
 
   float powerX, powerY;
   float avgV = 0;
@@ -135,7 +135,8 @@ class Table
       
       if (dist < 25) // 150
       {
-        fitness += (25 - dist)/100;   //150
+        float value = (25-dist)/100;   //150
+        fitness += value;
       }
       
       return ball.dead;
@@ -180,7 +181,7 @@ class Table
     float cosX = cos(angleX*0.0174532925);
     float sinX = sin(angleX*0.0174532925);
     float sinY = sin(angleY*0.0174532925);
-    float accMag = 5f/7f * 0.009807f;
+    float accMag = 5f/7f * 0.009801;
 
     float xr2d = -sinX + 0f;
     float yr2d = -sinY*cosX + 0f;
