@@ -16,21 +16,6 @@ void setup()
   
   delay(2000);
   
-  /*
-  while (serial.available() == 0) { delay(2); }
-  int r = serial.read();
-  serial.write(0x00);
-  
-  while (serial.available() == 0) { delay(2); }
-  int g = serial.read();
-  serial.write(0x00);
-  
-  while (serial.available() == 0) { delay(2); }
-  int b = serial.read();
-  
-  println(r, g, b);
-  */
-  
   readInt();
   println("Ready!");
 }

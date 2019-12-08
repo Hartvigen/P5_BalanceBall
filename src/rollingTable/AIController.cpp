@@ -27,19 +27,18 @@ namespace RollingTable
 
         if (firstTrack)
         {
-            xVel = 0 - xCo;
-            yVel = 0 - yCo;
-            oldX = xCo;
-            oldY = yCo;
+            xVel = (0 - xCo) / PERIOD;
+            yVel = (0 - yCo) / PERIOD;
             firstTrack = false;
         }
         else
         {
-            xVel = xCo - oldX;
-            yVel = yCo - oldY;
-            oldX = xCo;
-            oldY = yCo;
+            xVel = (xCo - oldX) / PERIOD;
+            yVel = (yCo - oldY) / PERIOD;
         }
+
+        oldX = xCo;
+        oldY = yCo;
 
         input[0] = xCo;
         input[1] = yCo;
@@ -47,28 +46,24 @@ namespace RollingTable
         input[3] = yVel;
         input[4] = xEdge;
         input[5] = yEdge;
-        for(int i = 0; i < 6; i++)
-            
+   
         for (int i = 0; i < 6; i++)
         {
             hlOut[i] = hlBias[i];
             for (int j = 0; j < 6; j++)
-            {
                 hlOut[i] += hlWeights[i][j] * input[j];
-            }
             
             if(i < 4)
                 hlOut[i] = Rectifier(hlOut[i]);
             else
                 hlOut[i] = Tipping(Sigmoid(Inverse(hlOut[i])));
         }
+
         for (int i = 0; i < 2; i++)
         {
             output[i] = outputBias[i];
             for (int j = 0; j < 6; j++)
-            {
                 output[i] += outputWeights[i][j] * hlOut[j];
-            }
             
             output[i] = Tipping(output[i]);
         }
@@ -76,8 +71,8 @@ namespace RollingTable
         outerAng = (output[1] * MAX_ANGLE);
     }
 
-    double AIController::Rectifier(double input){return (input < 0 ? 0 : input);}
-    double AIController::Sigmoid(double input){return 2 / (1 + exp(input))- 1;}
-    double AIController::Tipping(double input){return 5*pow(input/5, 3);}
-    double AIController::Inverse(double input){return -15/input;}
+    inline double AIController::Rectifier(double input){return (input < 0 ? 0 : input);}
+    inline double AIController::Sigmoid(double input){return 2 / (1 + exp(input))- 1;}
+    inline double AIController::Tipping(double input){return 5*pow(input/5, 3);}
+    inline double AIController::Inverse(double input){return -15/input;}
 } // namespace RollingTable
