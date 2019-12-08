@@ -67,7 +67,8 @@ namespace RollingTable
             
             output[i] = Tipping(output[i]);
         }
-        innerAng = (output[0] * MAX_ANGLE);
+
+        innerAng = -(output[0] * MAX_ANGLE); // Inner motors are inverted
         outerAng = (output[1] * MAX_ANGLE);
     }
 

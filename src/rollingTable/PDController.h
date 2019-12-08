@@ -1,14 +1,14 @@
 #ifndef PID_CONTROLLER_H
 #define PID_CONTROLLER_H
 
+#include "Setup.h"
 #include <stdint.h>
 
-#define PERIOD 5
+#define IN_KP 0.1
+#define OUT_KP 0.1
 
-#define IN_KP 0.2
-#define IN_KD 0.2
-#define OUT_KP 4
-#define OUT_KD 4
+#define IN_KD 2.2
+#define OUT_KD 2.2
 
 namespace RollingTable
 {

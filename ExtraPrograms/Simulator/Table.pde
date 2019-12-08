@@ -15,13 +15,16 @@ class Table
   
   PVector decision;
   long decisionTime = 0;
-  int delayTime = 150;
+  int delayTime = 170;
   int aliveTime = 0;
   
   float fitness = 0f;
   float allTimeBestFit = 0f;
 
   int xyZeroCounter = 0;
+  
+  float oldX, oldY;
+  float period = 5;
 
 
   Table()
@@ -75,7 +78,7 @@ class Table
     }
 
     // Find starting velocity
-    float speed = (0.05 + random(0.145));
+    float speed = (0.07 + random(0.03));
     float angle = atan2(ballx, bally) + random(PI/2) - PI/4;
     if (angle < 0)
       angle += 2*PI;
@@ -96,9 +99,16 @@ class Table
     {
       decisionTime = currentTime + delayTime;
       
-      float relX = ball.center.x;
-      float relY = ball.center.y;
-      decision = brain.compute(relX, relY, ball.vel.x, ball.vel.y, (relX < 0 ? halfSize : -halfSize) + relX, (relY < 0 ? halfSize : -halfSize) + relY);
+      float currX = ball.center.x;
+      float currY = ball.center.y;
+      
+      float velX = (currX - oldX) / period;
+      float velY = (currY - oldY) / period;
+      
+      oldX = currX;
+      oldY = currY;
+      
+      decision = brain.compute(currX, currY, velX, velY, (currX < 0 ? halfSize : -halfSize) + currX, (currY < 0 ? halfSize : -halfSize) + currY);
     } 
     else if (decisionTime < currentTime)
     {
@@ -110,14 +120,18 @@ class Table
     updateTilt();
     
     float dist = ball.center.mag();
-    if(desiredX == 0 && desiredY == 0 && dist > 25) //When the x-y degrees are stuck at zero.
+    if(abs(desiredX) <= 1 && abs(desiredY) <= 1 && dist > 25) //When the x-y degrees are stuck at zero.
     { 
       xyZeroCounter += 1;
-      if(xyZeroCounter > 500){
+      if(xyZeroCounter > 60*5){
         fitness = 0;
         ball.out = true;
         return;
       }
+    }
+    else
+    {
+      xyZeroCounter = 0;
     }
 
     ball.update(getAcceleration());

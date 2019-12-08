@@ -1,6 +1,6 @@
 #include "SerialHelper.h"
 
-#if USE_IMG_DIS
+#if USE_IMG_DIS || INTF_RVIEWER
 void SerialHelper::AwaitSignal()
 {
     while (!Serial.available()) { delay(2); }

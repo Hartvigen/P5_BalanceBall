@@ -15,7 +15,7 @@ namespace RollingTable
         derivativeOuter   = OUT_KD * (yCo - yPrev) / PERIOD;
 
         innerAng = (int8_t)(proportionalInner + derivativeInner);
-        outerAng = -(int8_t)(proportionalOuter + derivativeOuter); // Motors were inverted unintentionally
+        outerAng = -(int8_t)(proportionalOuter + derivativeOuter); // Motors are inverted
 
         xPrev = xCo;
         yPrev = yCo;

@@ -1,5 +1,5 @@
 #include "Setup.h"
-#if USE_IMG_DIS
+#if USE_IMG_DIS || INTF_RVIEWER
 
 #ifndef SERIAL_HELPER_H_INCLUDE
 #define SERIAL_HELPER_H_INCLUDE

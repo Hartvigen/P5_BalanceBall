@@ -63,7 +63,7 @@ namespace RollingTable
 
         angleError = abs(angleError);
         
-        if (angleError <= 1)
+        if (angleError <= 2)
         {
             if (dir != 0)
             {

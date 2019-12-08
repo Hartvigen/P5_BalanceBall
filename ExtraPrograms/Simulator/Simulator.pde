@@ -114,9 +114,6 @@ void update()
     if (t.fitness > bestTable.fitness)
       bestTable = t;
       
-    if (t.fitness > maxFitness)
-      maxFitness = t.fitness;
-      
     if (!t.isRunning())
       stillRunning--;
   }
@@ -130,6 +127,10 @@ void nextEpoch()
  
   if (runAI)
   {
+    for (Table t : tables)
+      if (t.fitness > maxFitness)
+        maxFitness = t.fitness;
+        
     mutate();
   }
   else
@@ -144,14 +145,16 @@ void mutate()
   Table[] newTables = new Table[genSize];
   
   newTables[0] = getBestFit();
-  for (int i = 1; i < genSize - 1; i++)
+  for (int i = 1; i < genSize - 100; i++)
   {
     newTables[i] = new Table(getParent().getChild(getParent()));
-    ((AI)newTables[i].brain).mutate(0.5, 0.3);
+    ((AI)newTables[i].brain).mutate(0.05, 0.1);
   }
   newTables[0].fitness = 0;
   newTables[0].reset();
-  newTables[genSize-1] = new Table();
+  
+  for (int i = genSize - 100; i < genSize; i++)
+    newTables[i] = new Table();
   
   tables = newTables;
 
@@ -238,7 +241,6 @@ void SaveWeights(Table[] currentGen, int currentEpoch, float maxFitness)
     brain = (AI)t.brain;
     for (Neuron n : brain.hl1)
     {
-
       weights += n.bias;
       for (float f : n.weights)
       {
@@ -247,7 +249,7 @@ void SaveWeights(Table[] currentGen, int currentEpoch, float maxFitness)
       weights += "! ";
     }
     weights += "#";
-    for (Neuron n : brain.output) //<>//
+    for (Neuron n : brain.output)
     {
       weights += n.bias;
       for (float f : n.weights)
@@ -285,7 +287,7 @@ void readEpoch(InputStream input)
   try {
     String epochString = "";
     int data = input.read();
-    while (data != 44 && data >= 48 && data <= 57 )
+    while (data >= 48 && data <= 57)
     {
       epochString += char(data);
       data = input.read();
@@ -319,9 +321,8 @@ void keyPressed() {
 void loadHiddenLayer(InputStream input, float[][] weights)
 {
   int neuronCount = 0;
-  while (neuronCount < 6)
+  while (neuronCount < 4)
   {
-
     loadNeuron(input, weights[neuronCount]);
     neuronCount++;
   }
@@ -335,7 +336,7 @@ void loadOutputLayer(InputStream input, float[][] weights)
     while (data != 10 && data != 13 && neuronCount < 2)
     {
       data = loadNeuron(input, weights[neuronCount]);
-
+      
       data = input.read();
       neuronCount++;
     }

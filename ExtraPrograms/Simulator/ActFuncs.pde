@@ -3,6 +3,32 @@ interface ActivationFunction
   float compute(float x);
 }
 
+class Tilt implements ActivationFunction
+{
+  float compute(float x)
+  {
+    return x/1.5;
+  }
+}
+
+class Edge implements ActivationFunction
+{
+  float compute(float x)
+  {
+    return x < 0 ? (1/exp(abs(x))) : (-1/exp(abs(x)));
+  }
+}
+
+class Cntr implements ActivationFunction
+{
+  float compute(float x)
+  {
+    return 2/(1+exp(-x))-1;
+  }
+}
+
+
+
 class Linear implements ActivationFunction
 {
   float compute(float x)

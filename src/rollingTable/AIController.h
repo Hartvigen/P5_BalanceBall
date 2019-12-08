@@ -2,10 +2,8 @@
 #define AI_CONTROLLER_H
 
 #define HALF_SIZE 65
-#define MAX_ANGLE 5
 
-#define PERIOD 5
-
+#include "Setup.h"
 #include <stdint.h>
 #include <Arduino.h>
 

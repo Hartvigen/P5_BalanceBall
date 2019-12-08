@@ -16,7 +16,7 @@ class PD implements Brain
   double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 1.25, OKp = 1.25, IKi = 0, OKi = 0, IKd = 24 * timestep, OKd = 24 * timestep;
+  double IKp = 0.025, OKp = 0.025, IKi = 0, OKi = 0, IKd = 0.55, OKd = 0.55;
   
   PVector compute(float ... _input)
   {
@@ -46,10 +46,17 @@ class PD implements Brain
 
 // ================================================================================================================================
 
-Sigmoid sigmoid = new Sigmoid(2, 1, 1);
-Tipping tipping = new Tipping(5, 5, 3);
 ReLU relu = new ReLU();
-Composite tipInv = new Composite(tipping, new Composite(sigmoid, new Inverse(-15f)));
+Sigmoid sigmoid = new Sigmoid(2, 1, 1);
+Tipping tipping = new Tipping(2, 100, 3);
+
+Tipping tipping2 = new Tipping(5, 5, 3);
+Composite edgeComp = new Composite(tipping2, new Composite(sigmoid, new Inverse(-15f)));
+
+Tilt tilt = new Tilt();
+Edge edge = new Edge();
+Cntr cntr = new Cntr();
+
     
 class AI implements Brain
 {
@@ -64,17 +71,17 @@ class AI implements Brain
   AI()
   {
     hl1 = new Neuron[] {
-      new Neuron(relu, input), //Reason for up
-      new Neuron(relu, input), //Reason for up
-      new Neuron(relu, input), //Reason for up
-      new Neuron(relu, input), //Reason for up
-      new Neuron(tipInv, input),  //tipInv
-      new Neuron(tipInv, input),  //tipInv
+      new Neuron(cntr, input),
+      new Neuron(cntr, input),
+      //new Neuron(relu, input),
+      //new Neuron(relu, input),
+      new Neuron(edge, input),
+      new Neuron(edge, input),
     };
 
     output = new Neuron[] {
-      new Neuron(tipping, hl1), 
-      new Neuron(tipping, hl1), 
+      new Neuron(tilt, hl1), 
+      new Neuron(tilt, hl1), 
     };
 
     hl1Length = hl1.length;
@@ -84,17 +91,17 @@ class AI implements Brain
   AI(float[][][] weights)
   {
     hl1 = new Neuron[] {
-      new Neuron(relu, input, weights[0][0]), 
-      new Neuron(relu, input, weights[0][1]), 
-      new Neuron(relu, input, weights[0][2]), 
-      new Neuron(relu, input, weights[0][3]), 
-      new Neuron(tipInv, input, weights[0][4]), 
-      new Neuron(tipInv, input, weights[0][5]), 
+      new Neuron(cntr, input, weights[0][0]), 
+      new Neuron(cntr, input, weights[0][1]), 
+      //new Neuron(cntr, input, weights[0][2]), 
+      //new Neuron(cntr, input, weights[0][3]), 
+      new Neuron(edge, input, weights[0][2]), // 4
+      new Neuron(edge, input, weights[0][3]), // 5
     };
 
     output = new Neuron[] {
-      new Neuron(tipping, hl1, weights[1][0]), 
-      new Neuron(tipping, hl1, weights[1][1]), 
+      new Neuron(tilt, hl1, weights[1][0]), 
+      new Neuron(tilt, hl1, weights[1][1]), 
     };
 
     hl1Length = hl1.length;
@@ -127,11 +134,11 @@ class AI implements Brain
 
     for (int i = 0; i < hl1Length; i++)
       for (int x = 0; x < inputLength; x++)
-        newBrain.hl1[i].weights[x] = round(random(1)) == 0 ? hl1[i].weights[x] : ai.hl1[i].weights[x];
+        newBrain.hl1[i].weights[x] = random(1) < 0.5 ? hl1[i].weights[x] : ai.hl1[i].weights[x];
 
     for (int i = 0; i < outputLength; i++)
       for (int x = 0; x < hl1Length; x++)
-        newBrain.output[i].weights[x] = round(random(1)) == 0 ? output[i].weights[x] : ai.output[i].weights[x];
+        newBrain.output[i].weights[x] = random(1) < 0.5 ? output[i].weights[x] : ai.output[i].weights[x];
 
     return newBrain;
   }
@@ -166,7 +173,9 @@ class Neuron
 
     inputCount = inputs.length;
     for (int i = 0; i < inputCount; i++)
-      weights[i] = random(2) - 1;
+      weights[i] = random(8) - 8/2;
+    
+    bias = 0;
   }
 
   Neuron(ActivationFunction _func, Neuron[] _inputs, float[] _weights, float _bias)
@@ -203,8 +212,8 @@ class Neuron
 
   void mutate(float rate, float probability)
   {
-    if (random(1) < probability)
-      bias += random(2*rate) - rate;
+    //if (random(1) < probability)
+    //  bias += random(2*rate) - rate;
 
     for (int i = 0; i < inputCount; i++)
       if (random(1) < probability)

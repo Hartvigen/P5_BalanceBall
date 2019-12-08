@@ -1,13 +1,18 @@
 #ifndef UNIT_TEST
 #include "main.h"
 
+#include <stdint.h>
+#include <Arduino.h>
+#include <ArduCAM.h>
+#include <SPI.h>
+
 //Declaration of Variables used for the tracking and tilting processes.
 int16_t xCo, yCo;
 bool ballFound;
 int8_t innerAng, outerAng;
 
 //Variables used for timing the "loop" function.
-uint64_t startTime, endTime;
+uint64_t startTime, endTime, timer;
 
 int main()
 {
@@ -19,13 +24,18 @@ int main()
     while (true)
         CameraController::SendImageToProcessing();
 #elif !CTRL_MANUAL
+    timer = micros();
     while (true)
         loop();
-#else
-
 #endif
 
     return 0;
+}
+
+inline void WaitTimer()
+{
+    while (micros() < timer) { }
+    timer += 8000;
 }
 
 //Function initializes the Arduino board, and prepares all communication channels
@@ -44,7 +54,9 @@ void initialize()
 
 //If desired, starts communication with viewing program.
 #if INTF_RVIEWER || USE_IMG_DIS
-    SerialHelper::SendInt(1);
+    SerialHelper::SendInt(IMAGE_HEIGHT);
+    SerialHelper::SendInt(IMAGE_WIDTH);
+    SerialHelper::SendInt(MAX_ANGLE);
 #endif
 }
 
@@ -58,17 +70,24 @@ void setup()
 //Function representing the major cycle of the schedule
 inline void loop()
 {
-    startTime = millis();
+    MotorsController::Move();
     CameraController::BeginCapture();
+
+    endTime = millis();
+    printInfo();
+    startTime = millis();
+
     for (int i = 9; i--;)
     {
-        delay(6);
+        WaitTimer();
         MotorsController::Move();
     }
+
     CameraController::StartTracking();
     for (int i = 13; i--;)
     {
         CameraController::ProceedTracking(3);
+        WaitTimer();
         MotorsController::Move();
     }
     ballFound = CameraController::EndTracking(xCo, yCo);
@@ -88,11 +107,10 @@ inline void loop()
         MotorsController::SetInnerAngle(0);
         MotorsController::SetOuterAngle(0);
     }
-    MotorsController::Move();
 
-    endTime = millis();
-    printInfo();
+    WaitTimer();
 }
+
 
 inline void printInfo()
 {
@@ -112,15 +130,22 @@ inline void printInfo()
     }
 
     Serial.print("Actual angles: Inner = ");
-    Serial.print(MotorsController::GetInnerEncoder());
+    Serial.print(-MotorsController::GetInnerEncoder());
     Serial.print(" Outer = ");
     Serial.println(MotorsController::GetOuterEncoder());
     Serial.print("Desired angles: Inner = ");
-    Serial.print(innerAng);
+    Serial.print(-innerAng);
     Serial.print(" Outer = ");
     Serial.println(outerAng);
 #elif INTF_RVIEWER
-
+    SerialHelper::SendInt((int32_t)(endTime - startTime));
+    SerialHelper::SendInt((int32_t)ballFound);
+    SerialHelper::SendInt((int32_t)xCo);
+    SerialHelper::SendInt((int32_t)yCo);
+    SerialHelper::SendInt(-(int32_t)MotorsController::GetInnerEncoder());
+    SerialHelper::SendInt((int32_t)MotorsController::GetOuterEncoder());
+    SerialHelper::SendInt(-(int32_t)innerAng);
+    SerialHelper::SendInt((int32_t)outerAng);
 #endif
 }
 #endif
