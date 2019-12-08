@@ -191,9 +191,9 @@ class Neuron
   {
     this.func = _func;
     this.inputs = _inputs;
-    int wl = _weights.length;
-    float[] w = new float[wl-1];
-    for (int i = 0; i < wl - 1; i++)
+    int wl = _inputs.length;
+    float[] w = new float[wl];
+    for (int i = 0; i < wl; i++)
       w[i] = _weights[i + 1];
     this.weights = w;
     this.bias = _weights[0];
