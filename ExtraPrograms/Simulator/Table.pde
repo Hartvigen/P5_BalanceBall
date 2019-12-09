@@ -16,7 +16,7 @@ class Table
   
   PVector decision;
   long decisionTime = 0;
-  int delayTime = 184;
+  int delayTime = 20;
   int aliveTime = 0;
   
   float fitness = 0f;
@@ -25,6 +25,7 @@ class Table
   int xyZeroCounter = 0;
   
   float oldX, oldY;
+  float period = 20;
 
 
   Table()
