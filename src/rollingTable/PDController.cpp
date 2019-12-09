@@ -1,6 +1,6 @@
 #include "PDController.h"
 
-#include CTRL_PD
+#if CTRL_PD
 
 namespace RollingTable
 {
