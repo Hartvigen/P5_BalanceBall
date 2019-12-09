@@ -15,6 +15,6 @@
 
 // Here because used multiple places
 #define MAX_ANGLE (int8_t)5
-#define PERIOD 5
+#define PERIOD 184
 
 #endif

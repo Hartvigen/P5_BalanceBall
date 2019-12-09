@@ -9,6 +9,8 @@ int triesPerEpoch = 5;
 int tryNr = 1;
 
 float maxFitness;
+float mutationRate = 0.05;
+float mutationProbability = 0.15;
 
 PVector tablePos = new PVector(250, 250);
 Table[] tables;
@@ -145,15 +147,15 @@ void mutate()
   Table[] newTables = new Table[genSize];
   
   newTables[0] = getBestFit();
-  for (int i = 1; i < genSize - 100; i++)
+  for (int i = 1; i < genSize - 50; i++)
   {
     newTables[i] = new Table(getParent().getChild(getParent()));
-    ((AI)newTables[i].brain).mutate(0.05, 0.1);
+    ((AI)newTables[i].brain).mutate(mutationRate, mutationProbability);
   }
   newTables[0].fitness = 0;
   newTables[0].reset();
   
-  for (int i = genSize - 100; i < genSize; i++)
+  for (int i = genSize - 50; i < genSize; i++)
     newTables[i] = new Table();
   
   tables = newTables;

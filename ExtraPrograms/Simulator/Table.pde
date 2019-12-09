@@ -15,7 +15,7 @@ class Table
   
   PVector decision;
   long decisionTime = 0;
-  int delayTime = 170;
+  int delayTime = 184;
   int aliveTime = 0;
   
   float fitness = 0f;
@@ -24,7 +24,7 @@ class Table
   int xyZeroCounter = 0;
   
   float oldX, oldY;
-  float period = 5;
+  float period = 184;
 
 
   Table()
@@ -109,6 +109,7 @@ class Table
       oldY = currY;
       
       decision = brain.compute(currX, currY, velX, velY, (currX < 0 ? halfSize : -halfSize) + currX, (currY < 0 ? halfSize : -halfSize) + currY);
+      println("xAngle = "  + decision.x*maxAngle + ", yAngle = " + decision.y*maxAngle);
     } 
     else if (decisionTime < currentTime)
     {

@@ -8,7 +8,7 @@ class PD implements Brain
   //values for PID
   double innerInput, outerInput;
   double innerOutput, outerOutput;
-  double period = 5;
+  double period = 184;
   double integralSumInner = 0, integralSumOuter = 0;
   double lastInputInner = 0, lastInputOuter = 0;
   double outputInner = 0, outputOuter = 0;
@@ -16,7 +16,7 @@ class PD implements Brain
   double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 0.025, OKp = 0.025, IKi = 0, OKi = 0, IKd = 0.55, OKd = 0.55;
+  double IKp = 0.016, OKp = 0.016, IKi = 0, OKi = 0, IKd = 22, OKd = 22;
   
   PVector compute(float ... _input)
   {
@@ -45,14 +45,6 @@ class PD implements Brain
 }
 
 // ================================================================================================================================
-
-ReLU relu = new ReLU();
-Sigmoid sigmoid = new Sigmoid(2, 1, 1);
-Tipping tipping = new Tipping(2, 100, 3);
-
-Tipping tipping2 = new Tipping(5, 5, 3);
-Composite edgeComp = new Composite(tipping2, new Composite(sigmoid, new Inverse(-15f)));
-
 Tilt tilt = new Tilt();
 Edge edge = new Edge();
 Cntr cntr = new Cntr();
@@ -173,9 +165,9 @@ class Neuron
 
     inputCount = inputs.length;
     for (int i = 0; i < inputCount; i++)
-      weights[i] = random(8) - 8/2;
+      weights[i] = random(2) - 1;
     
-    bias = 0;
+    bias = random(2) - 1;
   }
 
   Neuron(ActivationFunction _func, Neuron[] _inputs, float[] _weights, float _bias)
@@ -212,8 +204,8 @@ class Neuron
 
   void mutate(float rate, float probability)
   {
-    //if (random(1) < probability)
-    //  bias += random(2*rate) - rate;
+    if (random(1) < probability)
+      bias += random(2*rate) - rate;
 
     for (int i = 0; i < inputCount; i++)
       if (random(1) < probability)
