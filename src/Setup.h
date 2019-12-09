@@ -5,8 +5,8 @@
 #define USE_IMG_DIS false
 
 // How should the table be controlled
-#define CTRL_PD true
-#define CTRL_AI false
+#define CTRL_PD false
+#define CTRL_AI true
 #define CTRL_MANUAL false
 
 // How to send commands and recieve output

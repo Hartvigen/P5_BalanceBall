@@ -72,9 +72,9 @@ namespace RollingTable
         outerAng = (output[1] * MAX_ANGLE);
     }
 
-   double Tilt(double x){return 1/1.25*x;}
-   double Edge(double x){return (x < 0 ? (1/exp(abs(x))) : (-1/exp(abs(x))));}
-   double Cntr(double x){return 2/(1 + exp(-x)) - 1;}
+   double AIController::Tilt(double x){return 1/1.25*x;}
+   double AIController::Edge(double x){return (x < 0 ? (1/exp(abs(x))) : (-1/exp(abs(x))));}
+   double AIController::Cntr(double x){return 2/(1 + exp(-x)) - 1;}
 } // namespace RollingTable
 
 #endif
