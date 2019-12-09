@@ -2,10 +2,10 @@
 #define SETUP_H_INCLUDE
 
 // Testing of image output
-#define USE_IMG_DIS false
+#define USE_IMG_DIS true
 
 // How should the table be controlled
-#define CTRL_PD true
+#define CTRL_PD false
 #define CTRL_AI false
 #define CTRL_MANUAL false
 
@@ -15,6 +15,6 @@
 
 // Here because used multiple places
 #define MAX_ANGLE (int8_t)5
-#define PERIOD 5
+#define PERIOD 184
 
 #endif

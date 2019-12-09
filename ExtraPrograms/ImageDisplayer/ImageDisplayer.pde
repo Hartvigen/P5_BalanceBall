@@ -9,13 +9,15 @@ void setup()
   noStroke(); // Don't draw a stroke around shapes
   
   printArray(Serial.list());
-  println("Creating connection to: '" + Serial.list()[1] + "'...");
-  serial = new Serial(this, Serial.list()[1], 115200 * 6);
+  println("Creating connection to: '" + Serial.list()[0] + "'...");
+  serial = new Serial(this, Serial.list()[0], 115200 * 6);
   println("Connected!");
   serial.clear();
   
   delay(2000);
   
+  readInt();
+  readInt();
   readInt();
   println("Ready!");
 }

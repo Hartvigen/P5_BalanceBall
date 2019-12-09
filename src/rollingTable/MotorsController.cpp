@@ -77,7 +77,7 @@ namespace RollingTable
             bank.motorRunUnlimited(
                 SH_Motor_Both, 
                 (dir > 0 ? SH_Direction_Forward : SH_Direction_Reverse), 
-                (angleError <= 4 ? speed/2 : speed)
+                (angleError <= 3 ? speed/2 : speed)
             );
         }
     }

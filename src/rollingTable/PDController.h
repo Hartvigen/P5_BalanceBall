@@ -1,23 +1,27 @@
-#ifndef PID_CONTROLLER_H
-#define PID_CONTROLLER_H
+#ifndef PD_CONTROLLER_H
+#define PD_CONTROLLER_H
 
 #include "Setup.h"
 #include <stdint.h>
 
-#define IN_KP 0.1
-#define OUT_KP 0.1
+#if CTRL_PD
 
-#define IN_KD 2.2
-#define OUT_KD 2.2
+#define IN_KP 0.016
+#define OUT_KP 0.016
+
+#define IN_KD 22
+#define OUT_KD 22
 
 namespace RollingTable
 {
-    class PDController 
+    class PDController
     {
         public:
             //Calculates the desired angles using PD controllers
             static void RunPD(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng);
     };
 }
+
+#endif
 
 #endif

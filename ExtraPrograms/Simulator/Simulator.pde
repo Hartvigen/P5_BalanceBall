@@ -5,22 +5,26 @@ long currentTime = 0;
 int epoch = 1;
 int genSize = 500;
 int stillRunning;
-int triesPerEpoch = 5;
+int triesPerEpoch = 1;
 int tryNr = 1;
 
 float maxFitness;
+float mutationRate = 0.05;
+float mutationProbability = 0.15;
 
-PVector tablePos = new PVector(250, 250);
+PVector tablePos = new PVector(200, 250);
 Table[] tables;
 Table bestTable, firstAlive;
 
-boolean runAI = true;
+boolean runAI = false;
 boolean showBestElseFirstAlive = false;
+
+PrintWriter writer;
 
 
 void setup()
 {
-  size(500, 500);
+  size(400, 400);
   textFont(createFont("Consolas",10));
   
   frameRate(framerate);
@@ -33,6 +37,11 @@ void initialize()
 {
   if (runAI)
   {
+    String[] lines = loadStrings("AIfit.txt");
+    writer = createWriter("AIfit.txt");
+    for (int i = 0; i < lines.length; i++) {
+      writer.println(lines[i]);  
+  }
     tables = new Table[genSize];
     
     int data = checkRun();
@@ -64,6 +73,12 @@ void initialize()
   }
   else
   {
+    String[] lines = loadStrings("PDfit.txt");
+    writer = createWriter("PDfit.txt");
+    for (int i = 0; i < lines.length; i++) {
+      writer.println(lines[i]);  
+  }
+  
     tables = new Table[] { new Table() };
     tables[0].brain = new PD();
   }
@@ -135,6 +150,8 @@ void nextEpoch()
   }
   else
   {
+    writer.println(bestTable.fitness);
+    writer.flush();
     bestTable.reset();
     bestTable.fitness = 0;
   }
@@ -145,15 +162,15 @@ void mutate()
   Table[] newTables = new Table[genSize];
   
   newTables[0] = getBestFit();
-  for (int i = 1; i < genSize - 100; i++)
+  for (int i = 1; i < genSize - 50; i++)
   {
     newTables[i] = new Table(getParent().getChild(getParent()));
-    ((AI)newTables[i].brain).mutate(0.05, 0.1);
+    ((AI)newTables[i].brain).mutate(mutationRate, mutationProbability);
   }
   newTables[0].fitness = 0;
   newTables[0].reset();
   
-  for (int i = genSize - 100; i < genSize; i++)
+  for (int i = genSize - 50; i < genSize; i++)
     newTables[i] = new Table();
   
   tables = newTables;
@@ -373,7 +390,7 @@ int loadNeuron(InputStream input, float[] weights)
       try {
         weights[i] = float(weight);
       }
-      catch(ArrayIndexOutOfBoundsException e)
+      catch(ArrayIndexOutOfBoundsException e) //<>//
       {
         e.printStackTrace(); //<>//
       }
@@ -397,7 +414,7 @@ int checkRun()
   }
   catch(IOException e) {
     e.printStackTrace();
-  }
+  } //<>//
   return data;
 } //<>//
 

@@ -7,7 +7,7 @@ class Tilt implements ActivationFunction
 {
   float compute(float x)
   {
-    return x/1;
+    return 1/1.25*x;
   }
 }
 
