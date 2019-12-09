@@ -6,7 +6,7 @@ class Table
   Ball ball;
   
   int size = 210;
-  int halfSize = 210/2;
+  int halfSize = size/2;
 
   float degreeVelocity = timestep*0.05;
   float desiredX = 0, desiredY = 0;
@@ -15,7 +15,7 @@ class Table
   
   PVector decision;
   long decisionTime = 0;
-  int delayTime = 170;
+  int delayTime = 184;
   int aliveTime = 0;
   
   float fitness = 0f;
@@ -24,7 +24,6 @@ class Table
   int xyZeroCounter = 0;
   
   float oldX, oldY;
-  float period = 5;
 
 
   Table()
@@ -102,8 +101,8 @@ class Table
       float currX = ball.center.x;
       float currY = ball.center.y;
       
-      float velX = (currX - oldX) / period;
-      float velY = (currY - oldY) / period;
+      float velX = (currX - oldX) / delayTime;
+      float velY = (currY - oldY) / delayTime;
       
       oldX = currX;
       oldY = currY;
@@ -151,8 +150,7 @@ class Table
   void updateTilt()
   {
     float xDiff = desiredX - angleX;
-    if(abs(xDiff) <= 1)
-    {}
+    if (abs(xDiff) <= 1) {}
     else if (abs(xDiff) > degreeVelocity) 
     {
       if (xDiff < 0 && angleX - degreeVelocity >= -maxAngle)
@@ -169,8 +167,7 @@ class Table
     }
 
     float yDiff = desiredY - angleY;
-    if(abs(yDiff) <= 1)
-    {}
+    if (abs(yDiff) <= 1) {}
     else if (abs(yDiff) > degreeVelocity) 
     {
       if (yDiff < 0 && angleY - degreeVelocity >= -maxAngle)

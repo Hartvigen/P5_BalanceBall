@@ -1,5 +1,7 @@
 #include "PDController.h"
 
+#include CTRL_PD
+
 namespace RollingTable
 {
     double proportionalInner = 0, proportionalOuter = 0;
@@ -21,3 +23,5 @@ namespace RollingTable
         yPrev = yCo;
     }
 }
+
+#endif

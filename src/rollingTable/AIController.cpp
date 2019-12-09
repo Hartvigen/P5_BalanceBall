@@ -1,5 +1,7 @@
 #include "AIController.h"
 
+#if CTRL_AI
+
 namespace RollingTable
 {
     double xEdge, yEdge;
@@ -77,3 +79,5 @@ namespace RollingTable
     inline double AIController::Tipping(double input){return 5*pow(input/5, 3);}
     inline double AIController::Inverse(double input){return -15/input;}
 } // namespace RollingTable
+
+#endif

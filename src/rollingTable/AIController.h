@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <Arduino.h>
 
+#if CTRL_AI
+
 namespace RollingTable
 {
     class AIController 
@@ -21,5 +23,7 @@ namespace RollingTable
             static void RunNN(double xCo, double yCo, int8_t& innerAng, int8_t& outerAng);
     };
 }
+
+#endif
 
 #endif

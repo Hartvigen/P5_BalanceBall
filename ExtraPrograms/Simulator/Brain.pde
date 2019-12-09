@@ -8,7 +8,7 @@ class PD implements Brain
   //values for PID
   double innerInput, outerInput;
   double innerOutput, outerOutput;
-  double period = 5;
+  double period = 184;
   double integralSumInner = 0, integralSumOuter = 0;
   double lastInputInner = 0, lastInputOuter = 0;
   double outputInner = 0, outputOuter = 0;
@@ -16,7 +16,7 @@ class PD implements Brain
   double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 0.025, OKp = 0.025, IKi = 0, OKi = 0, IKd = 0.55, OKd = 0.55;
+  double IKp = 0.016, OKp = 0.016, IKi = 0, OKi = 0, IKd = 22, OKd = 22;
   
   PVector compute(float ... _input)
   {
