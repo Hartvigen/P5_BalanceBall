@@ -16,7 +16,7 @@ PVector tablePos = new PVector(200, 250);
 Table[] tables;
 Table bestTable, firstAlive;
 
-boolean runAI = true;
+boolean runAI = false;
 boolean showBestElseFirstAlive = false;
 
 
@@ -375,7 +375,7 @@ int loadNeuron(InputStream input, float[] weights)
       try {
         weights[i] = float(weight);
       }
-      catch(ArrayIndexOutOfBoundsException e)
+      catch(ArrayIndexOutOfBoundsException e) //<>//
       {
         e.printStackTrace(); //<>//
       }
@@ -399,7 +399,7 @@ int checkRun()
   }
   catch(IOException e) {
     e.printStackTrace();
-  }
+  } //<>//
   return data;
 } //<>//
 

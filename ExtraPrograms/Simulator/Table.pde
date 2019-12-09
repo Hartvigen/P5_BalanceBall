@@ -149,21 +149,24 @@ class Table
     fitness += 0.05/dist;
     if (dist < 25*mmToPx) // Convert mm to px
     {
-      float value = (25*mmToPx-dist)/50;
+      float value = (25*mmToPx-dist)/50*mmToPx;
       fitness += value;
     }
   }
   
   void updateTilt()
   {
+    
     float xDiff = desiredInner - angleInner;
+    float innerVel = abs(xDiff) <= 2 ? degreeVelocity/2 : degreeVelocity;
+    
     if (abs(xDiff) <= 1) {}
-    else if (abs(xDiff) > degreeVelocity) 
+    else if (abs(xDiff) > innerVel) 
     {
-      if (xDiff < 0 && angleInner - degreeVelocity >= -maxAngle)
-        angleInner -= degreeVelocity;
-      else if (xDiff > 0 && angleInner + degreeVelocity <= maxAngle)
-        angleInner += degreeVelocity;
+      if (xDiff < 0 && angleInner - innerVel >= -maxAngle)
+        angleInner -= innerVel;
+      else if (xDiff > 0 && angleInner + innerVel <= maxAngle)
+        angleInner += innerVel;
     } 
     else
     {
@@ -174,13 +177,15 @@ class Table
     }
 
     float yDiff = desiredOuter - angleOuter;
+    float outerVel = abs(yDiff) <= 2 ? degreeVelocity/2 : degreeVelocity;
+    
     if (abs(yDiff) <= 1) {}
-    else if (abs(yDiff) > degreeVelocity) 
+    else if (abs(yDiff) > outerVel) 
     {
-      if (yDiff < 0 && angleOuter - degreeVelocity >= -maxAngle)
-        angleOuter -= degreeVelocity;
-      else if (yDiff > 0 && angleOuter + degreeVelocity <= maxAngle)
-        angleOuter += degreeVelocity;
+      if (yDiff < 0 && angleOuter - outerVel >= -maxAngle)
+        angleOuter -= outerVel;
+      else if (yDiff > 0 && angleOuter + outerVel <= maxAngle)
+        angleOuter += outerVel;
     } 
     else
     {
@@ -213,12 +218,12 @@ class Table
   {
     // Ball and board
     noFill();
-    strokeWeight(2);
+    strokeWeight(2); //<>//
     rect(pos.x-halfWidth, pos.y-halfHeight, boardWidth, boardHeight);
     strokeWeight(1);
     
     //Inner green circle
-     //<>//
+    
     if(ball.center.mag() < 25*mmToPx)
       fill(0,255,0); //<>//
     circle(pos.x, pos.y, 50*mmToPx);
