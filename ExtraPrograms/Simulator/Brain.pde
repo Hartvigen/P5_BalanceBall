@@ -16,7 +16,7 @@ class PD implements Brain
   double curX = 0, curY = 0, prevX = 0, prevY = 0;
   
   //tuning values for PID
-  double IKp = 0.016, OKp = 0.016, IKi = 0, OKi = 0, IKd = 22, OKd = 22;
+  double IKp = 0.025, OKp = 0.025, IKi = 0, OKi = 0, IKd = 30, OKd = 30;
   
   PVector compute(float ... _input)
   {

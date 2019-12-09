@@ -1,16 +1,16 @@
-int ballRadius = 6;
+float ballRadius = 6*0.729;
 
 class Table
 {
   Brain brain = new PD();
   Ball ball;
   
-  int size = 210;
-  int halfSize = size/2;
+  int boardWidth = 129, boardHeight = 119;
+  int halfWidth = boardWidth/2, halfHeight = boardHeight/2;
 
   float degreeVelocity = timestep*0.05;
-  float desiredX = 0, desiredY = 0;
-  float angleX = 0, angleY = 0;
+  float desiredInner = 0, desiredOuter = 0;
+  float angleInner = 0, angleOuter = 0;
   float maxAngle = 5;
   
   PVector decision;
@@ -58,27 +58,31 @@ class Table
   
   public void reset()
   {
-    desiredX = 0;
-    desiredY = 0;
-    angleX = 0; 
-    angleY = 0;
+    desiredInner = 0;
+    desiredOuter = 0;
+    angleInner = 0; 
+    angleOuter = 0;
     
     aliveTime = 0;
     
+    float mod, ballx, bally;
+    
     // Find starting point for ball
-    float mod = float(halfSize-ballRadius-3)/halfSize;
-    float ballx = (round(random(1))*size - halfSize) * mod;
-    float bally = (random(size) - halfSize) * mod;
-
     if (random(1) < 0.5f)
     {
-      float temp = ballx;
-      ballx = bally;
-      bally = temp;
+      mod = (halfWidth-ballRadius-3)/halfWidth;
+      ballx = (round(random(1))*boardWidth - halfWidth) * mod;
+      bally = (random(boardWidth) - halfWidth) * mod;
+    }
+    else
+    {
+      mod = (halfHeight-ballRadius-3)/halfHeight;
+      ballx = (round(random(1))*boardHeight - halfHeight) * mod;
+      bally = (random(boardHeight) - halfHeight) * mod;
     }
 
     // Find starting velocity
-    float speed = (0.07 + random(0.03));
+    float speed = (0.07 + random(0.03)) * 0.729; // 0.729 px/mm converts from mm/ms to px/ms
     float angle = atan2(ballx, bally) + random(PI/2) - PI/4;
     if (angle < 0)
       angle += 2*PI;
@@ -108,20 +112,19 @@ class Table
       oldX = currX;
       oldY = currY;
       
-      decision = brain.compute(currX, currY, velX, velY, (currX < 0 ? halfSize : -halfSize) + currX, (currY < 0 ? halfSize : -halfSize) + currY);
-      println("xAngle = "  + decision.x*maxAngle + ", yAngle = " + decision.y*maxAngle);
+      decision = brain.compute(currX, currY, velX, velY, (currX < 0 ? halfWidth : -halfWidth) + currX, (currY < 0 ? halfHeight : -halfHeight) + currY);
     } 
     else if (decisionTime < currentTime)
     {
-      desiredX = int(decision.x * (runAI ? maxAngle : 1));
-      desiredY = int(decision.y * (runAI ? maxAngle : 1));
+      desiredInner = int(decision.x * (runAI ? maxAngle : 1));
+      desiredOuter = int(decision.y * (runAI ? maxAngle : 1));
       
       decisionTime = 0;
     }
     updateTilt();
     
     float dist = ball.center.mag();
-    if(abs(desiredX) <= 1 && abs(desiredY) <= 1 && dist > 25) //When the x-y degrees are stuck at zero.
+    if(abs(desiredInner) <= 1 && abs(desiredOuter) <= 1 && dist > 25) //When the x-y degrees are stuck at zero.
     { 
       xyZeroCounter += 1;
       if(xyZeroCounter > 60*5){
@@ -136,61 +139,61 @@ class Table
     }
 
     ball.update(getAcceleration());
-    if (abs(ball.center.x) > halfSize || abs(ball.center.y) > halfSize)
+    if (abs(ball.center.x) > halfWidth || abs(ball.center.y) > halfHeight)
     {
       ball.out = true;
       return;
     }
     
-    if (dist < 25)
+    if (dist < 25*0.729) // Convert mm to px
     {
-      float value = (25-dist)/100;
+      float value = (25*0.729-dist)/100;
       fitness += value;
     }
   }
   
   void updateTilt()
   {
-    float xDiff = desiredX - angleX;
+    float xDiff = desiredInner - angleInner;
     if (abs(xDiff) <= 1) {}
     else if (abs(xDiff) > degreeVelocity) 
     {
-      if (xDiff < 0 && angleX - degreeVelocity >= -maxAngle)
-        angleX -= degreeVelocity;
-      else if (xDiff > 0 && angleX + degreeVelocity <= maxAngle)
-        angleX += degreeVelocity;
+      if (xDiff < 0 && angleInner - degreeVelocity >= -maxAngle)
+        angleInner -= degreeVelocity;
+      else if (xDiff > 0 && angleInner + degreeVelocity <= maxAngle)
+        angleInner += degreeVelocity;
     } 
     else
     {
-      if (-maxAngle <= angleX - xDiff && angleX + xDiff <= maxAngle)
-        angleX += xDiff;
+      if (-maxAngle <= angleInner - xDiff && angleInner + xDiff <= maxAngle)
+        angleInner += xDiff;
       else
-        angleX = maxAngle;
+        angleInner = maxAngle;
     }
 
-    float yDiff = desiredY - angleY;
+    float yDiff = desiredOuter - angleOuter;
     if (abs(yDiff) <= 1) {}
     else if (abs(yDiff) > degreeVelocity) 
     {
-      if (yDiff < 0 && angleY - degreeVelocity >= -maxAngle)
-        angleY -= degreeVelocity;
-      else if (yDiff > 0 && angleY + degreeVelocity <= maxAngle)
-        angleY += degreeVelocity;
+      if (yDiff < 0 && angleOuter - degreeVelocity >= -maxAngle)
+        angleOuter -= degreeVelocity;
+      else if (yDiff > 0 && angleOuter + degreeVelocity <= maxAngle)
+        angleOuter += degreeVelocity;
     } 
     else
     {
-      if (-maxAngle <= angleY - yDiff && angleY + yDiff <= maxAngle)
-        angleY += yDiff;
+      if (-maxAngle <= angleOuter - yDiff && angleOuter + yDiff <= maxAngle)
+        angleOuter += yDiff;
       else
-        angleY = maxAngle;
+        angleOuter = maxAngle;
     }
   }
 
   PVector getAcceleration()
   {
-    float cosX = cos(angleX*0.0174532925);
-    float sinX = sin(angleX*0.0174532925);
-    float sinY = sin(angleY*0.0174532925);
+    float cosX = cos(angleInner*0.0174532925);
+    float sinX = sin(angleInner*0.0174532925);
+    float sinY = sin(angleOuter*0.0174532925);
     float accMag = 5f/7f * 0.009807f;
 
     float xr2d = -sinX + 0f;
@@ -198,6 +201,7 @@ class Table
 
     PVector acc = new PVector(xr2d, yr2d);
     acc.mult(accMag);
+    acc.mult(0.729); // acc mm/ms^ * 0.729 px/mm = acc*0.729 px/ms^
     
     return acc;
   }
@@ -208,23 +212,23 @@ class Table
     // Ball and board
     noFill();
     strokeWeight(2);
-    rect(pos.x-halfSize, pos.y-halfSize, size, size);
+    rect(pos.x-halfWidth, pos.y-halfHeight, boardWidth, boardHeight);
     strokeWeight(1);
     
     //Inner green circle
     
-    if(ball.center.mag() < 25)
-      fill(0,255,0);
-    circle(pos.x, pos.y, 50);
+    if(ball.center.mag() < 25*0.729)
+      fill(0,255,0); //<>//
+    circle(pos.x, pos.y, 50*0.729);
     ball.show(pos);
     noFill();
     
     // Tilt info
-    int offset = halfSize+50;
-    drawTiltMeter(angleX, new PVector(pos.x + offset, pos.y));
-    drawTiltMeter(-angleX, new PVector(pos.x - offset, pos.y));
-    drawTiltMeter(angleY, new PVector(pos.x, pos.y + offset));
-    drawTiltMeter(-angleY, new PVector(pos.x, pos.y - offset));
+    int offset = halfWidth+50;
+    drawTiltMeter(angleInner, new PVector(pos.x + offset, pos.y));
+    drawTiltMeter(-angleInner, new PVector(pos.x - offset, pos.y));
+    drawTiltMeter(angleOuter, new PVector(pos.x, pos.y + offset));
+    drawTiltMeter(-angleOuter, new PVector(pos.x, pos.y - offset));
   }
 
   void drawTiltMeter(float _ang, PVector _pos)
@@ -232,7 +236,7 @@ class Table
     float magnitude = 25;
 
     fill(_ang > 0 ? 0 : 255, _ang > 0 ? 255 : 0, 0);
-    rect(_pos.x, _pos.y, 10, magnitude * (_ang/maxAngle));
+    rect(_pos.x, _pos.y, 10, magnitude * -(_ang/maxAngle));
 
     fill(0);
     rect(_pos.x, _pos.y-1, 10, 2);

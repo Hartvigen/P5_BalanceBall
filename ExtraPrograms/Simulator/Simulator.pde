@@ -12,7 +12,7 @@ float maxFitness;
 float mutationRate = 0.05;
 float mutationProbability = 0.15;
 
-PVector tablePos = new PVector(250, 250);
+PVector tablePos = new PVector(200, 250);
 Table[] tables;
 Table bestTable, firstAlive;
 
@@ -22,7 +22,7 @@ boolean showBestElseFirstAlive = false;
 
 void setup()
 {
-  size(500, 500);
+  size(400, 400);
   textFont(createFont("Consolas",10));
   
   frameRate(framerate);
