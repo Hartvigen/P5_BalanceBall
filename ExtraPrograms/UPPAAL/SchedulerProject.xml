@@ -244,6 +244,18 @@ gantt {
 			<comment>The NN</comment>
 		</query>
 		<query>
+			<formula>StartTracking.Idle --&gt; StartTracking.Unready</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>StartTracking.Initial --&gt; StartTracking.Unready</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A&lt;&gt; (BeginCapture.Ready or StartTracking.Unready)</formula>
+			<comment></comment>
+		</query>
+		<query>
 			<formula>E[] not (Move.ERR or BeginCapture.ERR or StartTracking.ERR or ProceedTracking.ERR or EndTracking.ERR or RunPD.ERR or SetOuterAngle.ERR or SetInnerAngle.ERR)</formula>
 			<comment>PD</comment>
 		</query>
