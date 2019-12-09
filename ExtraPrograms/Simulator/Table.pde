@@ -16,7 +16,7 @@ class Table
   
   PVector decision;
   long decisionTime = 0;
-  int delayTime = 20;
+  int delayTime = 184;
   int aliveTime = 0;
   
   float fitness = 0f;
@@ -25,7 +25,6 @@ class Table
   int xyZeroCounter = 0;
   
   float oldX, oldY;
-  float period = 20;
 
 
   Table()
@@ -218,7 +217,7 @@ class Table
   {
     // Ball and board
     noFill();
-    strokeWeight(2); //<>//
+    strokeWeight(2); //<>// //<>//
     rect(pos.x-halfWidth, pos.y-halfHeight, boardWidth, boardHeight);
     strokeWeight(1);
     
