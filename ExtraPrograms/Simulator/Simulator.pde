@@ -5,7 +5,7 @@ long currentTime = 0;
 int epoch = 1;
 int genSize = 500;
 int stillRunning;
-int triesPerEpoch = 1;
+int triesPerEpoch = 5;
 int tryNr = 1;
 
 float maxFitness;
@@ -375,7 +375,7 @@ int loadNeuron(InputStream input, float[] weights)
     if (data == 35 || data == 10 || data == 13)
       return data;
     while (data == 46 || (48 <= data && data <= 57) || data == 45 || data == 69) {
-      weight += char(data);
+      weight += char(data); //<>//
       data = input.read();
     }
     weights[0] = float(weight);
@@ -399,7 +399,7 @@ int loadNeuron(InputStream input, float[] weights)
     }
   }
   catch(IOException e) {
-    e.printStackTrace();
+    e.printStackTrace(); //<>//
   }
   return data;
 }
