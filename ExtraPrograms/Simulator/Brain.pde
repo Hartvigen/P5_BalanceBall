@@ -167,7 +167,7 @@ class Neuron
     for (int i = 0; i < inputCount; i++)
       weights[i] = random(2) - 1;
     
-    bias = random(2) - 1;
+    bias = 0; // random(2) - 1;
   }
 
   Neuron(ActivationFunction _func, Neuron[] _inputs, float[] _weights, float _bias)
@@ -204,8 +204,8 @@ class Neuron
 
   void mutate(float rate, float probability)
   {
-    if (random(1) < probability)
-      bias += random(2*rate) - rate;
+    //if (random(1) < probability)
+    //  bias += random(2*rate) - rate;
 
     for (int i = 0; i < inputCount; i++)
       if (random(1) < probability)

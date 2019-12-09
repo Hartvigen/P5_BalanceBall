@@ -1,4 +1,5 @@
-float ballRadius = 6*0.729;
+float mmToPx = 0.729;
+float ballRadius = 6*mmToPx;
 
 class Table
 {
@@ -24,7 +25,6 @@ class Table
   int xyZeroCounter = 0;
   
   float oldX, oldY;
-  float period = 184;
 
 
   Table()
@@ -82,7 +82,7 @@ class Table
     }
 
     // Find starting velocity
-    float speed = (0.07 + random(0.03)) * 0.729; // 0.729 px/mm converts from mm/ms to px/ms
+    float speed = (0.07 + random(0.03)) * mmToPx; // 0.729 px/mm converts from mm/ms to px/ms
     float angle = atan2(ballx, bally) + random(PI/2) - PI/4;
     if (angle < 0)
       angle += 2*PI;
@@ -122,12 +122,19 @@ class Table
       decisionTime = 0;
     }
     updateTilt();
+
+    ball.update(getAcceleration());
+    if (abs(ball.center.x) > halfWidth || abs(ball.center.y) > halfHeight)
+    {
+      ball.out = true;
+      return;
+    }
     
     float dist = ball.center.mag();
     if(abs(desiredInner) <= 1 && abs(desiredOuter) <= 1 && dist > 25) //When the x-y degrees are stuck at zero.
     { 
       xyZeroCounter += 1;
-      if(xyZeroCounter > 60*5){
+      if(xyZeroCounter > 60*10){
         fitness = 0;
         ball.out = true;
         return;
@@ -137,17 +144,11 @@ class Table
     {
       xyZeroCounter = 0;
     }
-
-    ball.update(getAcceleration());
-    if (abs(ball.center.x) > halfWidth || abs(ball.center.y) > halfHeight)
-    {
-      ball.out = true;
-      return;
-    }
     
-    if (dist < 25*0.729) // Convert mm to px
+    fitness += 0.05/dist;
+    if (dist < 25*mmToPx) // Convert mm to px
     {
-      float value = (25*0.729-dist)/100;
+      float value = (25*mmToPx-dist)/50;
       fitness += value;
     }
   }
@@ -201,7 +202,7 @@ class Table
 
     PVector acc = new PVector(xr2d, yr2d);
     acc.mult(accMag);
-    acc.mult(0.729); // acc mm/ms^ * 0.729 px/mm = acc*0.729 px/ms^
+    acc.mult(mmToPx); // acc mm/ms^ * 0.729 px/mm = acc*0.729 px/ms^
     
     return acc;
   }
@@ -216,10 +217,10 @@ class Table
     strokeWeight(1);
     
     //Inner green circle
-    
-    if(ball.center.mag() < 25*0.729)
+     //<>//
+    if(ball.center.mag() < 25*mmToPx)
       fill(0,255,0); //<>//
-    circle(pos.x, pos.y, 50*0.729);
+    circle(pos.x, pos.y, 50*mmToPx);
     ball.show(pos);
     noFill();
     

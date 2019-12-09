@@ -22,8 +22,8 @@ namespace RollingTable
 
     void AIController::RunNN(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng)
     {
-        xEdge = (xCo < 0 ? HALF_SIZE : -HALF_SIZE) + xCo;
-        yEdge = (yCo < 0 ? HALF_SIZE : -HALF_SIZE) + yCo;
+        xEdge = (xCo < 0 ? HALF_WIDTH : -HALF_WIDTH) + xCo;
+        yEdge = (yCo < 0 ? HALF_HEIGHT : -HALF_HEIGHT) + yCo;
 
         if (firstTrack)
         {

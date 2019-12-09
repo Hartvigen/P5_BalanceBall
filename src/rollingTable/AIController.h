@@ -1,7 +1,8 @@
 #ifndef AI_CONTROLLER_H
 #define AI_CONTROLLER_H
 
-#define HALF_SIZE 65
+#define HALF_WIDTH 65.5
+#define HALF_HEIGHT 59.5
 
 #include "Setup.h"
 #include <stdint.h>
