@@ -1,26 +1,17 @@
 #include "test_MotorsController.h"
 
-// Alle motor teste herinde
+// All test for MotorsController should be placed in here
 void TestAll_MotorsController()
 {
-    RUN_TEST(Test_AnglesOfInnerMotors);
-    RUN_TEST(Test_AnglesOfOuterMotors);
+    //RUN_TEST(Test_AnglesOfMotors);
 }
 
-// Test om fejlmargin i forhold til moterne(When done)
-void Test_AnglesOfOuterMotors()
+// Test for seeing if the motor will be set correct
+void Test_AnglesOfMotors()
 {
-    MotorsController::SetOuterAngle(4);
-    MotorsController::Move();
-    delay(100);
-    TEST_ASSERT_EQUAL(4, MotorsController::GetOuterEncoder());
-}
-
-void Test_AnglesOfInnerMotors()
-{
+    MotorsController::SetOuterAngle(5);
     MotorsController::SetInnerAngle(5);
     MotorsController::Move();
-    delay(100);
-    TEST_ASSERT_EQUAL(5, MotorsController::GetInnerEncoder());
-
+    TEST_ASSERT((int) MotorsController::GetInnerEncoder == 5 &&
+                (int) MotorsController::GetOuterEncoder == 5);
 }

@@ -1,8 +1,10 @@
 #ifdef UNIT_TEST
 #include <Wire.h>
+#include "../../src/Serial/SerialHelper.h"
 #include "test_rollingTable/test_CameraController.h"
 #include "test_rollingTable/test_MotorsController.h"
 #include "test_rollingTable/test_PIDController.h"
+#include "test_rollingTable/test_AIController.h"
 
 #define CAM_SLAVE_PIN 53
 
@@ -19,21 +21,20 @@ void initialize()
         Serial.read();
     delay(1000);
 
-    #if INTF_RVIEWER || USE_IMG_DIS
-    SerialHelper::SendInt(1);
-    #endif
+//If desired, starts communication with viewing program.
+#if INTF_RVIEWER || USE_IMG_DIS
+    SerialHelper::SendInt(IMAGE_HEIGHT);
+    SerialHelper::SendInt(IMAGE_WIDTH);
+    SerialHelper::SendInt(MAX_ANGLE);
+#endif
 }
 
+//Function initializes controllers.
 void setup()
 {
-    CameraController::Init(CAM_SLAVE_PIN, 3,6,3);
-
+    CameraController::Init(CAM_SLAVE_PIN, 4, 8, 4);
     MotorsController::Init();
-    MotorsController::Reset();
-
-    #if !CTRL_MANUAL && CTRL_AI
-    // Init AI
-    #endif
+    
 }
 
 int main()
@@ -47,6 +48,7 @@ int main()
     TestAll_CameraController();
     TestAll_MotorsController();
     TestAll_PIDController();
+    TestAll_AIController();
 
     UNITY_END();
 }

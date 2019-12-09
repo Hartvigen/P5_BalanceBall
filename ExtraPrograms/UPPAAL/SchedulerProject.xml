@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+const int N=9;
+typedef int [1,N] id_t;
+
+chan ready, release;
+urgent chan run;
+
+clock capture;
+
+
+int current = 2;
+int waitTimeForPicture = 700;
+
+bool MoveReady = false;
+
+
+
+void setCurrent(id_t id, int next)
+{
+    if(id != 1)
+    {
+        current = next;
+    }
+}
+
+void setUpCaptureDelay(id_t id)
+{
+    if(id ==2)
+    {
+        capture = 0;
+    }
+}
+
+void readyMove(id_t id)
+{
+    if(id == 1)
+    {
+        MoveReady = true;
+    }
+}
+
+void idleMove(id_t id)
+{
+    if(id == 1)
+    {
+        MoveReady = false;
+    }
+}
+</declaration>
+	<template>
+		<name x="5" y="5">TASK</name>
+		<parameter>const id_t id, const int T, const int C, int next, int numberTimes, int times</parameter>
+		<declaration>// Place local declarations here.
+clock t, c;
+</declaration>
+		<location id="id0" x="323" y="400">
+			<name x="314" y="416">ERR</name>
+		</location>
+		<location id="id1" x="-68" y="399">
+			<name x="-93" y="416">Running</name>
+			<label kind="invariant" x="-93" y="433">c&lt;=C &amp;&amp;
+t&lt;=T</label>
+		</location>
+		<location id="id2" x="-68" y="170">
+			<name x="-51" y="136">Ready</name>
+			<label kind="invariant" x="-144" y="161">t&lt;=T</label>
+		</location>
+		<location id="id3" x="-68" y="-136">
+			<name x="-78" y="-170">Idle</name>
+			<label kind="invariant" x="-85" y="-187">t&lt;= T</label>
+		</location>
+		<location id="id4" x="-68" y="-8">
+			<name x="-127" y="-34">Unready</name>
+			<label kind="invariant" x="-59" y="-51">capture &lt;= waitTimeForPicture ||
+current != id</label>
+		</location>
+		<location id="id5" x="-323" y="68">
+			<name x="-382" y="59">Initial</name>
+			<label kind="invariant" x="-382" y="76">t&lt;= 10</label>
+		</location>
+		<init ref="id5"/>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-68" y="250">id == 1</label>
+			<label kind="synchronisation" x="-68" y="267">run?</label>
+			<label kind="assignment" x="-68" y="284">c = 0</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id0"/>
+			<label kind="guard" x="442" y="127">t == T</label>
+			<nail x="433" y="-8"/>
+			<nail x="433" y="399"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-331" y="221">id == 4 &amp;&amp;
+c == C &amp;&amp; 
+times &lt; 12</label>
+			<label kind="synchronisation" x="-331" y="297">release!</label>
+			<label kind="assignment" x="-331" y="280">times += 1</label>
+			<nail x="-255" y="263"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-297" y="110">id != 3 &amp;&amp; 
+t == 10</label>
+			<label kind="assignment" x="-297" y="144">t = 0</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-289" y="-8">id == 3 &amp;&amp;
+t==10</label>
+			<label kind="assignment" x="-289" y="25">t = 0</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="guard" x="272" y="-102">id != 3 &amp;&amp;
+t==T</label>
+			<label kind="assignment" x="272" y="-144">t = 0,  
+readyMove(id)</label>
+			<nail x="263" y="-136"/>
+			<nail x="263" y="119"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-59" y="76">current == 3 &amp;&amp;
+capture == waitTimeForPicture</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-144" y="-119">id == 3 &amp;&amp;
+t==T</label>
+			<label kind="assignment" x="-144" y="-85">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-697" y="34">c == C &amp;&amp; 
+(id != 4  || (id == 4 &amp;&amp; times == 12))</label>
+			<label kind="synchronisation" x="-697" y="76">release!</label>
+			<label kind="assignment" x="-697" y="-25">times = 0, setCurrent(id, next),
+setUpCaptureDelay(id),
+idleMove(id)</label>
+			<nail x="-442" y="399"/>
+			<nail x="-442" y="-136"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="144" y="408">t==T</label>
+			<nail x="51" y="399"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="guard" x="331" y="255">t==T</label>
+			<nail x="323" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+			<label kind="guard" x="136" y="221">id != 1 &amp;&amp;
+!MoveReady &amp;&amp;
+current == id</label>
+			<label kind="synchronisation" x="136" y="289">run?</label>
+			<label kind="assignment" x="136" y="272">c=0</label>
+			<nail x="127" y="263"/>
+		</transition>
+	</template>
+	<template>
+		<name>CPU</name>
+		<location id="id6" x="-102" y="34">
+			<name x="-112" y="0">USED</name>
+		</location>
+		<location id="id7" x="-102" y="-102">
+			<name x="-112" y="-136">IDLE</name>
+		</location>
+		<init ref="id7"/>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-246" y="-42">release?</label>
+			<nail x="-170" y="34"/>
+			<nail x="-170" y="-102"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-25" y="-51">run!</label>
+			<nail x="-34" y="-102"/>
+			<nail x="-34" y="34"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+// Every number -- except the id -- is a times 10
+const int period = 1840; // 3240
+Move = TASK(1 ,80 ,20 ,2 ,1 ,0);
+
+BeginCapture = TASK(2 ,period ,1 ,3 ,1 ,0);
+StartTracking = TASK(3 ,period ,10 ,4 ,1 ,0);
+ProceedTracking = TASK(4 ,period ,60 ,5 ,13 ,0);
+EndTracking = TASK(5 ,period ,2 ,6 ,1 ,0);
+RunPD = TASK(6, period, 2, 7 ,1 ,0);
+RunNN  = TASK(6, period , 40, 7 , 1, 0);
+SetInnerAngle = TASK(7,period,2, 8, 1, 0);
+SetOuterAngle = TASK(8,period,2, 2, 1 ,0);
+
+
+
+// List one or more processes to be composed into a system.
+// RunPID or RunNN needs to be changed depending on PID or NN
+system Move, BeginCapture, StartTracking, ProceedTracking, EndTracking, RunPD, SetInnerAngle, SetOuterAngle, CPU;
+
+gantt {
+    Move : Move.Ready -&gt; 6, Move.Running -&gt; 1, Move.ERR-&gt;5; 
+    BeginCapture :  BeginCapture.Ready -&gt; 6, BeginCapture.Running -&gt; 1, BeginCapture.ERR-&gt;5; 
+    StartTracking :  StartTracking.Ready -&gt; 6, StartTracking.Running -&gt; 1, StartTracking.ERR-&gt;5;
+    ProceedTracking :  ProceedTracking.Ready -&gt; 6, ProceedTracking.Running -&gt; 1, ProceedTracking.ERR-&gt;5; 
+    EndTracking :  EndTracking.Ready -&gt; 6, EndTracking.Running -&gt; 1, EndTracking.ERR-&gt;5; 
+    RunPD :  RunPD.Ready -&gt; 6, RunPD.Running -&gt; 1, RunPD.ERR-&gt;5;
+    //RunNN :  RunNN.Ready -&gt; 6, RunNN.Running -&gt; 1, RunNN.ERR-&gt;5;
+    SetInnerAngle :  SetInnerAngle.Ready -&gt; 6, SetInnerAngle.Running -&gt; 1, SetInnerAngle.ERR-&gt;5;
+    SetOuterAngle :  SetOuterAngle.Ready -&gt; 6, SetOuterAngle.Running -&gt; 1, SetOuterAngle.ERR-&gt;5;  
+}
+</system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E[] not (Move.ERR or BeginCapture.ERR or StartTracking.ERR or ProceedTracking.ERR or EndTracking.ERR or RunNN.ERR or SetOuterAngle.ERR or SetInnerAngle.ERR)</formula>
+			<comment>The NN</comment>
+		</query>
+		<query>
+			<formula>E[] not (Move.ERR or BeginCapture.ERR or StartTracking.ERR or ProceedTracking.ERR or EndTracking.ERR or RunPD.ERR or SetOuterAngle.ERR or SetInnerAngle.ERR)</formula>
+			<comment>PD</comment>
+		</query>
+	</queries>
+</nta>

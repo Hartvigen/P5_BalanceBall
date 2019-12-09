@@ -3,5 +3,4 @@
 
 using namespace RollingTable;
 void TestAll_MotorsController();
-void Test_AnglesOfOuterMotors();
-void Test_AnglesOfInnerMotors();
+void Test_AnglesOfMotors();

@@ -1,33 +1,42 @@
 #include "test_CameraController.h"
 
-int16_t xCoor = 5, yCoor = 7;
-// Alle camera teste herind
+int16_t xCoor, yCoor;
+uint64_t timer;
+
+// All test for CameraController should be placed in here
 void TestAll_CameraController()
 {
-    RUN_TEST(Test_SizeOfCameraFIFO);
     RUN_TEST(Test_CameraTest);
-}
-
-
-// Test størrelsen på billede er det rigtige(When done!)
-void Test_SizeOfCameraFIFO()
-{
-    ArduCAM camera;
-    uint32_t size = camera.read_fifo_length();
-    TEST_ASSERT_EQUAL(size, 8388607);
-    
 }
 
 void Test_CameraTest()
 {
-    CameraController::BeginCapture();
-    CameraController::StartTracking();
-    CameraController::ProceedTracking(39);
-    bool booll = CameraController::EndTracking(xCoor,yCoor);
-    TEST_IGNORE_MESSAGE(BoolToString(booll));
+    bool ballfoundtrue = CameraSetup();
+    TEST_ASSERT(ballfoundtrue);
 }
 
-inline const char * const BoolToString(bool b)
+bool CameraSetup()
 {
-  return b ? "true" : "false";
+    bool ballFound;
+    CameraController::BeginCapture();
+    for (int i = 9; i--;)
+    {
+        WaitTimer();
+    }
+
+    CameraController::StartTracking();
+    for (int i = 13; i--;)
+    {
+        CameraController::ProceedTracking(3);
+        WaitTimer();
+    }
+    ballFound = CameraController::EndTracking(xCoor, yCoor);
+    return ballFound;
+}
+
+inline void WaitTimer()
+{
+    timer = micros();
+    while (micros() < timer) { }
+    timer += 8000;
 }
