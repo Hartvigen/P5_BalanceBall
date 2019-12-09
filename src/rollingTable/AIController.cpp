@@ -1,5 +1,7 @@
 #include "AIController.h"
 
+#if CTRL_AI
+
 namespace RollingTable
 {
     double xEdge, yEdge;
@@ -74,3 +76,5 @@ namespace RollingTable
    double Edge(double x){return (x < 0 ? (1/exp(abs(x))) : (-1/exp(abs(x))));}
    double Cntr(double x){return 2/(1 + exp(-x)) - 1;}
 } // namespace RollingTable
+
+#endif
