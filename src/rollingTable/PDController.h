@@ -14,7 +14,7 @@
 
 namespace RollingTable
 {
-    class PDController 
+    class PDController
     {
         public:
             //Calculates the desired angles using PD controllers
