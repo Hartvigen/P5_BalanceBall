@@ -5,7 +5,7 @@ long currentTime = 0;
 int epoch = 1;
 int genSize = 500;
 int stillRunning;
-int triesPerEpoch = 5;
+int triesPerEpoch = 1;
 int tryNr = 1;
 
 float maxFitness;
@@ -18,6 +18,8 @@ Table bestTable, firstAlive;
 
 boolean runAI = false;
 boolean showBestElseFirstAlive = false;
+
+PrintWriter writer;
 
 
 void setup()
@@ -35,6 +37,11 @@ void initialize()
 {
   if (runAI)
   {
+    String[] lines = loadStrings("AIfit.txt");
+    writer = createWriter("AIfit.txt");
+    for (int i = 0; i < lines.length; i++) {
+      writer.println(lines[i]);  
+  }
     tables = new Table[genSize];
     
     int data = checkRun();
@@ -66,6 +73,12 @@ void initialize()
   }
   else
   {
+    String[] lines = loadStrings("PDfit.txt");
+    writer = createWriter("PDfit.txt");
+    for (int i = 0; i < lines.length; i++) {
+      writer.println(lines[i]);  
+  }
+  
     tables = new Table[] { new Table() };
     tables[0].brain = new PD();
   }
@@ -137,6 +150,8 @@ void nextEpoch()
   }
   else
   {
+    writer.println(bestTable.fitness);
+    writer.flush();
     bestTable.reset();
     bestTable.fitness = 0;
   }
