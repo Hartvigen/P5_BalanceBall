@@ -49,7 +49,6 @@ void draw()
   time = millis();
   
   drawTable();
-  println(millis());
 }
 
 void drawTable()

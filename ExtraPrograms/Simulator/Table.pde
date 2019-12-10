@@ -88,6 +88,8 @@ class Table
       angle += 2*PI;
 
     ball = new Ball(new PVector(ballx, bally), new PVector(-sin(angle)*speed, -cos(angle)*speed));
+    oldX = ball.center.x;
+    oldY = ball.center.y;
   }
   
   
@@ -103,16 +105,19 @@ class Table
     {
       decisionTime = currentTime + delayTime;
       
-      float currX = ball.center.x;
-      float currY = ball.center.y;
+      float currX = ball.center.x / (runAI ? halfWidth : 1);
+      float currY = ball.center.y / (runAI ? halfHeight : 1);
       
-      float velX = (currX - oldX) / delayTime;
-      float velY = (currY - oldY) / delayTime;
+      float velX = (ball.center.x - oldX) / delayTime / 0.1*mmToPx;
+      float velY = (ball.center.y - oldY) / delayTime / 0.1*mmToPx;
       
-      oldX = currX;
-      oldY = currY;
+      //float xEdge = ((currX < 0 ? halfWidth : -halfWidth) + currX) / halfWidth;
+      //float yEdge = ((currY < 0 ? halfHeight : -halfHeight) + currY) / halfHeight;
       
-      decision = brain.compute(currX, currY, velX, velY, (currX < 0 ? halfWidth : -halfWidth) + currX, (currY < 0 ? halfHeight : -halfHeight) + currY);
+      oldX = ball.center.x;
+      oldY = ball.center.y;
+      
+      decision = brain.compute(currX, currY, velX, velY); //, xEdge, yEdge //<>//
     } 
     else if (decisionTime < currentTime)
     {
@@ -217,14 +222,14 @@ class Table
   {
     // Ball and board
     noFill();
-    strokeWeight(2); //<>// //<>//
+    strokeWeight(2);
     rect(pos.x-halfWidth, pos.y-halfHeight, boardWidth, boardHeight);
     strokeWeight(1);
     
     //Inner green circle
     
     if(ball.center.mag() < 25*mmToPx)
-      fill(0,255,0); //<>//
+      fill(0,255,0);
     circle(pos.x, pos.y, 50*mmToPx);
     ball.show(pos);
     noFill();
