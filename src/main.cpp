@@ -7,9 +7,8 @@
 #include <SPI.h>
 
 //Declaration of Variables used for the tracking and tilting processes.
-int16_t xCo, yCo;
-bool ballFound;
-int8_t innerAng, outerAng;
+TiltResult tiltResult;
+TrackResult trackResult;
 
 //Variables used for timing the "loop" function.
 uint64_t startTime, endTime, timer;
@@ -37,6 +36,7 @@ inline void WaitTimer()
     while (micros() < timer) { }
     timer += 8000;
 }
+
 
 //Function initializes the Arduino board, and prepares all communication channels
 void initialize()
@@ -90,17 +90,17 @@ inline void loop()
         WaitTimer();
         MotorsController::Move();
     }
-    ballFound = CameraController::EndTracking(xCo, yCo);
+    trackResult = CameraController::EndTracking();
 
-    if (ballFound)
+    if (trackResult.ballFound)
     {
 #if CTRL_PD
-        PDController::RunPD(xCo, yCo, innerAng, outerAng);
+        tiltResult = PDController::RunPD(trackResult.xCoord, trackResult.yCoord);
 #elif CTRL_AI
-        AIController::RunNN(xCo, yCo, innerAng, outerAng);
+        tiltResult = AIController::RunNN(trackResult.xCoord, trackResult.yCoord);
 #endif
-        MotorsController::SetInnerAngle(innerAng);
-        MotorsController::SetOuterAngle(outerAng);
+        MotorsController::SetInnerAngle(tiltResult.innerAng);
+        MotorsController::SetOuterAngle(tiltResult.outerAng);
     }
     else
     {
@@ -118,11 +118,11 @@ inline void printInfo()
     Serial.print("Time: ");
     Serial.println((uint32_t)(endTime - startTime));
     Serial.print("Ball: ");
-    if (ballFound)
+    if (trackResult.ballFound)
     {
-        Serial.print(xCo);
+        Serial.print(trackResult.xCoord);
         Serial.print(" ");
-        Serial.println(yCo);
+        Serial.println(trackResult.yCoord);
     }
     else
     {
@@ -134,18 +134,18 @@ inline void printInfo()
     Serial.print(" Outer = ");
     Serial.println(MotorsController::GetOuterEncoder());
     Serial.print("Desired angles: Inner = ");
-    Serial.print(-innerAng);
+    Serial.print(-tiltResult.innerAng);
     Serial.print(" Outer = ");
-    Serial.println(outerAng);
+    Serial.println(tiltResult.outerAng);
 #elif INTF_RVIEWER
     SerialHelper::SendInt((int32_t)(endTime - startTime));
-    SerialHelper::SendInt((int32_t)ballFound);
-    SerialHelper::SendInt((int32_t)xCo);
-    SerialHelper::SendInt((int32_t)yCo);
+    SerialHelper::SendInt((int32_t)trackResult.ballFound);
+    SerialHelper::SendInt((int32_t)trackResult.xCoord);
+    SerialHelper::SendInt((int32_t)trackResult.yCoord);
     SerialHelper::SendInt(-(int32_t)MotorsController::GetInnerEncoder());
     SerialHelper::SendInt((int32_t)MotorsController::GetOuterEncoder());
-    SerialHelper::SendInt(-(int32_t)innerAng);
-    SerialHelper::SendInt((int32_t)outerAng);
+    SerialHelper::SendInt(-(int32_t)tiltResult.innerAng);
+    SerialHelper::SendInt((int32_t)tiltResult.outerAng);
 #endif
 }
 #endif

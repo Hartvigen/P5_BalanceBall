@@ -54,7 +54,7 @@ namespace RollingTable
             //Progress tracking process by "trackTimes" times
             static void ProceedTracking(uint16_t trackTimes);
             //End tracking process, and output xCo and yCo coordinates of ball.
-            static bool EndTracking(int16_t& xCo, int16_t& yCo);
+            static TrackResult EndTracking();
 
 #if USE_IMG_DIS
             static void SendImageToProcessing();

@@ -63,7 +63,7 @@ namespace RollingTable
 
         angleError = abs(angleError);
         
-        if (angleError <= 2)
+        if (angleError <= 1)
         {
             if (dir != 0)
             {
@@ -77,7 +77,7 @@ namespace RollingTable
             bank.motorRunUnlimited(
                 SH_Motor_Both, 
                 (dir > 0 ? SH_Direction_Forward : SH_Direction_Reverse), 
-                (angleError <= 3 ? speed/2 : speed)
+                (angleError <= 2 ? speed/2 : speed)
             );
         }
     }

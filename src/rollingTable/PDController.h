@@ -6,11 +6,11 @@
 
 #if CTRL_PD
 
-#define IN_KP 0.016
-#define OUT_KP 0.016
+#define IN_KP 0.025
+#define OUT_KP 0.025
 
-#define IN_KD 22
-#define OUT_KD 22
+#define IN_KD 30
+#define OUT_KD 30
 
 namespace RollingTable
 {
@@ -18,7 +18,7 @@ namespace RollingTable
     {
         public:
             //Calculates the desired angles using PD controllers
-            static void RunPD(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng);
+            static TiltResult RunPD(double xCo, double yCo);
     };
 }
 
