@@ -2,10 +2,13 @@ int framerate = 60;
 int timestep = 1000/framerate;
 long currentTime = 0;
 
+boolean runAI = true;
+boolean trainAI = false;
+
 int epoch = 1;
 int genSize = 500;
 int stillRunning;
-int triesPerEpoch = 5;
+int triesPerEpoch = trainAI ? 5 : 1;
 int tryNr = 1;
 
 float maxFitness = 0;
@@ -14,10 +17,8 @@ float mutationProbability = 0.15;
 
 PVector tablePos = new PVector(200, 250);
 Table[] tables;
-Table bestTable, firstAlive;
 
-boolean runAI = true;
-boolean trainAI = true;
+Table bestTable, firstAlive;
 boolean showBestElseFirstAlive = false;
 
 PrintWriter writer;
@@ -89,16 +90,16 @@ void initialize()
     float[][][] weights = new float[][][] 
     {
       {
-        { 0f, 0.20f,0f, 0.50f,0f },
-        { 0f, 0f,0.25f, 0f,0.55f },
+        { 0f, -0.2964024f,0.18378629f,-0.91938466f,0.36641848f },
+        { 0f, -0.021119785f,0.122923404f,0.65720594f,1.1896727f },
         
-        { 0f, 0.25f,0f, 0.50f,0f },
-        { 0f, 0f,0.20f, 0f,0.55f },
+        { 0f, 0.22569329f,0.10951537f,0.32479393f,-0.13010181f },
+        { 0f, 0.2584523f,0.26595068f,-0.23763365f,-0.13353215f },
       },
       
       {
-        { 0f, 0.7f,0f, 0.8f,0f, },
-        { 0f, 0f,0.7f, 0f,0.8f, },
+        { 0f, -0.44277257f,0.347226f,0.27664354f,0.2820416f },
+        { 0f, 0.057973266f,0.58700985f,-0.1832499f,0.2290406f },
       }
     };
     
@@ -374,8 +375,8 @@ void loadOutputLayer(InputStream input, float[][] weights)
   int data = 0;
   try {
     int neuronCount = 0;
-    while (data != 10 && data != 13 && neuronCount < 2)
-    { //<>// //<>//
+    while (data != 10 && data != 13 && neuronCount < 2) //<>//
+    { //<>//
       data = loadNeuron(input, weights[neuronCount]);
       
       data = input.read();
@@ -413,10 +414,10 @@ int loadNeuron(InputStream input, float[] weights)
       }
       try {
         weights[i] = float(weight);
-      }
-      catch(ArrayIndexOutOfBoundsException e) //<>// //<>//
-      {
-        e.printStackTrace(); //<>// //<>//
+      } //<>//
+      catch(ArrayIndexOutOfBoundsException e) //<>//
+      { //<>//
+        e.printStackTrace(); //<>//
       }
       weight = "";
       i++;
@@ -437,10 +438,10 @@ int checkRun()
     input.close();
   }
   catch(IOException e) {
-    e.printStackTrace();
-  } //<>// //<>//
-  return data;
-} //<>// //<>//
+    e.printStackTrace(); //<>//
+  } //<>//
+  return data; //<>//
+} //<>//
 
 void SaveWeightsToFolder(Table[] currentGen, int currentEpoch, float maxFitness)
 {

@@ -4,23 +4,34 @@
 
 namespace RollingTable
 {
-    double xPrev = 0, yPrev = 0;
+    double xPrev, yPrev;
+    bool firstTrack = true;
 
-    TiltResult PDController::RunPD(double xCo, double yCo)
+    TiltResult PDController::RunPD(TrackResult trackResult)
     {
-        TiltResult result;
+        TiltResult result = { 0, 0 };
+        if (!trackResult.ballFound)
+        {
+            firstTrack = true;
+            return result;
+        }
+
+        double xCo = trackResult.xCoord;
+        double yCo = trackResult.yCoord;
+        double xVel = (firstTrack ? (0 - xCo) : (xCo - xPrev)) / PERIOD;
+        double yVel = (firstTrack ? (0 - yCo) : (yCo - yPrev)) / PERIOD;
 
         double proportionalInner = IN_KP * xCo;
-        double derivativeInner   = IN_KD * (xCo - xPrev) / PERIOD;
+        double derivativeInner   = IN_KD * xVel;
 
         double proportionalOuter = OUT_KP * yCo;
-        double derivativeOuter   = OUT_KD * (yCo - yPrev) / PERIOD;
+        double derivativeOuter   = OUT_KD * yVel
 
         result.innerAng = (int8_t)(proportionalInner + derivativeInner);
         result.outerAng = -(int8_t)(proportionalOuter + derivativeOuter); // Motors are inverted
 
-        xPrev = xCo;
-        yPrev = yCo;
+        xPrev = trackResult.xCoord;
+        yPrev = trackResult.yCoord;
 
         return result;
     }
