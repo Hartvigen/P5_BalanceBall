@@ -18,7 +18,7 @@ namespace RollingTable
     {
         public:
             //Calculates the desired angles using PD controllers
-            static TiltResult RunPD(double xCo, double yCo);
+            static TiltResult RunPD(TrackResult trackResult);
     };
 }
 

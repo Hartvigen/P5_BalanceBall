@@ -91,23 +91,15 @@ inline void loop()
         MotorsController::Move();
     }
     trackResult = CameraController::EndTracking();
-
-    if (trackResult.ballFound)
-    {
+    
 #if CTRL_PD
-        tiltResult = PDController::RunPD(trackResult.xCoord, trackResult.yCoord);
+        tiltResult = PDController::RunPD(trackResult);
 #elif CTRL_AI
-        tiltResult = AIController::RunNN(trackResult.xCoord, trackResult.yCoord);
+        tiltResult = AIController::RunNN(trackResult);
 #endif
-        MotorsController::SetInnerAngle(tiltResult.innerAng);
-        MotorsController::SetOuterAngle(tiltResult.outerAng);
-    }
-    else
-    {
-        MotorsController::SetInnerAngle(0);
-        MotorsController::SetOuterAngle(0);
-    }
 
+    MotorsController::SetInnerAngle(tiltResult.innerAng);
+    MotorsController::SetOuterAngle(tiltResult.outerAng);
     WaitTimer();
 }
 

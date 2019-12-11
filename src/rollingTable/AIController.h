@@ -20,7 +20,7 @@ namespace RollingTable
             static double Tilt(double x);
         public:
             //Runs Neural network to get desired angle
-            static TiltResult RunNN(double xCo, double yCo);
+            static TiltResult RunNN(TrackResult trackResult);
     };
 }
 

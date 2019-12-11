@@ -14,15 +14,22 @@ namespace RollingTable
     double outputWeights[2][4] = {{1.8540885,0.5719164,-2.3648925,-0.9914899},
                                 {-1.2158763,1.7786465,-1.547747,0.8287909}};
 
-    double oldX, oldY;
+    double xPrev, yPrev;
     bool firstTrack = true;
 
-    TiltResult AIController::RunNN(double xCo, double yCo)
+    TiltResult AIController::RunNN(TrackResult trackResult)
     {
-        TiltResult result;
+        TiltResult result = { 0, 0 };
+        if (!trackResult.ballFound)
+        {
+            firstTrack = true;
+            return result;
+        }
 
-        double xVel = firstTrack ? (0 - xCo) / PERIOD : (xCo - oldX) / PERIOD;
-        double yVel = firstTrack ? (0 - yCo) / PERIOD : (yCo - oldY) / PERIOD;
+        double xCo = trackResult.xCoord;
+        double yCo = trackResult.yCoord;
+        double xVel = (firstTrack ? (0 - xCo) : (xCo - xPrev)) / PERIOD;
+        double yVel = (firstTrack ? (0 - yCo) : (yCo - yPrev)) / PERIOD;
         double input[] { xCo/HALF_WIDTH, yCo/HALF_HEIGHT, xVel/0.1, yVel/0.1 };
    
 
@@ -49,8 +56,8 @@ namespace RollingTable
         result.innerAng = -(output[0] * MAX_ANGLE); // Inner motors are inverted
         result.outerAng = (output[1] * MAX_ANGLE);
 
-        oldX = xCo;
-        oldY = yCo;
+        xPrev = xCo;
+        yPrev = yCo;
         firstTrack = false;
 
         return result;
