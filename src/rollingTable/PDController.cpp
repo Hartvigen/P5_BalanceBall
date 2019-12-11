@@ -30,8 +30,9 @@ namespace RollingTable
         result.innerAng = (int8_t)(proportionalInner + derivativeInner);
         result.outerAng = -(int8_t)(proportionalOuter + derivativeOuter); // Motors are inverted
 
-        xPrev = trackResult.xCoord;
-        yPrev = trackResult.yCoord;
+        xPrev = xCo
+        yPrev = xCo;
+        firstTrack = false;
 
         return result;
     }
