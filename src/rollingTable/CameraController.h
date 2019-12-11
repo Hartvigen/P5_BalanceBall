@@ -1,7 +1,7 @@
 #ifndef CAMERA_CONTROLLER_H_INCLUDE
 #define CAMERA_CONTROLLER_H_INCLUDE
 
-#include "Setup.h"
+#include "SystemSetup.h"
 
 #include <stdint.h>
 #include <Arduino.h>

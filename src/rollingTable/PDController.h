@@ -1,7 +1,7 @@
 #ifndef PD_CONTROLLER_H
 #define PD_CONTROLLER_H
 
-#include "Setup.h"
+#include "SystemSetup.h"
 #include <stdint.h>
 
 #if CTRL_PD

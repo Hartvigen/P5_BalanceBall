@@ -1,4 +1,4 @@
-#include "Setup.h"
+#include "SystemSetup.h"
 #if USE_IMG_DIS || INTF_RVIEWER
 
 #ifndef SERIAL_HELPER_H_INCLUDE

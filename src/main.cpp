@@ -13,7 +13,7 @@ TrackResult trackResult;
 //Variables used for timing the "loop" function.
 uint64_t startTime, endTime, timer;
 
-int Main()
+int main()
 {
     initialize();
     setup();
@@ -22,7 +22,7 @@ int Main()
 #if USE_IMG_DIS
     while (true)
         CameraController::SendImageToProcessing();
-#elif !CTRL_MANUAL
+#else
     timer = micros();
     while (true)
         loop();
@@ -93,9 +93,9 @@ inline void loop()
     trackResult = CameraController::EndTracking();
     
 #if CTRL_PD
-        tiltResult = PDController::RunPD(trackResult);
+    tiltResult = PDController::RunPD(trackResult);
 #elif CTRL_AI
-        tiltResult = AIController::RunNN(trackResult);
+    tiltResult = AIController::RunNN(trackResult);
 #endif
 
     MotorsController::SetInnerAngle(tiltResult.innerAng);

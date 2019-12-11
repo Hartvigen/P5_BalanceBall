@@ -9,9 +9,8 @@
 // How should the table be controlled
 #define CTRL_PD false
 #define CTRL_AI true
-#define CTRL_MANUAL false
 
-// How to send commands and recieve output
+// How to recieve info output
 #define INTF_TERMINAL false
 #define INTF_RVIEWER true
 

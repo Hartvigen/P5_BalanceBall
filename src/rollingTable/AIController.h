@@ -4,7 +4,7 @@
 #define HALF_WIDTH 65.5
 #define HALF_HEIGHT 59.5
 
-#include "Setup.h"
+#include "SystemSetup.h"
 #include <stdint.h>
 #include <Arduino.h>
 
