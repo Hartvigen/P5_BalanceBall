@@ -107,7 +107,7 @@ inline void loop()
         MotorsController::SetInnerAngle(0);
         MotorsController::SetOuterAngle(0);
     }
-
+    //printInfo();
     WaitTimer();
 }
 

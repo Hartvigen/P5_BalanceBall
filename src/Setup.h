@@ -13,7 +13,7 @@
 
 // How to send commands and recieve output
 #define INTF_TERMINAL false
-#define INTF_RVIEWER true
+#define INTF_RVIEWER false
 
 // Here because used multiple places
 #define MAX_ANGLE (int8_t)5
