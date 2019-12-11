@@ -1,5 +1,5 @@
 #ifndef UNIT_TEST
-#include "main.h"
+#include "Main.h"
 
 #include <stdint.h>
 #include <Arduino.h>
@@ -13,7 +13,7 @@ TrackResult trackResult;
 //Variables used for timing the "loop" function.
 uint64_t startTime, endTime, timer;
 
-int main()
+int Main()
 {
     initialize();
     setup();
