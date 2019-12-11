@@ -25,7 +25,7 @@ namespace RollingTable
         double derivativeInner   = IN_KD * xVel;
 
         double proportionalOuter = OUT_KP * yCo;
-        double derivativeOuter   = OUT_KD * yVel
+        double derivativeOuter   = OUT_KD * yVel;
 
         result.innerAng = (int8_t)(proportionalInner + derivativeInner);
         result.outerAng = -(int8_t)(proportionalOuter + derivativeOuter); // Motors are inverted
