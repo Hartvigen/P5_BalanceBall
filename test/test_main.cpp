@@ -37,7 +37,7 @@ void setup()
     
 }
 
-int main()
+int Main()
 {
     
     initialize();

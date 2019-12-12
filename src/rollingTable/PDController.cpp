@@ -4,23 +4,37 @@
 
 namespace RollingTable
 {
-    double proportionalInner = 0, proportionalOuter = 0;
-    double derivativeInner = 0, derivativeOuter = 0;
-    double xPrev = 0, yPrev = 0;
+    double xPrev, yPrev;
+    bool firstTrack = true;
 
-    void PDController::RunPD(double xCo, double yCo, int8_t &innerAng, int8_t &outerAng)
+    TiltResult PDController::RunPD(TrackResult trackResult)
     {
-        proportionalInner = IN_KP * xCo;
-        derivativeInner   = IN_KD * (xCo - xPrev) / PERIOD;
+        TiltResult result = { 0, 0 };
+        if (!trackResult.ballFound)
+        {
+            firstTrack = true;
+            return result;
+        }
 
-        proportionalOuter = OUT_KP * yCo;
-        derivativeOuter   = OUT_KD * (yCo - yPrev) / PERIOD;
+        double xCo = trackResult.xCoord;
+        double yCo = trackResult.yCoord;
+        double xVel = (firstTrack ? (0 - xCo) : (xCo - xPrev)) / PERIOD;
+        double yVel = (firstTrack ? (0 - yCo) : (yCo - yPrev)) / PERIOD;
 
-        innerAng = (int8_t)(proportionalInner + derivativeInner);
-        outerAng = -(int8_t)(proportionalOuter + derivativeOuter); // Motors are inverted
+        double proportionalInner = IN_KP * xCo;
+        double derivativeInner   = IN_KD * xVel;
 
-        xPrev = xCo;
-        yPrev = yCo;
+        double proportionalOuter = OUT_KP * yCo;
+        double derivativeOuter   = OUT_KD * yVel;
+
+        result.innerAng = (int8_t)(proportionalInner + derivativeInner);
+        result.outerAng = -(int8_t)(proportionalOuter + derivativeOuter); // Motors are inverted
+
+        xPrev = xCo
+        yPrev = xCo;
+        firstTrack = false;
+
+        return result;
     }
 }
 

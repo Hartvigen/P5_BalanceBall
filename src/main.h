@@ -1,5 +1,5 @@
 #ifndef UNIT_TEST
-#include "Setup.h"
+#include "SystemSetup.h"
 
 #if USE_IMG_DIS || INTF_RVIEWER
 #include "Serial/SerialHelper.h"

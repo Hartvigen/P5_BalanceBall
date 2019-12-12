@@ -1,7 +1,7 @@
 #ifndef MOTORS_CONTROLLER_H_INCLUDE
 #define MOTORS_CONTROLLER_H_INCLUDE
 
-#include "Setup.h"
+#include "SystemSetup.h"
 #include <stdint.h>
 #include <NXShield.h>
 

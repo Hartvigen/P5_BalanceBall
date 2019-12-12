@@ -40,7 +40,7 @@ class PD implements Brain
     outputInner = proportionalInner + integralInner + derivativeInner;
     outputOuter = proportionalOuter + integralOuter + derivativeOuter;
     
-    return new PVector((float)outputInner, (float)outputOuter);
+    return new PVector((float)outputInner, (float)outputOuter); //<>//
   }
 }
 
@@ -52,7 +52,7 @@ Cntr cntr = new Cntr();
     
 class AI implements Brain
 {
-  Neuron[] input = new Neuron[] { new Neuron(), new Neuron(), new Neuron(), new Neuron(), new Neuron(), new Neuron() };
+  Neuron[] input = new Neuron[] { new Neuron(), new Neuron(), new Neuron(), new Neuron() }; //, new Neuron(), new Neuron()
   Neuron[] hl1;
   Neuron[] output;
 
@@ -165,7 +165,7 @@ class Neuron
 
     inputCount = inputs.length;
     for (int i = 0; i < inputCount; i++)
-      weights[i] = random(2) - 1;
+      weights[i] = random(0.4) + 0.3;
     
     bias = 0; // random(2) - 1;
   }
@@ -197,7 +197,8 @@ class Neuron
   {
     float sum = bias;
     for (int i = 0; i < inputCount; i++)
-      sum += weights[i] * inputs[i].output;
+      if (abs(weights[i]) >= 0.00001 && abs(inputs[i].output) >= 0.00001)
+        sum += weights[i] * inputs[i].output;
 
     output = func.compute(sum);
   }

@@ -126,17 +126,24 @@ namespace RollingTable
     }
 
     //Concludes the tracking by extracting the
-    bool CameraController::EndTracking(int16_t &xCo, int16_t &yCo)
+    TrackResult CameraController::EndTracking()
     {
+        TrackResult result;
+
         if (pointsAveraged != 0 && pointsAveraged <= MAX_AVERAGED_POINTS)
         {
-            xCo = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH / 2);
-            yCo = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT / 2);
-            return true;
+            result.xCoord = (int16_t)round(avgX) - (int16_t)(IMAGE_WIDTH / 2);
+            result.yCoord = (int16_t)round(avgY) - (int16_t)(IMAGE_HEIGHT / 2);
+            result.ballFound = true;
         }
-
-        xCo = yCo = 0;
-        return false;
+        else
+        {
+            result.xCoord = 0;
+            result.yCoord = 0;
+            result.ballFound = false;
+        }
+        
+        return result;
     }
 
     #if USE_IMG_DIS

@@ -7,7 +7,7 @@ class Tilt implements ActivationFunction
 {
   float compute(float x)
   {
-    return 1/1.25*x;
+    return x;
   }
 }
 
@@ -15,7 +15,7 @@ class Edge implements ActivationFunction
 {
   float compute(float x)
   {
-    return x < 0 ? (1/exp(abs(x))) : (-1/exp(abs(x)));
+    return pow(x,3);
   }
 }
 
@@ -23,7 +23,7 @@ class Cntr implements ActivationFunction
 {
   float compute(float x)
   {
-    return 2/(1+exp(-x))-1;
+    return 2/(1+exp(-5*x))-1;
   }
 }
 
