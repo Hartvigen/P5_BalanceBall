@@ -89,18 +89,17 @@ void initialize()
     
     float[][][] weights = new float[][][] 
     {
-      {
-        { 0f, -0.2964024f,0.18378629f,-0.91938466f,0.36641848f },
-        { 0f, -0.021119785f,0.122923404f,0.65720594f,1.1896727f },
+      {  
+        {0f, -0.26396087, 0.17738606,-1.04795900, 0.30522442},
+        {0f, -0.09836733, 0.16733426, 0.85635210, 1.41451500},
         
-        { 0f, 0.22569329f,0.10951537f,0.32479393f,-0.13010181f },
-        { 0f, 0.2584523f,0.26595068f,-0.23763365f,-0.13353215f },
+        {0f, -0.06680263, 0.01970565,-0.15914561,-0.05600453},
+        {0f,  0.37515295,-0.08730203,-0.49338546,-0.56916930},
       },
-      
       {
-        { 0f, -0.44277257f,0.347226f,0.27664354f,0.2820416f },
-        { 0f, 0.057973266f,0.58700985f,-0.1832499f,0.2290406f },
-      }
+        {0f, -0.37129474, 0.36047890, 0.20418686, 0.61584735},
+        {0f,  0.03696144, 0.51748920,-0.10813793, 0.16429268},
+      },
     };
     
     tables = new Table[] { new Table() };
@@ -376,7 +375,7 @@ void loadOutputLayer(InputStream input, float[][] weights)
   try {
     int neuronCount = 0;
     while (data != 10 && data != 13 && neuronCount < 2) //<>//
-    { //<>//
+    { //<>// //<>//
       data = loadNeuron(input, weights[neuronCount]);
       
       data = input.read();
@@ -415,9 +414,9 @@ int loadNeuron(InputStream input, float[] weights)
       try {
         weights[i] = float(weight);
       } //<>//
-      catch(ArrayIndexOutOfBoundsException e) //<>//
+      catch(ArrayIndexOutOfBoundsException e) //<>// //<>//
       { //<>//
-        e.printStackTrace(); //<>//
+        e.printStackTrace(); //<>// //<>//
       }
       weight = "";
       i++;
@@ -439,9 +438,9 @@ int checkRun()
   }
   catch(IOException e) {
     e.printStackTrace(); //<>//
-  } //<>//
+  } //<>// //<>//
   return data; //<>//
-} //<>//
+} //<>// //<>//
 
 void SaveWeightsToFolder(Table[] currentGen, int currentEpoch, float maxFitness)
 {

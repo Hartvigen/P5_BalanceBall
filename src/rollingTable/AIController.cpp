@@ -4,15 +4,16 @@
 
 namespace RollingTable
 {
-    double hlOut[4];
-    double hlWeights[4][4] = {{1.2491459,-1.6336393,2.5097566,-2.648139},
-                            {1.5949479,0.39890862,1.1823832,2.4798512},
-                            {-2.9181266,-1.4038169,-1.7521994,-2.4527593}, 
-                            {-2.9856622,3.150909,-2.0548623,1.9108675}};
-
-    double output[2];
-    double outputWeights[2][4] = {{1.8540885,0.5719164,-2.3648925,-0.9914899},
-                                {-1.2158763,1.7786465,-1.547747,0.8287909}};
+    double hlWeights[4][4] = {  
+        {-0.26396087, 0.17738606,-1.04795900, 0.30522442},
+        {-0.09836733, 0.16733426, 0.85635210, 1.41451500},
+        {-0.06680263, 0.01970565,-0.15914561,-0.05600453},
+        { 0.37515295,-0.08730203,-0.49338546,-0.56916930},
+    };
+    double outputWeights[2][4] = {
+        {-0.37129474, 0.36047890, 0.20418686, 0.61584735},
+        { 0.03696144, 0.51748920,-0.10813793, 0.16429268},
+    };
 
     double xPrev, yPrev;
     bool firstTrack = true;
@@ -20,8 +21,7 @@ namespace RollingTable
     TiltResult AIController::RunNN(TrackResult trackResult)
     {
         TiltResult result = { 0, 0 };
-        if (!trackResult.ballFound)
-        {
+        if (!trackResult.ballFound) {
             firstTrack = true;
             return result;
         }
@@ -31,27 +31,25 @@ namespace RollingTable
         double xVel = (firstTrack ? (0 - xCo) : (xCo - xPrev)) / PERIOD;
         double yVel = (firstTrack ? (0 - yCo) : (yCo - yPrev)) / PERIOD;
         double input[] { xCo/HALF_WIDTH, yCo/HALF_HEIGHT, xVel/0.1, yVel/0.1 };
-   
 
-        for (int i = 0; i < 4; i++)
+        double hlOut[4] = { 0,0,0,0 };
+        for (int i = 0; i < 4; i++) 
         {
             for (int j = 0; j < 4; j++)
                 hlOut[i] += hlWeights[i][j] * input[j];
             
-            if(i < 2)
-                hlOut[i] = Cntr(hlOut[i]);
-            else
-                hlOut[i] = Edge(hlOut[i]);
+            if (i<2) hlOut[i] = C(hlOut[i]);
+            else     hlOut[i] = E(hlOut[i]);
         }
 
-        for (int i = 0; i < 2; i++)
+        double output[2] = { 0,0 };
+        for (int i = 0; i < 2; i++) 
         {
             for (int j = 0; j < 4; j++)
                 output[i] += outputWeights[i][j] * hlOut[j];
             
-            output[i] = Tilt(output[i]);
+            output[i] = T(output[i]);
         }
-
 
         result.innerAng = -(output[0] * MAX_ANGLE); // Inner motors are inverted
         result.outerAng = (output[1] * MAX_ANGLE);
@@ -63,9 +61,9 @@ namespace RollingTable
         return result;
     }
 
-    double AIController::Tilt(double x){return x;}
-    double AIController::Edge(double x){return pow(x,3);}
-    double AIController::Cntr(double x){return 2/(1 + exp(-5*x)) - 1;}
+    inline double AIController::T(double x) {return x;}
+    inline double AIController::E(double x) {return pow(x,3);}
+    inline double AIController::C(double x) {return 2/(1 + exp(-5*x)) - 1;}
 } // namespace RollingTable
 
 #endif
