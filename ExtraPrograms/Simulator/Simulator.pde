@@ -245,7 +245,7 @@ AI getParent()
 void drawInfo()
 {
   fill(200);
-  rect(-1, -1, width+1, runAI ? 65 : 45);
+  rect(-1, -1, width+1, runAI && trainAI ? 65 : 35);
   fill(0);
   
   if (runAI && trainAI)
@@ -260,9 +260,8 @@ void drawInfo()
   else
   {
     text("Variant:   " + (runAI ? "AI" : "PD"), 5, 10);
-    text("Try nr.:   " + tryNr + "/" + triesPerEpoch, 5, 20);
-    text("Max fit:   " + bestTable.fitness, 5, 30);
-    text("Live-time: " + bestTable.aliveTime, 5, 40);
+    text("Fitness:   " + bestTable.fitness, 5, 20);
+    text("Live-time: " + bestTable.aliveTime, 5, 30);
   }
 }
 
@@ -375,8 +374,8 @@ void loadOutputLayer(InputStream input, float[][] weights)
   try {
     int neuronCount = 0;
     while (data != 10 && data != 13 && neuronCount < 2) //<>//
-    { //<>// //<>//
-      data = loadNeuron(input, weights[neuronCount]);
+    { //<>//
+      data = loadNeuron(input, weights[neuronCount]); //<>//
       
       data = input.read();
       neuronCount++;
@@ -414,10 +413,10 @@ int loadNeuron(InputStream input, float[] weights)
       try {
         weights[i] = float(weight);
       } //<>//
-      catch(ArrayIndexOutOfBoundsException e) //<>// //<>//
-      { //<>//
-        e.printStackTrace(); //<>// //<>//
-      }
+      catch(ArrayIndexOutOfBoundsException e) //<>//
+      { //<>// //<>//
+        e.printStackTrace(); //<>//
+      } //<>//
       weight = "";
       i++;
     }
@@ -438,10 +437,10 @@ int checkRun()
   }
   catch(IOException e) {
     e.printStackTrace(); //<>//
-  } //<>// //<>//
-  return data; //<>//
-} //<>// //<>//
-
+  } //<>//
+  return data; //<>// //<>//
+} //<>//
+ //<>//
 void SaveWeightsToFolder(Table[] currentGen, int currentEpoch, float maxFitness)
 {
   String file = "weights\\weights" + epoch/5 + ".txt";

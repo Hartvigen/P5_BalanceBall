@@ -30,39 +30,38 @@ namespace RollingTable
         double yCo = trackResult.yCoord;
         double xVel = (firstTrack ? (0 - xCo) : (xCo - xPrev)) / PERIOD;
         double yVel = (firstTrack ? (0 - yCo) : (yCo - yPrev)) / PERIOD;
-        double input[] { xCo/HALF_WIDTH, yCo/HALF_HEIGHT, xVel/0.1, yVel/0.1 };
+        double input[4] { xCo/HALF_WIDTH, yCo/HALF_HEIGHT, xVel/0.1, yVel/0.1 };
 
         double hlOut[4] = { 0,0,0,0 };
-        for (int i = 0; i < 4; i++) 
+        for (uint8_t i = 0; i < 4; i++) 
         {
-            for (int j = 0; j < 4; j++)
+            for (uint8_t j = 0; j < 4; j++)
                 hlOut[i] += hlWeights[i][j] * input[j];
             
-            if (i<2) hlOut[i] = C(hlOut[i]);
-            else     hlOut[i] = E(hlOut[i]);
+            hlOut[i] = (i<2) ? C(hlOut[i]) : E(hlOut[i]);
         }
 
         double output[2] = { 0,0 };
-        for (int i = 0; i < 2; i++) 
+        for (uint8_t i = 0; i < 2; i++) 
         {
-            for (int j = 0; j < 4; j++)
+            for (uint8_t j = 0; j < 4; j++)
                 output[i] += outputWeights[i][j] * hlOut[j];
             
             output[i] = T(output[i]);
         }
 
-        result.innerAng = -(output[0] * MAX_ANGLE); // Inner motors are inverted
-        result.outerAng = (output[1] * MAX_ANGLE);
-
         xPrev = xCo;
         yPrev = yCo;
         firstTrack = false;
+
+        result.innerAng = -(output[0] * MAX_ANGLE); // Inner motors are inverted
+        result.outerAng = (output[1] * MAX_ANGLE);
 
         return result;
     }
 
     inline double AIController::T(double x) {return x;}
-    inline double AIController::E(double x) {return pow(x,3);}
+    inline double AIController::E(double x) {return x*x*x;}
     inline double AIController::C(double x) {return 2/(1 + exp(-5*x)) - 1;}
 } // namespace RollingTable
 

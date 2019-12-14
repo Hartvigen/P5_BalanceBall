@@ -1,11 +1,6 @@
 #ifndef UNIT_TEST
 #include "Main.h"
 
-#include <stdint.h>
-#include <Arduino.h>
-#include <ArduCAM.h>
-#include <SPI.h>
-
 //Declaration of Variables used for the tracking and tilting processes.
 TiltResult tiltResult;
 TrackResult trackResult;
@@ -19,7 +14,7 @@ int main()
     setup();
 
 //See "Setup.h" for explanation of values used in pre-processor directive.
-#if USE_IMG_DIS
+#if OUTPUT_IMAGE
     while (true)
         CameraController::SendImageToProcessing();
 #else
@@ -51,18 +46,18 @@ void initialize()
     while (Serial.available() > 0)
         Serial.read();
     delay(1000);
-
-//If desired, starts communication with viewing program.
-#if INTF_RVIEWER || USE_IMG_DIS
-    SerialHelper::SendInt(IMAGE_HEIGHT);
-    SerialHelper::SendInt(IMAGE_WIDTH);
-    SerialHelper::SendInt(MAX_ANGLE);
-#endif
 }
 
 //Function initializes controllers.
 void setup()
 {
+    //If desired, start communication with viewing program.
+#if INTF_RVIEWER || OUTPUT_IMAGE
+    SerialHelper::SendInt(IMAGE_HEIGHT);
+    SerialHelper::SendInt(IMAGE_WIDTH);
+    SerialHelper::SendInt(MAX_ANGLE);
+#endif
+
     CameraController::Init(CAM_SLAVE_PIN, 4, 8, 4);
     MotorsController::Init();
 }

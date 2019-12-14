@@ -3,16 +3,16 @@
 
 #include <stdint.h>
 
-// Testing of image output
-#define USE_IMG_DIS false
+// If system should output image and tracking data
+#define OUTPUT_IMAGE false
 
-// How should the table be controlled
-#define CTRL_PD false
-#define CTRL_AI true
-
-// How to recieve info output
+// Where to output status info
 #define INTF_TERMINAL false
 #define INTF_RVIEWER true
+
+// What policy to use for decision making
+#define CTRL_PD false
+#define CTRL_AI true
 
 // Here because used multiple places
 #define MAX_ANGLE (int8_t)5

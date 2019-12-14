@@ -22,7 +22,7 @@ void initialize()
     delay(1000);
 
 //If desired, starts communication with viewing program.
-#if INTF_RVIEWER || USE_IMG_DIS
+#if INTF_RVIEWER || OUTPUT_IMAGE
     SerialHelper::SendInt(IMAGE_HEIGHT);
     SerialHelper::SendInt(IMAGE_WIDTH);
     SerialHelper::SendInt(MAX_ANGLE);

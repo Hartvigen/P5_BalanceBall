@@ -1,7 +1,7 @@
 #ifndef UNIT_TEST
 #include "SystemSetup.h"
 
-#if USE_IMG_DIS || INTF_RVIEWER
+#if OUTPUT_IMAGE || INTF_RVIEWER
 #include "Serial/SerialHelper.h"
 #endif
 

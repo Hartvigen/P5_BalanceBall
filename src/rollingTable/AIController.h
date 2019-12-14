@@ -2,7 +2,6 @@
 #define AI_CONTROLLER_H
 
 #include "SystemSetup.h"
-#include <stdint.h>
 #include <Arduino.h>
 
 #if CTRL_AI

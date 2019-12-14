@@ -1,6 +1,6 @@
 #include "SerialHelper.h"
 
-#if USE_IMG_DIS || INTF_RVIEWER
+#if OUTPUT_IMAGE || INTF_RVIEWER
 void SerialHelper::AwaitSignal()
 {
     while (!Serial.available()) { delay(2); }
@@ -21,7 +21,7 @@ void SerialHelper::SendInt(int32_t value)
         (uint8_t)(value >> 16),
         (uint8_t)(value >> 24)
     };
-
+    
     Serial.write(bytes, 4);
 }
 #endif

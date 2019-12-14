@@ -146,7 +146,7 @@ namespace RollingTable
         return result;
     }
 
-    #if USE_IMG_DIS
+    #if OUTPUT_IMAGE
     //Function is used to send image to a processing program capable of displaying it.
     void CameraController::SendImageToProcessing()
     {
@@ -167,7 +167,6 @@ namespace RollingTable
         SPI.transfer(0x00); // Skip dummy byte
 
         SkipRows(TOP_MARGIN);
-        //Sends an entire row of pixels to Processing.
         for (uint16_t row = 0; row < IMAGE_HEIGHT; row++)
         {
             SkipColumns(LEFT_MARGIN);
@@ -181,7 +180,7 @@ namespace RollingTable
                 bytes[col * 3 + 2] = ((c565 >> 11) & 0x1F); // B
 
                 //Since the entire image is sent to processing, then the number of tracked points
-                //can exceed the desired limit as time is not a factor.
+                //may exceed the desired limit as time is not a factor.
                 if (row % (ROW_SKIP_COUNT + 1) == 0 &&
                     bytes[col * 3 + 0] < limitR && bytes[col * 3 + 1] < limitG && bytes[col * 3 + 2] < limitB)
                 {

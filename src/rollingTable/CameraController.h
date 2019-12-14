@@ -8,7 +8,7 @@
 #include <ArduCAM.h>
 #include <SPI.h>
 
-#if USE_IMG_DIS
+#if OUTPUT_IMAGE
 #include "Serial/SerialHelper.h"
 #endif
 
@@ -56,7 +56,7 @@ namespace RollingTable
             //End tracking process, and output xCo and yCo coordinates of ball.
             static TrackResult EndTracking();
 
-#if USE_IMG_DIS
+#if OUTPUT_IMAGE
             static void SendImageToProcessing();
 #endif
     };
