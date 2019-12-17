@@ -77,8 +77,8 @@ class Table
     else
     {
       mod = (halfHeight-ballRadius-3)/halfHeight;
-      ballx = (round(random(1))*boardHeight - halfHeight) * mod;
-      bally = (random(boardHeight) - halfHeight) * mod;
+      bally = (round(random(1))*boardHeight - halfHeight) * mod;
+      ballx = (random(boardHeight) - halfHeight) * mod;
     }
 
     // Find starting velocity
@@ -111,13 +111,10 @@ class Table
       float velX = (ball.center.x - oldX) / delayTime / 0.1*mmToPx;
       float velY = (ball.center.y - oldY) / delayTime / 0.1*mmToPx;
       
-      //float xEdge = ((currX < 0 ? halfWidth : -halfWidth) + currX) / halfWidth;
-      //float yEdge = ((currY < 0 ? halfHeight : -halfHeight) + currY) / halfHeight;
-      
       oldX = ball.center.x;
       oldY = ball.center.y;
       
-      decision = brain.compute(currX, currY, velX, velY); //, xEdge, yEdge //<>//
+      decision = brain.compute(currX, currY, velX, velY); //<>//
     } 
     else if (decisionTime < currentTime)
     {
@@ -160,44 +157,23 @@ class Table
   
   void updateTilt()
   {
+    float innerDiff = desiredInner - angleInner;
+    float innerVel = abs(innerDiff) <= 2 ? degreeVelocity/2 : degreeVelocity;
     
-    float xDiff = desiredInner - angleInner;
-    float innerVel = abs(xDiff) <= 2 ? degreeVelocity/2 : degreeVelocity;
-    
-    if (abs(xDiff) <= 1) {}
-    else if (abs(xDiff) > innerVel) 
-    {
-      if (xDiff < 0 && angleInner - innerVel >= -maxAngle)
+    if (abs(innerDiff) <= 1) {}
+    else if (innerDiff < 0 && angleInner - innerVel >= -maxAngle)
         angleInner -= innerVel;
-      else if (xDiff > 0 && angleInner + innerVel <= maxAngle)
-        angleInner += innerVel;
-    } 
-    else
-    {
-      if (-maxAngle <= angleInner - xDiff && angleInner + xDiff <= maxAngle)
-        angleInner += xDiff;
-      else
-        angleInner = maxAngle;
-    }
+    else if (innerDiff > 0 && angleInner + innerVel <= maxAngle)
+      angleInner += innerVel;
 
-    float yDiff = desiredOuter - angleOuter;
-    float outerVel = abs(yDiff) <= 2 ? degreeVelocity/2 : degreeVelocity;
+    float outerDiff = desiredOuter - angleOuter;
+    float outerVel = abs(outerDiff) <= 2 ? degreeVelocity/2 : degreeVelocity;
     
-    if (abs(yDiff) <= 1) {}
-    else if (abs(yDiff) > outerVel) 
-    {
-      if (yDiff < 0 && angleOuter - outerVel >= -maxAngle)
-        angleOuter -= outerVel;
-      else if (yDiff > 0 && angleOuter + outerVel <= maxAngle)
-        angleOuter += outerVel;
-    } 
-    else
-    {
-      if (-maxAngle <= angleOuter - yDiff && angleOuter + yDiff <= maxAngle)
-        angleOuter += yDiff;
-      else
-        angleOuter = maxAngle;
-    }
+    if (abs(outerDiff) <= 1) {}
+    else if (outerDiff < 0 && angleOuter - outerVel >= -maxAngle)
+      angleOuter -= outerVel;
+    else if (outerDiff > 0 && angleOuter + outerVel <= maxAngle)
+      angleOuter += outerVel;
   }
 
   PVector getAcceleration()

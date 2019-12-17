@@ -2,7 +2,7 @@ int framerate = 60;
 int timestep = 1000/framerate;
 long currentTime = 0;
 
-boolean runAI = true;
+boolean runAI = false;
 boolean trainAI = false;
 
 int epoch = 1;
@@ -190,12 +190,12 @@ void mutate()
     newTables[i] = new Table(getParent().getChild(getParent()));
     ((AI)newTables[i].brain).mutate(mutationRate, mutationProbability);
   }
-  newTables[0].fitness = 0;
-  newTables[0].reset();
   
   for (int i = genSize - 50; i < genSize; i++)
     newTables[i] = new Table();
   
+  tables[0].fitness = 0;
+  tables[0].reset();
   tables = newTables;
 
   if (epoch % 5 == 0)
@@ -225,9 +225,6 @@ AI getParent()
   float fitnessSum = 0f;
   for (Table t : tables)
     fitnessSum += t.fitness;
-    
-  if (fitnessSum == 0)
-    return (AI)tables[int(random(0, 19))].brain;
     
   float probability = random(0f, fitnessSum);
   float runningSum = 0f;

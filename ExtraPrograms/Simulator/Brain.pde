@@ -45,6 +45,7 @@ class PD implements Brain
 }
 
 // ================================================================================================================================
+
 Tilt tilt = new Tilt();
 Edge edge = new Edge();
 Cntr cntr = new Cntr();
@@ -52,7 +53,7 @@ Cntr cntr = new Cntr();
     
 class AI implements Brain
 {
-  Neuron[] input = new Neuron[] { new Neuron(), new Neuron(), new Neuron(), new Neuron() }; //, new Neuron(), new Neuron()
+  Neuron[] input = new Neuron[] { new Neuron(), new Neuron(), new Neuron(), new Neuron() };
   Neuron[] hl1;
   Neuron[] output;
 
@@ -65,8 +66,6 @@ class AI implements Brain
     hl1 = new Neuron[] {
       new Neuron(cntr, input),
       new Neuron(cntr, input),
-      //new Neuron(relu, input),
-      //new Neuron(relu, input),
       new Neuron(edge, input),
       new Neuron(edge, input),
     };
@@ -83,12 +82,10 @@ class AI implements Brain
   AI(float[][][] weights)
   {
     hl1 = new Neuron[] {
-      new Neuron(cntr, input, weights[0][0]), 
-      new Neuron(cntr, input, weights[0][1]), 
-      //new Neuron(cntr, input, weights[0][2]), 
-      //new Neuron(cntr, input, weights[0][3]), 
-      new Neuron(edge, input, weights[0][2]), // 4
-      new Neuron(edge, input, weights[0][3]), // 5
+      new Neuron(cntr, input, weights[0][0]),
+      new Neuron(cntr, input, weights[0][1]),
+      new Neuron(edge, input, weights[0][2]),
+      new Neuron(edge, input, weights[0][3]),
     };
 
     output = new Neuron[] {
@@ -161,13 +158,11 @@ class Neuron
 
   Neuron(ActivationFunction _func, Neuron[] _inputs)
   {
-    this(_func, _inputs, new float[_inputs.length], 1f);
+    this(_func, _inputs, new float[_inputs.length], 0f);
 
     inputCount = inputs.length;
     for (int i = 0; i < inputCount; i++)
       weights[i] = random(0.4) + 0.3;
-    
-    bias = 0; // random(2) - 1;
   }
 
   Neuron(ActivationFunction _func, Neuron[] _inputs, float[] _weights, float _bias)
