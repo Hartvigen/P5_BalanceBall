@@ -18,7 +18,7 @@ int main()
     while (true)
         CameraController::SendImageToProcessing();
 #else
-    timer = micros();
+    WaitTimer();
     while (true)
         loop();
 #endif
