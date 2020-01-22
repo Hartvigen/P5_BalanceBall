@@ -79,9 +79,9 @@ inline void loop()
     }
 
     CameraController::StartTracking();
-    for (int i = 13; i--;)
+    for (int i = 4; i--;)
     {
-        CameraController::ProceedTracking(3);
+        CameraController::ProceedTracking(5);
         WaitTimer();
         MotorsController::Move();
     }

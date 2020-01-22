@@ -16,10 +16,10 @@ namespace RollingTable
             return result;
         }
 
-        double xCo = trackResult.xCoord;
-        double yCo = trackResult.yCoord;
-        double xVel = (firstTrack ? (0 - xCo) : (xCo - xPrev)) / PERIOD;
-        double yVel = (firstTrack ? (0 - yCo) : (yCo - yPrev)) / PERIOD;
+        double xCo = trackResult.xCoord*2;
+        double yCo = trackResult.yCoord*2;
+        double xVel = (firstTrack ? 0 : (xCo - xPrev)) / PERIOD;
+        double yVel = (firstTrack ? 0 : (yCo - yPrev)) / PERIOD;
 
         double proportionalInner = IN_KP * xCo;
         double derivativeInner   = IN_KD * xVel;

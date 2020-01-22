@@ -11,12 +11,12 @@
 #define INTF_RVIEWER true
 
 // What policy to use for decision making
-#define CTRL_PD false
-#define CTRL_AI true
+#define CTRL_PD true
+#define CTRL_AI false 
 
 // Here because used multiple places
 #define MAX_ANGLE (int8_t)5
-#define PERIOD 184
+#define PERIOD 112
 
 struct {
     int8_t innerAng;
